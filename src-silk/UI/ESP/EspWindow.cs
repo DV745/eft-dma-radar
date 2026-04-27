@@ -648,10 +648,10 @@ namespace eft_dma_radar.Silk.UI.ESP
             // Health fill
             float healthPct = player.HealthStatus switch
             {
-                EHealthStatus.Healthy => 1f,
-                EHealthStatus.Injured => 0.65f,
-                EHealthStatus.BadlyInjured => 0.35f,
-                EHealthStatus.Dying => 0.15f,
+                PlayerHealthStatus.Healthy => 1f,
+                PlayerHealthStatus.Injured => 0.65f,
+                PlayerHealthStatus.BadlyInjured => 0.35f,
+                PlayerHealthStatus.Dying => 0.15f,
                 _ => 1f,
             };
 

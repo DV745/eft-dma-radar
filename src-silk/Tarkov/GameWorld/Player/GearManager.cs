@@ -185,10 +185,11 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
                     if (SkipSlots.Contains(slotName))
                         continue;
 
-                    // Secure container — only record name, don't add value
-                    if (slotName.Equals(SecureSlot, StringComparison.OrdinalIgnoreCase))
+                    // Secure container and melee — only record name, don't add value
+                    if (slotName.Equals(SecureSlot, StringComparison.OrdinalIgnoreCase) ||
+                        slotName.Equals("Scabbard", StringComparison.OrdinalIgnoreCase))
                     {
-                        ReadSecureContainer(slotPtr, gear);
+                        ReadNoValueSlot(slotPtr, slotName, gear);
                         continue;
                     }
 
@@ -251,9 +252,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         }
 
         /// <summary>
-        /// Reads the secure container slot and adds it to gear (name only, no value contribution).
+        /// Reads a slot and adds it to gear with no value contribution (secure container, melee, etc.).
         /// </summary>
-        private static void ReadSecureContainer(ulong slotPtr, Dictionary<string, GearItem> gear)
+        private static void ReadNoValueSlot(ulong slotPtr, string slotName, Dictionary<string, GearItem> gear)
         {
             try
             {
@@ -266,11 +267,11 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
 
                 if (EftDataManager.AllItems.TryGetValue(bsgId, out var entry))
                 {
-                    gear[SecureSlot] = new GearItem
+                    gear[slotName] = new GearItem
                     {
                         Long = entry.Name,
                         Short = entry.ShortName,
-                        Price = 0 // Secure containers don't count toward gear value
+                        Price = 0
                     };
                 }
             }

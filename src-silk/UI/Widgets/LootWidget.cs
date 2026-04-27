@@ -69,6 +69,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     float dist = Vector3.Distance(localPos, item.Position);
                     bool important = result.Important;
                     bool wishlisted = result.Wishlisted;
+                    bool questRequired = result.QuestRequired;
+                    var category = result.Category;
                     visibleCount++;
                     totalValue += price;
 
@@ -81,6 +83,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
                             group.NearestDist = dist;
                         group.IsImportant |= important;
                         group.IsWishlisted |= wishlisted;
+                        group.IsQuestRequired |= questRequired;
                     }
                     else
                     {
@@ -93,6 +96,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
                         g.NearestDist = dist;
                         g.IsImportant = important;
                         g.IsWishlisted = wishlisted;
+                        g.IsQuestRequired = questRequired;
+                        g.Category = category;
                         _groups[item.ShortName] = g;
                         _sorted.Add(g);
                     }
@@ -167,10 +172,19 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 ImGui.TableNextRow();
 
                 var color = g.IsWishlisted
-                    ? new Vector4(0f, 0.9f, 1f, 1f)
-                    : g.IsImportant
-                    ? new Vector4(0.2f, 1f, 0.2f, 1f)
-                    : new Vector4(0.85f, 0.85f, 0.85f, 1f);
+                    ? SKPaints.ToVec4(SKPaints.LootWishlist.Color)
+                    : g.IsQuestRequired
+                    ? SKPaints.ToVec4(SKPaints.LootQuestItems.Color)
+                    : g.Category switch
+                    {
+                        LootFilter.LootCategory.Meds     => SKPaints.ToVec4(SKPaints.LootMeds.Color),
+                        LootFilter.LootCategory.Food     => SKPaints.ToVec4(SKPaints.LootFood.Color),
+                        LootFilter.LootCategory.Backpack => SKPaints.ToVec4(SKPaints.LootBackpacks.Color),
+                        LootFilter.LootCategory.Key      => SKPaints.ToVec4(SKPaints.LootKeys.Color),
+                        _ => g.IsImportant
+                            ? SKPaints.ToVec4(SKPaints.LootImportant.Color)
+                            : SKPaints.ToVec4(SKPaints.LootNormal.Color),
+                    };
 
                 // Item name
                 ImGui.TableNextColumn();
@@ -282,6 +296,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
             public float NearestDist;
             public bool IsImportant;
             public bool IsWishlisted;
+            public bool IsQuestRequired;
+            public LootFilter.LootCategory Category;
 
             // Cached distance text — rebuilt when NearestDist changes
             private int _cachedDistInt = -1;

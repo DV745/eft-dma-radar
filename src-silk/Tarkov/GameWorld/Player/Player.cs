@@ -4,18 +4,6 @@ using eft_dma_radar.Silk.Tarkov;
 namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
 {
     /// <summary>
-    /// Simplified health status derived from the ETagStatus bitmask.
-    /// Only the health-related bits are surfaced (Healthy, Injured, BadlyInjured, Dying).
-    /// </summary>
-    public enum EHealthStatus
-    {
-        Healthy,
-        Injured,
-        BadlyInjured,
-        Dying,
-    }
-
-    /// <summary>
     /// Player data model — state, classification, and position.
     /// Rendering is in <c>Player.Draw.cs</c>.
     /// </summary>
@@ -97,11 +85,12 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         /// <summary>Whether this player is in a DMA error state (transform read failures).</summary>
         public bool IsError { get; set; }
 
-        /// <summary>
-        /// Observed health status for non-local players.
-        /// Derived from <c>ObservedHealthController.HealthStatus</c> bitmask.
-        /// </summary>
-        public EHealthStatus HealthStatus { get; set; } = EHealthStatus.Healthy;
+        #region Health
+
+        /// <summary>Current health status derived from ETagStatus flags (observed players only).</summary>
+        public PlayerHealthStatus HealthStatus { get; set; } = PlayerHealthStatus.Healthy;
+
+        #endregion
 
         /// <summary>Whether this player is the local (MainPlayer) player.</summary>
         public virtual bool IsLocalPlayer => false;
@@ -188,5 +177,17 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         internal volatile Skeleton? Skeleton;
 
         public override string ToString() => $"{Type} [{Name}]";
+    }
+
+    /// <summary>
+    /// Health status derived from the ETagStatus flags read from ObservedHealthController.
+    /// Priority order: Dying > BadlyInjured > Injured > Healthy.
+    /// </summary>
+    public enum PlayerHealthStatus
+    {
+        Healthy      = 0,
+        Injured      = 1,
+        BadlyInjured = 2,
+        Dying        = 3,
     }
 }

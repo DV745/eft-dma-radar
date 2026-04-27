@@ -36,7 +36,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player.Plugins
             {
                 if (p is null || p.IsLocalPlayer || !p.IsAlive || !p.HasValidPosition)
                     continue;
-                if (!p.IsHostile)
+                if (!p.IsHostile && p.Type != PlayerType.AIBoss)
                 {
                     p.IsFacingLocalPlayer = false;
                     continue;

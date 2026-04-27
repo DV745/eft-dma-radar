@@ -188,6 +188,16 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         }
 
         /// <summary>
+        /// Clears all cached item addresses. Call when starting a new radar session
+        /// so stale entries don't cause the fast-path to skip re-reading item names
+        /// on freshly allocated <see cref="Player"/> objects that share the same base address.
+        /// </summary>
+        internal static void ClearAll()
+        {
+            _cachedItemAddr.Clear();
+        }
+
+        /// <summary>
         /// Returns the held-item address most recently observed by <see cref="Refresh"/>,
         /// or 0 if nothing has been cached for this player yet. Consumed by
         /// <see cref="Plugins.FirearmManager"/> so it doesn't re-walk the hands pointer chain.

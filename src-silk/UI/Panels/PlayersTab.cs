@@ -139,6 +139,23 @@ namespace eft_dma_radar.Silk.UI.Panels
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Zoom level (1.0 = ~90\u00b0 FOV, higher = zoomed in)");
 
+                if (!Config.AimviewShowSkeleton)
+                {
+                    ImGui.SetNextItemWidth(160);
+                    float dotSize = Config.AimviewDotSize;
+                    if (ImGui.SliderFloat("Dot Size", ref dotSize, 1f, 20f, "%.1f px"))
+                        Config.AimviewDotSize = dotSize;
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Radius of player dot markers in the aimview (default: 6)");
+
+                    ImGui.SetNextItemWidth(160);
+                    float labelScale = Config.AimviewLabelScale;
+                    if (ImGui.SliderFloat("Label Scale", ref labelScale, 0.5f, 3.0f, "%.1fx"))
+                        Config.AimviewLabelScale = labelScale;
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Scale multiplier for aimview marker labels (default: 1.0)");
+                }
+
                 ImGui.SetNextItemWidth(160);
                 int minLootValue = Config.AimviewMinLootValue;
                 if (ImGui.InputInt("Min Loot Value (\u20bd)", ref minLootValue, 1000, 10000))

@@ -21,6 +21,10 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
             IsAntialias = true,
         };
 
+        // Height indicator threshold — draw ▲/▼ when height difference exceeds this (meters)
+        private const float HEIGHT_INDICATOR_THRESHOLD = 1.85f;
+        private const float HEIGHT_INDICATOR_ARROW_SIZE = 4.5f;
+
         // Small font for the compact H/D info line
         private static readonly SKFont _infoFont = new(CustomFonts.Regular, 9.5f) { Subpixel = true };
 
@@ -37,6 +41,28 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
             IsStroke = false,
             IsAntialias = true,
         };
+
+        // Weapon/ammo line paint — slightly dimmer than the name
+        private static readonly SKPaint _weaponPaint = new()
+        {
+            Color = new SKColor(200, 200, 200, 190),
+            IsStroke = false,
+            IsAntialias = true,
+        };
+
+        // Health status indicator paints
+        private static readonly SKPaint _healthInjured    = new() { Color = new SKColor(230, 200,  50, 220), IsAntialias = true };
+        private static readonly SKPaint _healthBadly      = new() { Color = new SKColor(230, 120,  30, 220), IsAntialias = true };
+        private static readonly SKPaint _healthDying      = new() { Color = new SKColor(220,  40,  40, 220), IsAntialias = true };
+
+        // Local player weapon/energy label paints
+        private static readonly SKPaint _localInfoPaint = new()
+        {
+            Color = new SKColor(180, 180, 180, 200),
+            IsStroke = false,
+            IsAntialias = true,
+        };
+        private static readonly SKFont _localInfoFont = new(CustomFonts.Regular, 9f) { Subpixel = true };
 
         // Aimline paint — semi-transparent, thin line extending from the dot
         private static readonly SKPaint _aimlineOutline = new()
@@ -61,32 +87,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         // Cached info line — avoids per-frame string allocation
         private int _cachedInfoH = int.MinValue;
         private int _cachedInfoD = int.MinValue;
-        private EHealthStatus _cachedInfoHealth = EHealthStatus.Healthy;
         private string? _cachedInfo;
-
-        // Health status display strings — pre-allocated, no per-frame cost
-        private static readonly string[] HealthLabels =
-        [
-            "",              // Healthy — nothing shown
-            "Injured",       // Injured
-            "Badly Injured", // BadlyInjured
-            "Dying",         // Dying
-        ];
-
-        // Health status paint — small colored indicator
-        private static readonly SKPaint _healthPaintInjured = new()
-        {
-            Color = new SKColor(255, 200, 0, 220),
-            IsStroke = false,
-            IsAntialias = true,
-        };
-
-        private static readonly SKPaint _healthPaintDying = new()
-        {
-            Color = new SKColor(255, 60, 60, 230),
-            IsStroke = false,
-            IsAntialias = true,
-        };
 
         /// <summary>
         /// Draws this player on the radar canvas.
@@ -107,45 +108,45 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
 
             DrawMarker(canvas, pos, fillPaint, chevronPaint, sin, cos);
 
-            // Aimline — draw after marker so it extends outward
-            if (SilkProgram.Config.ShowAimlines && !IsLocalPlayer)
+            // Aimline — draw after marker so it extends outward (local player included)
+            if (SilkProgram.Config.ShowAimlines)
                 DrawAimline(canvas, pos, aimlinePaint, sin, cos, localPlayer);
 
             if (!IsLocalPlayer)
             {
                 string name = Name;
+                string? weaponLine = InHandsItem is not null
+                    ? (InHandsAmmo is not null ? $"{InHandsItem} ({InHandsAmmo})" : InHandsItem)
+                    : null;
 
                 if (localPlayer is not null)
                 {
-                    int h = (int)(Position.Y - localPlayer.Position.Y);
+                    float heightDiff = Position.Y - localPlayer.Position.Y;
+                    int h = (int)heightDiff;
                     int d = (int)Vector3.Distance(localPlayer.Position, Position);
-                    var health = HealthStatus;
 
-                    if (h != _cachedInfoH || d != _cachedInfoD || health != _cachedInfoHealth)
+                    if (h != _cachedInfoH || d != _cachedInfoD)
                     {
                         _cachedInfoH = h;
                         _cachedInfoD = d;
-                        _cachedInfoHealth = health;
-
-                        string hd = string.Create(null, stackalloc char[32], $"{h:+0;-0}m  {d:N0}m");
-                        _cachedInfo = health != EHealthStatus.Healthy
-                            ? $"{hd}  {HealthLabels[(int)health]}"
-                            : hd;
+                        _cachedInfo = string.Create(null, stackalloc char[32], $"{h:+0;-0}m  {d:N0}m");
                     }
 
-                    var infoPaint = health switch
-                    {
-                        EHealthStatus.Dying or EHealthStatus.BadlyInjured => _healthPaintDying,
-                        EHealthStatus.Injured => _healthPaintInjured,
-                        _ => _infoPaint,
-                    };
+                    if (heightDiff > HEIGHT_INDICATOR_THRESHOLD)
+                        DrawHeightArrow(canvas, pos, fillPaint, true);
+                    else if (heightDiff < -HEIGHT_INDICATOR_THRESHOLD)
+                        DrawHeightArrow(canvas, pos, fillPaint, false);
 
-                    DrawLabel(canvas, pos, textPaint, name, _cachedInfo, infoPaint);
+                    DrawLabel(canvas, pos, textPaint, name, _cachedInfo, weaponLine, HealthStatus, GearReady ? GearValue : 0);
                 }
                 else
                 {
-                    DrawLabel(canvas, pos, textPaint, name, null, _infoPaint);
+                    DrawLabel(canvas, pos, textPaint, name, null, weaponLine, HealthStatus, GearReady ? GearValue : 0);
                 }
+            }
+            else if (IsLocalPlayer)
+            {
+                DrawLocalPlayerLabel(canvas, pos);
             }
         }
 
@@ -185,6 +186,65 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         }
 
         /// <summary>
+        /// Draws a small ▲ or ▼ to the LEFT of the player dot to indicate height difference.
+        /// </summary>
+        private static void DrawHeightArrow(SKCanvas canvas, SKPoint point, SKPaint fillPaint, bool up)
+        {
+            const float S = HEIGHT_INDICATOR_ARROW_SIZE;
+            float cx = point.X - DotRadius - S - 3f;
+            float cy = point.Y;
+
+            using var path = new SKPath();
+            if (up)
+            {
+                path.MoveTo(cx,            cy - S);
+                path.LineTo(cx - S * 0.75f, cy + S * 0.6f);
+                path.LineTo(cx + S * 0.75f, cy + S * 0.6f);
+            }
+            else
+            {
+                path.MoveTo(cx,            cy + S);
+                path.LineTo(cx - S * 0.75f, cy - S * 0.6f);
+                path.LineTo(cx + S * 0.75f, cy - S * 0.6f);
+            }
+            path.Close();
+            canvas.DrawPath(path, SKPaints.ShapeBorder);
+            canvas.DrawPath(path, fillPaint);
+        }
+
+        /// <summary>
+        /// Draws weapon/ammo label below the local player dot.
+        /// </summary>
+        private void DrawLocalPlayerLabel(SKCanvas canvas, SKPoint point)
+        {
+            float x = point.X + DotRadius + 4f;
+            float y = point.Y + 4.5f;
+
+            // Name — same style as other players
+            canvas.DrawText("LocalPlayer", x + 1, y + 1, SKPaints.FontRegular11, SKPaints.TextShadow);
+            canvas.DrawText("LocalPlayer", x,     y,     SKPaints.FontRegular11, SKPaints.TextLocalPlayer);
+
+            string? weapon = InHandsItem is not null
+                ? (InHandsAmmo is not null ? $"{InHandsItem} ({InHandsAmmo})" : InHandsItem)
+                : null;
+
+            if (weapon is not null)
+            {
+                float y2 = y + 12f;
+                canvas.DrawText(weapon, x + 1, y2 + 1, _localInfoFont, _infoShadow);
+                canvas.DrawText(weapon, x,     y2,     _localInfoFont, _localInfoPaint);
+
+                if (GearReady && GearValue > 0)
+                {
+                    float y3 = y2 + 11f;
+                    var valueText = LootFilter.FormatPrice(GearValue);
+                    canvas.DrawText(valueText, x + 1, y3 + 1, _localInfoFont, _infoShadow);
+                    canvas.DrawText(valueText, x,     y3,     _localInfoFont, _localInfoPaint);
+                }
+            }
+        }
+
+        /// <summary>
         /// Draws a small X for dead players.
         /// </summary>
         private static void DrawDeathMarker(SKCanvas canvas, SKPoint point)
@@ -204,13 +264,15 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         {
             var config = SilkProgram.Config;
 
-            // Base length — shorter for AI, configurable for humans
-            float length = IsHuman ? config.AimlineLength : MathF.Min(config.AimlineLength * 0.5f, 10f);
+            // Base length — shorter for AI, configurable for humans and bosses
+            float length = (IsHuman || Type == PlayerType.AIBoss)
+                ? config.AimlineLength
+                : MathF.Min(config.AimlineLength * 0.5f, 10f);
 
             // High Alert — extend aimline when hostile is facing local player.
             // Reuses the cached flag from HighAlertManager (updated every realtime tick)
             // so we don't redo the Distance + Normalize + Acos + Log math per frame.
-            if (config.HighAlert && IsHostile && IsFacingLocalPlayer)
+            if (config.HighAlert && (IsHostile || Type == PlayerType.AIBoss) && IsFacingLocalPlayer)
             {
                 length = HighAlertLength;
             }
@@ -228,9 +290,10 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         }
 
         /// <summary>
-        /// Draws the player name + optional compact H/D info line.
+        /// Draws the player name + optional compact H/D info line + optional weapon/ammo line.
+        /// Health status (Injured/Badly Injured/Dying) is shown only when the player is damaged.
         /// </summary>
-        private static void DrawLabel(SKCanvas canvas, SKPoint point, SKPaint textPaint, string name, string? info, SKPaint infoPaint)
+        private static void DrawLabel(SKCanvas canvas, SKPoint point, SKPaint textPaint, string name, string? info, string? weapon = null, PlayerHealthStatus health = PlayerHealthStatus.Healthy, int gearValue = 0)
         {
             float x = point.X + DotRadius + 4f;
             float y = point.Y + 4.5f;
@@ -239,12 +302,44 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
             canvas.DrawText(name, x + 1, y + 1, SKPaints.FontRegular11, SKPaints.TextShadow);
             canvas.DrawText(name, x, y, SKPaints.FontRegular11, textPaint);
 
+            float y2 = y + 12f;
+
             // Compact H/D on second line in a smaller, dimmer font
             if (info is not null)
             {
-                float y2 = y + 12f;
                 canvas.DrawText(info, x + 1, y2 + 1, _infoFont, _infoShadow);
-                canvas.DrawText(info, x, y2, _infoFont, infoPaint);
+                canvas.DrawText(info, x, y2, _infoFont, _infoPaint);
+                y2 += 11f;
+            }
+
+            // Weapon/ammo on next line
+            if (weapon is not null)
+            {
+                canvas.DrawText(weapon, x + 1, y2 + 1, _infoFont, _infoShadow);
+                canvas.DrawText(weapon, x, y2, _infoFont, _weaponPaint);
+                y2 += 11f;
+            }
+
+            // Gear value on next line (only when > 0)
+            if (gearValue > 0)
+            {
+                var valueText = LootFilter.FormatPrice(gearValue);
+                canvas.DrawText(valueText, x + 1, y2 + 1, _infoFont, _infoShadow);
+                canvas.DrawText(valueText, x,     y2,     _infoFont, _weaponPaint);
+                y2 += 11f;
+            }
+
+            // Health status — only shown when damaged
+            if (health != PlayerHealthStatus.Healthy)
+            {
+                var (healthPaint, healthText) = health switch
+                {
+                    PlayerHealthStatus.Injured      => (_healthInjured, "Injured"),
+                    PlayerHealthStatus.BadlyInjured => (_healthBadly,   "Badly Injured"),
+                    _                               => (_healthDying,   "Dying"),
+                };
+                canvas.DrawText(healthText, x + 1, y2 + 1, _infoFont, _infoShadow);
+                canvas.DrawText(healthText, x,     y2,     _infoFont, healthPaint);
             }
         }
 

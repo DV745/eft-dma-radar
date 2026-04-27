@@ -152,6 +152,36 @@ namespace eft_dma_radar.Silk.UI
         /// <summary>Wishlisted loot on a different floor — dimmed.</summary>
         public static SKPaint LootWishlistDimmed { get; } = NewTextPaint(new SKColor(0, 230, 255, 100));
 
+        /// <summary>Quest-required loot — gold/amber.</summary>
+        public static SKPaint LootQuestItems { get; } = NewTextPaint(new SKColor(255, 200, 50));
+
+        /// <summary>Quest-required loot on a different floor — dimmed.</summary>
+        public static SKPaint LootQuestItemsDimmed { get; } = NewTextPaint(new SKColor(255, 200, 50, 100));
+
+        /// <summary>Meds category loot — teal.</summary>
+        public static SKPaint LootMeds { get; } = NewTextPaint(new SKColor(0, 200, 190));
+
+        /// <summary>Meds category loot on a different floor — dimmed.</summary>
+        public static SKPaint LootMedsDimmed { get; } = NewTextPaint(new SKColor(0, 200, 190, 100));
+
+        /// <summary>Food category loot — orange.</summary>
+        public static SKPaint LootFood { get; } = NewTextPaint(new SKColor(255, 150, 50));
+
+        /// <summary>Food category loot on a different floor — dimmed.</summary>
+        public static SKPaint LootFoodDimmed { get; } = NewTextPaint(new SKColor(255, 150, 50, 100));
+
+        /// <summary>Backpacks category loot — tan.</summary>
+        public static SKPaint LootBackpacks { get; } = NewTextPaint(new SKColor(200, 160, 100));
+
+        /// <summary>Backpacks category loot on a different floor — dimmed.</summary>
+        public static SKPaint LootBackpacksDimmed { get; } = NewTextPaint(new SKColor(200, 160, 100, 100));
+
+        /// <summary>Keys category loot — yellow.</summary>
+        public static SKPaint LootKeys { get; } = NewTextPaint(new SKColor(255, 230, 25));
+
+        /// <summary>Keys category loot on a different floor — dimmed.</summary>
+        public static SKPaint LootKeysDimmed { get; } = NewTextPaint(new SKColor(255, 230, 25, 100));
+
         /// <summary>Rare loot (≥ 2× important threshold) — orange.</summary>
         public static SKPaint LootRare { get; } = NewTextPaint(new SKColor(255, 170, 40));
 
@@ -415,6 +445,131 @@ namespace eft_dma_radar.Silk.UI
             StrokeCap = SKStrokeCap.Round,
             IsAntialias = true,
         };
+
+        /// <summary>Converts a packed ARGB uint (0xAARRGGBB) to an <see cref="SKColor"/> (ARGB).</summary>
+        private static SKColor ArgbToSKColor(uint argb) =>
+            new((byte)(argb >> 16), (byte)(argb >> 8), (byte)argb, (byte)(argb >> 24));
+
+        /// <summary>Converts an <see cref="SKColor"/> to a normalized RGBA <see cref="Vector4"/> for ImGui.</summary>
+        public static Vector4 ToVec4(SKColor c) => new(c.Red / 255f, c.Green / 255f, c.Blue / 255f, c.Alpha / 255f);
+
+        /// <summary>
+        /// Applies all color settings from <paramref name="config"/> to the shared paint instances.
+        /// Call after loading config and whenever the user changes a color in the Colors panel.
+        /// </summary>
+        public static void ApplyColors(SilkConfig config)
+        {
+            // ── Players ──────────────────────────────────────────────────────────
+            var lp = ArgbToSKColor(config.ColorLocalPlayer);
+            PaintLocalPlayer.Color = lp; TextLocalPlayer.Color = lp;
+            ChevronLocalPlayer.Color = lp; AimlineLocalPlayer.Color = lp;
+
+            var tm = ArgbToSKColor(config.ColorTeammate);
+            PaintTeammate.Color = tm; TextTeammate.Color = tm;
+            ChevronTeammate.Color = tm; AimlineTeammate.Color = tm;
+
+            var usec = ArgbToSKColor(config.ColorUSEC);
+            PaintUSEC.Color = usec; TextUSEC.Color = usec;
+            ChevronUSEC.Color = usec; AimlineUSEC.Color = usec;
+
+            var bear = ArgbToSKColor(config.ColorBEAR);
+            PaintBEAR.Color = bear; TextBEAR.Color = bear;
+            ChevronBEAR.Color = bear; AimlineBEAR.Color = bear;
+
+            var scav = ArgbToSKColor(config.ColorScav);
+            PaintScav.Color = scav; TextScav.Color = scav;
+            ChevronScav.Color = scav; AimlineScav.Color = scav;
+
+            var raider = ArgbToSKColor(config.ColorRaider);
+            PaintRaider.Color = raider; TextRaider.Color = raider;
+            ChevronRaider.Color = raider; AimlineRaider.Color = raider;
+
+            var boss = ArgbToSKColor(config.ColorBoss);
+            PaintBoss.Color = boss; TextBoss.Color = boss;
+            ChevronBoss.Color = boss; AimlineBoss.Color = boss;
+
+            var pscav = ArgbToSKColor(config.ColorPScav);
+            PaintPScav.Color = pscav; TextPScav.Color = pscav;
+            ChevronPScav.Color = pscav; AimlinePScav.Color = pscav;
+
+            var special = ArgbToSKColor(config.ColorSpecial);
+            PaintSpecial.Color = special; TextSpecial.Color = special;
+            ChevronSpecial.Color = special; AimlineSpecial.Color = special;
+
+            var streamer = ArgbToSKColor(config.ColorStreamer);
+            PaintStreamer.Color = streamer; TextStreamer.Color = streamer;
+            ChevronStreamer.Color = streamer; AimlineStreamer.Color = streamer;
+
+            // ── Loot ─────────────────────────────────────────────────────────────
+            var lootNorm = ArgbToSKColor(config.ColorLootNormal);
+            LootNormal.Color = lootNorm;
+            LootNormalDimmed.Color = lootNorm.WithAlpha(80);
+
+            var lootImp = ArgbToSKColor(config.ColorLootImportant);
+            LootImportant.Color = lootImp;
+            LootImportantDimmed.Color = lootImp.WithAlpha(100);
+
+            var lootWL = ArgbToSKColor(config.ColorLootWishlist);
+            LootWishlist.Color = lootWL;
+            LootWishlistDimmed.Color = lootWL.WithAlpha(100);
+
+            var lootQuest = ArgbToSKColor(config.ColorLootQuestItems);
+            LootQuestItems.Color = lootQuest;
+            LootQuestItemsDimmed.Color = lootQuest.WithAlpha(100);
+
+            var lootMeds = ArgbToSKColor(config.ColorLootMeds);
+            LootMeds.Color = lootMeds;
+            LootMedsDimmed.Color = lootMeds.WithAlpha(100);
+
+            var lootFood = ArgbToSKColor(config.ColorLootFood);
+            LootFood.Color = lootFood;
+            LootFoodDimmed.Color = lootFood.WithAlpha(100);
+
+            var lootPacks = ArgbToSKColor(config.ColorLootBackpacks);
+            LootBackpacks.Color = lootPacks;
+            LootBackpacksDimmed.Color = lootPacks.WithAlpha(100);
+
+            var lootKeys = ArgbToSKColor(config.ColorLootKeys);
+            LootKeys.Color = lootKeys;
+            LootKeysDimmed.Color = lootKeys.WithAlpha(100);
+
+            var corpse = ArgbToSKColor(config.ColorCorpse);
+            PaintCorpse.Color = corpse; TextCorpse.Color = corpse;
+
+            // ── Exfils ───────────────────────────────────────────────────────────
+            var exfilOpen = ArgbToSKColor(config.ColorExfilOpen);
+            PaintExfilOpen.Color = exfilOpen; TextExfilOpen.Color = exfilOpen;
+
+            var exfilPend = ArgbToSKColor(config.ColorExfilPending);
+            PaintExfilPending.Color = exfilPend; TextExfilPending.Color = exfilPend;
+
+            var exfilClose = ArgbToSKColor(config.ColorExfilClosed);
+            PaintExfilClosed.Color = exfilClose; TextExfilClosed.Color = exfilClose;
+
+            var exfilInact = ArgbToSKColor(config.ColorExfilInactive);
+            PaintExfilInactive.Color = exfilInact; TextExfilInactive.Color = exfilInact;
+
+            // ── Doors ────────────────────────────────────────────────────────────
+            var doorLocked = ArgbToSKColor(config.ColorDoorLocked);
+            PaintDoorLocked.Color = doorLocked; TextDoorLocked.Color = doorLocked;
+
+            var doorOpen = ArgbToSKColor(config.ColorDoorOpen);
+            PaintDoorOpen.Color = doorOpen; TextDoorOpen.Color = doorOpen;
+
+            var doorShut = ArgbToSKColor(config.ColorDoorShut);
+            PaintDoorShut.Color = doorShut; TextDoorShut.Color = doorShut;
+
+            // ── Misc ─────────────────────────────────────────────────────────────
+            PaintConnectorGroup.Color = ArgbToSKColor(config.ColorGroupLines);
+            PaintDeathMarker.Color    = ArgbToSKColor(config.ColorDeathMarker);
+
+            // ── Transits ─────────────────────────────────────────────────────────
+            var transit = ArgbToSKColor(config.ColorTransit);
+            PaintTransit.Color = transit; TextTransit.Color = transit;
+
+            var transitInact = ArgbToSKColor(config.ColorTransitInactive);
+            PaintTransitInactive.Color = transitInact; TextTransitInactive.Color = transitInact;
+        }
 
         #endregion
 

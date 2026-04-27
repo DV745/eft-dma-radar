@@ -16,8 +16,10 @@ namespace eft_dma_radar.Silk.UI.Widgets
         private static bool _colorsReady;
         private static uint _colorTeammate, _colorUsec, _colorBear, _colorScav, _colorRaider;
         private static uint _colorBoss, _colorPScav, _colorSpecial, _colorStreamer;
-        private static uint _colorCrosshair, _colorBg, _colorDotOutline, _colorShadow, _colorBorder;
-        private static uint _colorLoot, _colorLootImportant, _colorLootWishlist, _colorCorpse, _colorContainer;
+        private static uint _colorCrosshair, _colorBg, _colorDotOutline, _colorShadow, _colorBorder, _colorWeapon;
+        private static uint _colorLoot, _colorLootImportant, _colorLootWishlist, _colorLootQuestItems;
+        private static uint _colorLootMeds, _colorLootFood, _colorLootBackpacks, _colorLootKeys;
+        private static uint _colorCorpse, _colorContainer;
 
         /// <summary>Whether the aimview widget is open.</summary>
         public static bool IsOpenField;
@@ -35,28 +37,41 @@ namespace eft_dma_radar.Silk.UI.Widgets
         private static readonly ProjectedItem[] _containerBuf = new ProjectedItem[64];
         private static readonly float[] _usedLabelYs = new float[64];
 
+        /// <summary>Invalidate cached ImGui colors — they will be re-read from <see cref="SKPaints"/> on next frame.</summary>
+        public static void InvalidateColors() => _colorsReady = false;
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static uint SkColorToImGui(SKColor c) =>
+            ImGui.GetColorU32(new Vector4(c.Red / 255f, c.Green / 255f, c.Blue / 255f, c.Alpha / 255f));
+
         private static void EnsureColors()
         {
             if (_colorsReady) return;
-            _colorTeammate   = ImGui.GetColorU32(new Vector4(0.31f, 0.86f, 0.31f, 1f));
-            _colorUsec       = ImGui.GetColorU32(new Vector4(0.90f, 0.24f, 0.24f, 1f));
-            _colorBear       = ImGui.GetColorU32(new Vector4(0.27f, 0.51f, 0.90f, 1f));
-            _colorScav       = ImGui.GetColorU32(new Vector4(0.94f, 0.90f, 0.24f, 1f));
-            _colorRaider     = ImGui.GetColorU32(new Vector4(1.0f, 0.71f, 0.12f, 1f));
-            _colorBoss       = ImGui.GetColorU32(new Vector4(0.90f, 0.20f, 0.90f, 1f));
-            _colorPScav      = ImGui.GetColorU32(new Vector4(0.86f, 0.86f, 0.86f, 1f));
-            _colorSpecial    = ImGui.GetColorU32(new Vector4(1.0f, 0.35f, 0.63f, 1f));
-            _colorStreamer   = ImGui.GetColorU32(new Vector4(0.67f, 0.47f, 1.0f, 1f));
+            _colorTeammate   = SkColorToImGui(SKPaints.PaintTeammate.Color);
+            _colorUsec       = SkColorToImGui(SKPaints.PaintUSEC.Color);
+            _colorBear       = SkColorToImGui(SKPaints.PaintBEAR.Color);
+            _colorScav       = SkColorToImGui(SKPaints.PaintScav.Color);
+            _colorRaider     = SkColorToImGui(SKPaints.PaintRaider.Color);
+            _colorBoss       = SkColorToImGui(SKPaints.PaintBoss.Color);
+            _colorPScav      = SkColorToImGui(SKPaints.PaintPScav.Color);
+            _colorSpecial    = SkColorToImGui(SKPaints.PaintSpecial.Color);
+            _colorStreamer   = SkColorToImGui(SKPaints.PaintStreamer.Color);
             _colorCrosshair  = ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 0.4f));
             _colorBg         = ImGui.GetColorU32(new Vector4(0f, 0f, 0f, 0.75f));
             _colorDotOutline = ImGui.GetColorU32(new Vector4(0, 0, 0, 0.6f));
             _colorShadow     = ImGui.GetColorU32(new Vector4(0, 0, 0, 0.8f));
             _colorBorder     = ImGui.GetColorU32(new Vector4(0.4f, 0.4f, 0.4f, 0.6f));
-            _colorLoot          = ImGui.GetColorU32(new Vector4(0.78f, 0.78f, 0.78f, 0.85f));
-            _colorLootImportant = ImGui.GetColorU32(new Vector4(0.20f, 1.0f, 0.20f, 1.0f));
-            _colorLootWishlist  = ImGui.GetColorU32(new Vector4(0.0f, 0.90f, 1.0f, 1.0f));
-            _colorCorpse        = ImGui.GetColorU32(new Vector4(0.85f, 0.55f, 0.20f, 0.9f));
-            _colorContainer     = ImGui.GetColorU32(new Vector4(0.39f, 0.78f, 0.86f, 0.85f));
+            _colorWeapon     = ImGui.GetColorU32(new Vector4(0.75f, 0.75f, 0.75f, 0.85f));
+            _colorLoot              = SkColorToImGui(SKPaints.LootNormal.Color);
+            _colorLootImportant     = SkColorToImGui(SKPaints.LootImportant.Color);
+            _colorLootWishlist      = SkColorToImGui(SKPaints.LootWishlist.Color);
+            _colorLootQuestItems    = SkColorToImGui(SKPaints.LootQuestItems.Color);
+            _colorLootMeds          = SkColorToImGui(SKPaints.LootMeds.Color);
+            _colorLootFood          = SkColorToImGui(SKPaints.LootFood.Color);
+            _colorLootBackpacks     = SkColorToImGui(SKPaints.LootBackpacks.Color);
+            _colorLootKeys          = SkColorToImGui(SKPaints.LootKeys.Color);
+            _colorCorpse            = SkColorToImGui(SKPaints.PaintCorpse.Color);
+            _colorContainer         = SkColorToImGui(SKPaints.PaintContainer.Color);
             _colorsReady = true;
         }
 
@@ -89,6 +104,18 @@ namespace eft_dma_radar.Silk.UI.Widgets
             var drawList = ImGui.GetWindowDrawList();
             var contentMax = contentMin + contentSize;
 
+            DrawContent(drawList, localPlayer, contentMin, contentSize, contentMax);
+        }
+
+        /// <summary>
+        /// Renders the aimview scene from <paramref name="viewPlayer"/>'s perspective.
+        /// Called by <see cref="Draw"/> for the local player and by <see cref="TeammateAimviewWidget"/> for teammates.
+        /// </summary>
+        public static void DrawContent(
+            ImDrawListPtr drawList, Player viewPlayer,
+            Vector2 contentMin, Vector2 contentSize, Vector2 contentMax)
+        {
+            var allPlayers = Memory.Players;
             EnsureColors();
 
             // Background + crosshair
@@ -97,18 +124,18 @@ namespace eft_dma_radar.Silk.UI.Widgets
             drawList.AddLine(new Vector2(contentMin.X, center.Y), new Vector2(contentMax.X, center.Y), _colorCrosshair);
             drawList.AddLine(new Vector2(center.X, contentMin.Y), new Vector2(center.X, contentMax.Y), _colorCrosshair);
 
-            // Build synthetic camera from local player position + rotation.
+            // Build synthetic camera from view player position + rotation.
             // Use the game's look transform position when available (accurate eye position),
             // otherwise fall back to body root + configurable eye height offset.
             var config = SilkProgram.Config;
             Vector3 eyePos;
-            if (localPlayer is LocalPlayer localP && localP.HasLookPosition)
+            if (viewPlayer is LocalPlayer localP && localP.HasLookPosition)
             {
                 eyePos = localP.LookPosition;
             }
             else
             {
-                eyePos = new Vector3(localPlayer.Position.X, localPlayer.Position.Y + config.AimviewEyeHeight, localPlayer.Position.Z);
+                eyePos = new Vector3(viewPlayer.Position.X, viewPlayer.Position.Y + config.AimviewEyeHeight, viewPlayer.Position.Z);
             }
 
             int widgetW = (int)contentSize.X;
@@ -116,8 +143,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
             float maxPlayerDist = config.AimviewPlayerDistance;
             float maxLootDist = config.AimviewLootDistance;
 
-            // ── Advanced mode: real game camera via CameraManager ──
-            bool useAdvanced = config.UseAdvancedAimview && CameraManager.IsActive && CameraManager.ViewportWidth > 0;
+            // ── Advanced mode: real game camera via CameraManager (local player only) ──
+            bool useAdvanced = viewPlayer.IsLocalPlayer && config.UseAdvancedAimview && CameraManager.IsActive && CameraManager.ViewportWidth > 0;
 
             // Build projection context — captures all state needed by TryProjectCtx
             var projCtx = new ProjectionContext
@@ -131,8 +158,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
             if (!useAdvanced)
             {
-                float yaw = localPlayer.RotationYaw * (MathF.PI / 180f);
-                float pitch = localPlayer.RotationPitch * (MathF.PI / 180f); // EFT: positive = looking down
+                float yaw = viewPlayer.RotationYaw * (MathF.PI / 180f);
+                float pitch = viewPlayer.RotationPitch * (MathF.PI / 180f); // EFT: positive = looking down
 
                 (float sy, float cy) = MathF.SinCos(yaw);
                 (float sp, float cp) = MathF.SinCos(pitch);
@@ -166,7 +193,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
                 foreach (var player in allPlayers)
                 {
-                    if (player.IsLocalPlayer || !player.IsActive || !player.IsAlive || !player.HasValidPosition)
+                    if (player == viewPlayer || !player.IsActive || !player.IsAlive || !player.HasValidPosition)
                         continue;
 
                     if (hideAI && IsAIPlayer(player.Type))
@@ -208,7 +235,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     float labelOffset;
                     if (!drewSkeleton)
                     {
-                        float dotRadius = float.Clamp(6f - dist * 0.015f, 2f, 6f);
+                        float dotRadius = float.Clamp(config.AimviewDotSize - dist * 0.015f, 2f, config.AimviewDotSize);
                         drawList.AddCircleFilled(new Vector2(screenX, screenY), dotRadius, color);
                         drawList.AddCircle(new Vector2(screenX, screenY), dotRadius, _colorDotOutline);
                         labelOffset = dotRadius + 2f;
@@ -222,7 +249,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     {
                         string label = $"{player.Name} ({(int)dist}m)";
                         DrawLabel(drawList, label, screenX, screenY, labelOffset, color,
-                            projCtx.ContentMin, projCtx.ContentMax);
+                            projCtx.ContentMin, projCtx.ContentMax, config.AimviewLabelScale);
                     }
                 }
             }
@@ -268,8 +295,17 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 if (!TryProjectCtx(worldPos, eyePos, ref ctx, out float sx, out float sy))
                     continue;
 
-                uint color = result.Wishlisted ? _colorLootWishlist
-                           : result.Important ? _colorLootImportant
+                uint color = result.Wishlisted      ? _colorLootWishlist
+                           : result.QuestRequired   ? _colorLootQuestItems
+                           : result.CategoryMatch   ? result.Category switch
+                           {
+                               LootFilter.LootCategory.Meds     => _colorLootMeds,
+                               LootFilter.LootCategory.Food     => _colorLootFood,
+                               LootFilter.LootCategory.Backpack => _colorLootBackpacks,
+                               LootFilter.LootCategory.Key      => _colorLootKeys,
+                               _ => _colorLootImportant,
+                           }
+                           : result.Important       ? _colorLootImportant
                            : _colorLoot;
                 _lootBuf[count++] = new ProjectedItem(sx, sy, dist, price,
                     color,
@@ -311,12 +347,12 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 float baseY = p.ScreenY + half + 2f;
                 float labelY = DeconflictY(baseY, _usedLabelYs, ref usedCount,
                     ctx.ContentMin.Y + 2, ctx.ContentMax.Y - LabelLineHeight - 2);
-                DrawLabelAt(drawList, p.Label, p.ScreenX, labelY, p.Color, ctx.ContentMin, ctx.ContentMax);
+                DrawLabelAt(drawList, p.Label, p.ScreenX, labelY, p.Color, ctx.ContentMin, ctx.ContentMax, cfg.AimviewLabelScale);
             }
         }
 
         /// <summary>
-        /// Collect visible corpses, sort by distance, draw X markers then labels.
+        /// Collect visible corpses
         /// Unified for both synthetic and advanced projection modes.
         /// </summary>
         private static void DrawCorpseItems(
@@ -382,12 +418,12 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 float baseY = p.ScreenY + s + 2f;
                 float labelY = DeconflictY(baseY, _usedLabelYs, ref usedCount,
                     ctx.ContentMin.Y + 2, ctx.ContentMax.Y - LabelLineHeight - 2);
-                DrawLabelAt(drawList, p.Label, p.ScreenX, labelY, p.Color, ctx.ContentMin, ctx.ContentMax);
+                DrawLabelAt(drawList, p.Label, p.ScreenX, labelY, p.Color, ctx.ContentMin, ctx.ContentMax, cfg.AimviewLabelScale);
             }
         }
 
         /// <summary>
-        /// Collect visible containers, sort by distance, draw square markers then labels.
+        /// Collect visible containers
         /// Unified for both synthetic and advanced projection modes.
         /// </summary>
         private static void DrawContainerItems(
@@ -456,13 +492,13 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 float baseY = p.ScreenY + half + 2f;
                 float labelY = DeconflictY(baseY, _usedLabelYs, ref usedCount,
                     ctx.ContentMin.Y + 2, ctx.ContentMax.Y - LabelLineHeight - 2);
-                DrawLabelAt(drawList, p.Label, p.ScreenX, labelY, p.Color, ctx.ContentMin, ctx.ContentMax);
+                DrawLabelAt(drawList, p.Label, p.ScreenX, labelY, p.Color, ctx.ContentMin, ctx.ContentMax, config.AimviewLabelScale);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsAIPlayer(PlayerType type) => type is
-            PlayerType.AIScav or PlayerType.AIRaider or PlayerType.AIBoss;
+        private static bool IsAIPlayer(PlayerType type) =>
+            type is PlayerType.AIScav or PlayerType.AIRaider or PlayerType.AIBoss;
 
         /// <summary>
         /// Returns an ImGui color (packed uint) for the given player type.
@@ -584,17 +620,19 @@ namespace eft_dma_radar.Silk.UI.Widgets
         private static void DrawLabel(
             ImDrawListPtr drawList, string label,
             float screenX, float screenY, float offsetY,
-            uint color, Vector2 contentMin, Vector2 contentMax)
+            uint color, Vector2 contentMin, Vector2 contentMax, float labelScale = 1f)
         {
             float labelY = screenY + offsetY;
-            var textSize = ImGui.CalcTextSize(label);
+            var font = ImGui.GetFont();
+            float fontSize = ImGui.GetFontSize() * labelScale;
+            var textSize = ImGui.CalcTextSize(label) * labelScale;
             float labelX = screenX - textSize.X * 0.5f;
 
             labelX = float.Clamp(labelX, contentMin.X + 2, contentMax.X - textSize.X - 2);
             labelY = float.Clamp(labelY, contentMin.Y + 2, contentMax.Y - textSize.Y - 2);
 
-            drawList.AddText(new Vector2(labelX + 1, labelY + 1), _colorShadow, label);
-            drawList.AddText(new Vector2(labelX, labelY), color, label);
+            drawList.AddText(font, fontSize, new Vector2(labelX + 1, labelY + 1), _colorShadow, label);
+            drawList.AddText(font, fontSize, new Vector2(labelX, labelY), color, label);
         }
 
         /// <summary>
@@ -604,15 +642,17 @@ namespace eft_dma_radar.Silk.UI.Widgets
         private static void DrawLabelAt(
             ImDrawListPtr drawList, string label,
             float screenX, float labelY,
-            uint color, Vector2 contentMin, Vector2 contentMax)
+            uint color, Vector2 contentMin, Vector2 contentMax, float labelScale = 1f)
         {
-            var textSize = ImGui.CalcTextSize(label);
+            var font = ImGui.GetFont();
+            float fontSize = ImGui.GetFontSize() * labelScale;
+            var textSize = ImGui.CalcTextSize(label) * labelScale;
             float labelX = screenX - textSize.X * 0.5f;
             labelX = float.Clamp(labelX, contentMin.X + 2, contentMax.X - textSize.X - 2);
             labelY = float.Clamp(labelY, contentMin.Y + 2, contentMax.Y - textSize.Y - 2);
 
-            drawList.AddText(new Vector2(labelX + 1, labelY + 1), _colorShadow, label);
-            drawList.AddText(new Vector2(labelX, labelY), color, label);
+            drawList.AddText(font, fontSize, new Vector2(labelX + 1, labelY + 1), _colorShadow, label);
+            drawList.AddText(font, fontSize, new Vector2(labelX, labelY), color, label);
         }
 
         /// <summary>

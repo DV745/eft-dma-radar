@@ -275,6 +275,12 @@ namespace eft_dma_radar.Silk.Config
         /// <summary>Zoom level for the aimview (1.0 = ~90° FOV, higher = narrower/zoomed in).</summary>
         public float AimviewZoom { get; set; } = 1.0f;
 
+        /// <summary>Base dot radius for player markers in the aimview (scales down with distance).</summary>
+        public float AimviewDotSize { get; set; } = 6.0f;
+
+        /// <summary>Font scale for labels in the aimview (1.0 = default size).</summary>
+        public float AimviewLabelScale { get; set; } = 1.0f;
+
         /// <summary>
         /// Use the advanced aimview mode that reads the game's real camera ViewMatrix
         /// via <see cref="CameraManager"/> for pixel-accurate W2S projection.
@@ -614,6 +620,85 @@ namespace eft_dma_radar.Silk.Config
         /// <summary>Hide containers that have been searched/opened.</summary>
         public bool HideSearchedContainers { get; set; } = true;
 
+        // ── Colors ──────────────────────────────────────────────────────────────
+
+        // Players
+        public uint ColorLocalPlayer   { get; set; } = 0xFF32CD32;
+        public uint ColorTeammate      { get; set; } = 0xFF50DC50;
+        public uint ColorUSEC          { get; set; } = 0xFFE63C3C;
+        public uint ColorBEAR          { get; set; } = 0xFF4682E6;
+        public uint ColorScav          { get; set; } = 0xFFF0E63C;
+        public uint ColorRaider        { get; set; } = 0xFFFFB41E;
+        public uint ColorBoss          { get; set; } = 0xFFE632E6;
+        public uint ColorPScav         { get; set; } = 0xFFDCDCDC;
+        public uint ColorSpecial       { get; set; } = 0xFFFF5AA0;
+        public uint ColorStreamer      { get; set; } = 0xFFAA78FF;
+
+        // Loot
+        public uint ColorLootNormal      { get; set; } = 0xC8C8C8C8;
+        public uint ColorLootImportant   { get; set; } = 0xFF32FF32;
+        public uint ColorLootWishlist    { get; set; } = 0xFF00E6FF;
+        public uint ColorLootQuestItems  { get; set; } = 0xFFFFC832;
+        public uint ColorLootMeds        { get; set; } = 0xFF00C8BE;
+        public uint ColorLootFood        { get; set; } = 0xFFFF9632;
+        public uint ColorLootBackpacks   { get; set; } = 0xFFC8A064;
+        public uint ColorLootKeys        { get; set; } = 0xFFFFE619;
+        public uint ColorCorpse          { get; set; } = 0xB4C89650;
+
+        // Exfils
+        public uint ColorExfilOpen     { get; set; } = 0xFF32CD32;
+        public uint ColorExfilPending  { get; set; } = 0xFFFFD700;
+        public uint ColorExfilClosed   { get; set; } = 0xFFC83C3C;
+        public uint ColorExfilInactive { get; set; } = 0x78787878;
+
+        // Doors
+        public uint ColorDoorLocked    { get; set; } = 0xFFDC3C3C;
+        public uint ColorDoorOpen      { get; set; } = 0xFF3CC83C;
+        public uint ColorDoorShut      { get; set; } = 0xFFF0A51E;
+
+        // Misc
+        public uint ColorGroupLines    { get; set; } = 0x3C7CFC00;
+        public uint ColorDeathMarker   { get; set; } = 0x8CA0A0A0;
+
+        // Transits
+        public uint ColorTransit         { get; set; } = 0xFF00C8DC;
+        public uint ColorTransitInactive { get; set; } = 0x6400C8DC;
+
+        /// <summary>Reset all colors to their default values.</summary>
+        public void ResetColors()
+        {
+            ColorLocalPlayer   = 0xFF32CD32;
+            ColorTeammate      = 0xFF50DC50;
+            ColorUSEC          = 0xFFE63C3C;
+            ColorBEAR          = 0xFF4682E6;
+            ColorScav          = 0xFFF0E63C;
+            ColorRaider        = 0xFFFFB41E;
+            ColorBoss          = 0xFFE632E6;
+            ColorPScav         = 0xFFDCDCDC;
+            ColorSpecial       = 0xFFFF5AA0;
+            ColorStreamer       = 0xFFAA78FF;
+            ColorLootNormal     = 0xC8C8C8C8;
+            ColorLootImportant  = 0xFF32FF32;
+            ColorLootWishlist   = 0xFF00E6FF;
+            ColorLootQuestItems = 0xFFFFC832;
+            ColorLootMeds       = 0xFF00C8BE;
+            ColorLootFood       = 0xFFFF9632;
+            ColorLootBackpacks  = 0xFFC8A064;
+            ColorLootKeys       = 0xFFFFE619;
+            ColorCorpse         = 0xB4C89650;
+            ColorExfilOpen     = 0xFF32CD32;
+            ColorExfilPending  = 0xFFFFD700;
+            ColorExfilClosed   = 0xFFC83C3C;
+            ColorExfilInactive = 0x78787878;
+            ColorDoorLocked    = 0xFFDC3C3C;
+            ColorDoorOpen      = 0xFF3CC83C;
+            ColorDoorShut      = 0xFFF0A51E;
+            ColorGroupLines    = 0x3C7CFC00;
+            ColorDeathMarker   = 0x8CA0A0A0;
+            ColorTransit         = 0xFF00C8DC;
+            ColorTransitInactive = 0x6400C8DC;
+        }
+
         // ── Persistence ─────────────────────────────────────────────────────────
 
         /// <summary>
@@ -631,6 +716,8 @@ namespace eft_dma_radar.Silk.Config
             AimviewLootDistance = Math.Clamp(AimviewLootDistance, 1f, 500f);
             AimviewEyeHeight = Math.Clamp(AimviewEyeHeight, 0f, 5f);
             AimviewZoom = Math.Clamp(AimviewZoom, 0.5f, 5.0f);
+            AimviewDotSize = Math.Clamp(AimviewDotSize, 1f, 15f);
+            AimviewLabelScale = Math.Clamp(AimviewLabelScale, 0.5f, 2.5f);
             AimviewMinLootValue = Math.Max(AimviewMinLootValue, 0);
             AimviewMaxLoot = Math.Clamp(AimviewMaxLoot, 0, 128);
             AimviewMaxCorpses = Math.Clamp(AimviewMaxCorpses, 0, 32);

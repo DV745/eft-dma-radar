@@ -90,13 +90,13 @@ namespace eft_dma_radar.Silk.UI
                 _tooltipLines.Add(($"Group: {player.SpawnGroupID}", SKPaints.TooltipText));
 
             // Health status (only show if not Healthy)
-            if (player.HealthStatus != EHealthStatus.Healthy)
+            if (player.HealthStatus != PlayerHealthStatus.Healthy)
             {
                 string healthLabel = player.HealthStatus switch
                 {
-                    EHealthStatus.Dying => "Dying",
-                    EHealthStatus.BadlyInjured => "Badly Injured",
-                    EHealthStatus.Injured => "Injured",
+                    PlayerHealthStatus.Dying => "Dying",
+                    PlayerHealthStatus.BadlyInjured => "Badly Injured",
+                    PlayerHealthStatus.Injured => "Injured",
                     _ => "Healthy",
                 };
                 _tooltipLines.Add(($"Health: {healthLabel}", SKPaints.TooltipAccent));

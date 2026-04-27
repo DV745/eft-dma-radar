@@ -227,6 +227,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
         {
             _gameWorldBase = gameWorldBase;
             _mapId = mapId;
+            // Clear stale HandsManager cache so re-discovered players on the same base
+            // addresses don't hit the fast-path before their new Player objects are populated.
+            HandsManager.ClearAll();
         }
 
         #endregion
@@ -558,27 +561,14 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                         catch { /* non-fatal */ }
                     }
 
-                    // Health status refresh — lightweight single int read, not budgeted
+                    // Health refresh (not budget-limited — read is cheap)
                     if (now >= entry.NextHealthRefresh)
                     {
                         entry.NextHealthRefresh = now.AddSeconds(HealthRefreshIntervalSec);
+                        HealthManager.Refresh(entry.Base, entry.Player, entry.IsObserved);
 
-                        if (entry.IsObserved)
-                        {
-                            // Lazily resolve the ObservedHealthController on first use — moved
-                            // off the critical discovery tick (saves ~3 DMA reads per new observed
-                            // player). Until resolved, HealthStatus stays at Healthy.
-                            if (entry.ObservedHealthControllerAddr == 0)
-                                TryResolveObservedHealthController(entry.Base, entry);
-
-                            // Observed player: read ETagStatus from ObservedHealthController
-                            UpdateObservedHealthStatus(entry);
-                        }
-                        else if (entry.Player is Player.LocalPlayer lp)
-                        {
-                            // Local player: read energy/hydration
+                        if (!entry.IsObserved && entry.Player is Player.LocalPlayer lp)
                             lp.UpdateEnergyHydration(entry.Base);
-                        }
                     }
                 }
                 else
@@ -627,13 +617,13 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
 
                 // ETagStatus is a [Flags] enum — check from most severe to least
                 if ((tag & ETagDying) != 0)
-                    entry.Player.HealthStatus = Player.EHealthStatus.Dying;
+                    entry.Player.HealthStatus = PlayerHealthStatus.Dying;
                 else if ((tag & ETagBadlyInjured) != 0)
-                    entry.Player.HealthStatus = Player.EHealthStatus.BadlyInjured;
+                    entry.Player.HealthStatus = PlayerHealthStatus.BadlyInjured;
                 else if ((tag & ETagInjured) != 0)
-                    entry.Player.HealthStatus = Player.EHealthStatus.Injured;
+                    entry.Player.HealthStatus = PlayerHealthStatus.Injured;
                 else
-                    entry.Player.HealthStatus = Player.EHealthStatus.Healthy;
+                    entry.Player.HealthStatus = PlayerHealthStatus.Healthy;
             }
             catch
             {

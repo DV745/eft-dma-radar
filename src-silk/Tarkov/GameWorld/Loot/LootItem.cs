@@ -194,11 +194,18 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
             if (result.Wishlisted)
                 return differentFloor ? SKPaints.LootWishlistDimmed : SKPaints.LootWishlist;
 
-            // Value tiers override the plain "important green" at 2×/5× the threshold
-            if (result.Tier >= 3)
-                return differentFloor ? SKPaints.LootTopDimmed : SKPaints.LootTop;
-            if (result.Tier == 2)
-                return differentFloor ? SKPaints.LootRareDimmed : SKPaints.LootRare;
+            if (result.QuestRequired)
+                return differentFloor ? SKPaints.LootQuestItemsDimmed : SKPaints.LootQuestItems;
+
+            if (result.CategoryMatch)
+                return result.Category switch
+                {
+                    LootFilter.LootCategory.Meds     => differentFloor ? SKPaints.LootMedsDimmed     : SKPaints.LootMeds,
+                    LootFilter.LootCategory.Food     => differentFloor ? SKPaints.LootFoodDimmed     : SKPaints.LootFood,
+                    LootFilter.LootCategory.Backpack => differentFloor ? SKPaints.LootBackpacksDimmed : SKPaints.LootBackpacks,
+                    LootFilter.LootCategory.Key      => differentFloor ? SKPaints.LootKeysDimmed     : SKPaints.LootKeys,
+                    _ => differentFloor ? SKPaints.LootImportantDimmed : SKPaints.LootImportant,
+                };
 
             if (result.Important)
                 return differentFloor ? SKPaints.LootImportantDimmed : SKPaints.LootImportant;

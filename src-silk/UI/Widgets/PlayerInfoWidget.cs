@@ -80,7 +80,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
                              ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY |
                              ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.NoPadOuterX;
 
-            if (ImGui.BeginTable("PlayersTable", 8, tableFlags))
+            if (ImGui.BeginTable("PlayersTable", 9, tableFlags))
             {
                 ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 140f);
                 ImGui.TableSetupColumn("Lvl", ImGuiTableColumnFlags.WidthFixed, 28f);
@@ -89,6 +89,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 ImGui.TableSetupColumn("Hands", ImGuiTableColumnFlags.WidthFixed, 60f);
                 ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 55f);
                 ImGui.TableSetupColumn("Gear", ImGuiTableColumnFlags.WidthFixed, 40f);
+                ImGui.TableSetupColumn("Secure", ImGuiTableColumnFlags.WidthFixed, 50f);
                 ImGui.TableSetupColumn("Dist", ImGuiTableColumnFlags.WidthFixed, 45f);
                 ImGui.TableSetupScrollFreeze(0, 1);
                 ImGui.TableHeadersRow();
@@ -164,6 +165,13 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     {
                         ImGui.TextColored(ColorDim, "--");
                     }
+
+                    // Secure container
+                    ImGui.TableNextColumn();
+                    if (player.GearReady && player.Equipment.TryGetValue("SecuredContainer", out var secure))
+                        ImGui.TextColored(color, secure.Short);
+                    else
+                        ImGui.TextColored(ColorDim, "--");
 
                     // Distance
                     ImGui.TableNextColumn();
@@ -351,11 +359,12 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
         private static Vector4 GetPlayerColor(PlayerType t) => t switch
         {
-            PlayerType.USEC or PlayerType.BEAR => new Vector4(0.38f, 0.55f, 1f, 1f),
-            PlayerType.PScav                   => new Vector4(0.9f, 0.8f, 0.2f, 1f),
-            PlayerType.SpecialPlayer           => new Vector4(1f, 0.4f, 0f, 1f),
-            PlayerType.Streamer                => new Vector4(0.6f, 0.2f, 1f, 1f),
-            _                                  => new Vector4(1f, 1f, 1f, 1f)
+            PlayerType.USEC        => SKPaints.ToVec4(SKPaints.PaintUSEC.Color),
+            PlayerType.BEAR        => SKPaints.ToVec4(SKPaints.PaintBEAR.Color),
+            PlayerType.PScav       => SKPaints.ToVec4(SKPaints.PaintPScav.Color),
+            PlayerType.SpecialPlayer => SKPaints.ToVec4(SKPaints.PaintSpecial.Color),
+            PlayerType.Streamer    => SKPaints.ToVec4(SKPaints.PaintStreamer.Color),
+            _                      => new Vector4(1f, 1f, 1f, 1f)
         };
 
         /// <summary>

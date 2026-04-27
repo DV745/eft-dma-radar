@@ -32,6 +32,11 @@ namespace eft_dma_radar.Silk.UI.Panels
                     DrawMapTab();
                     DrawHotkeysTab();
                     DrawMemWritesTab();
+                    if (ImGui.BeginTabItem("\U0001f3a8 Colors"))
+                    {
+                        ColorsPanel.Draw();
+                        ImGui.EndTabItem();
+                    }
 
                     ImGui.EndTabBar();
                 }

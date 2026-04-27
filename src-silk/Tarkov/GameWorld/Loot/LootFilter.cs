@@ -58,6 +58,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
 
         // ── Filter result ────────────────────────────────────────────────────
 
+        /// <summary>Category that caused a category-bypass match.</summary>
+        internal enum LootCategory : byte { None = 0, Meds = 1, Food = 2, Backpack = 3, Key = 4 }
+
         /// <summary>
         /// Result of evaluating an item against all filter criteria.
         /// Avoids repeated evaluation across render + widget + tooltip paths.
@@ -75,6 +78,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
 
             /// <summary>Whether the item was shown due to a category toggle.</summary>
             public bool CategoryMatch { get; init; }
+
+            /// <summary>Which category caused the match (None if not a category match).</summary>
+            public LootCategory Category { get; init; }
 
             /// <summary>Whether the item is required for an active quest.</summary>
             public bool QuestRequired { get; init; }
@@ -167,8 +173,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
             }
 
             // Category toggle bypass (show regardless of price)
-            bool categoryMatch = IsCategoryMatch(item, config);
-            if (categoryMatch)
+            var category = GetCategory(item, config);
+            if (category != LootCategory.None)
             {
                 // Name search still applies to category items
                 if (!PassesNameSearch(item))
@@ -179,6 +185,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                     Visible = true,
                     Important = IsImportant(displayPrice),
                     CategoryMatch = true,
+                    Category = category,
                     Tier = GetTier(displayPrice),
                 };
             }
@@ -252,13 +259,13 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                    item.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool IsCategoryMatch(TarkovMarketItem item, SilkConfig config)
+        private static LootCategory GetCategory(TarkovMarketItem item, SilkConfig config)
         {
-            if (config.LootShowMeds && item.IsMeds) return true;
-            if (config.LootShowFood && item.IsFood) return true;
-            if (config.LootShowBackpacks && item.IsBackpack) return true;
-            if (config.LootShowKeys && item.IsKey) return true;
-            return false;
+            if (config.LootShowMeds && item.IsMeds) return LootCategory.Meds;
+            if (config.LootShowFood && item.IsFood) return LootCategory.Food;
+            if (config.LootShowBackpacks && item.IsBackpack) return LootCategory.Backpack;
+            if (config.LootShowKeys && item.IsKey) return LootCategory.Key;
+            return LootCategory.None;
         }
 
         // ── Batch helpers ────────────────────────────────────────────────────

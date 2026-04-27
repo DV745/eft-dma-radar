@@ -168,6 +168,9 @@ namespace eft_dma_radar.Silk.UI
                 if (ImGui.MenuItem("\u25ce Aimview", "A", AimviewWidget.IsOpen))
                     AimviewWidget.IsOpen = !AimviewWidget.IsOpen;
 
+                if (ImGui.MenuItem("\u25cf Teammate Aimview", null, TeammateAimviewWidget.IsOpen))
+                    TeammateAimviewWidget.IsOpen = !TeammateAimviewWidget.IsOpen;
+
                 ImGui.Separator();
 
                 // Overlays
@@ -192,6 +195,7 @@ namespace eft_dma_radar.Silk.UI
                     PlayerInfoWidget.IsOpen = false;
                     LootWidget.IsOpen = false;
                     AimviewWidget.IsOpen = false;
+                    TeammateAimviewWidget.IsOpen = false;
                 }
 
                 ImGui.EndMenu();
@@ -394,6 +398,9 @@ namespace eft_dma_radar.Silk.UI
 
             if (AimviewWidget.IsOpen && InRaid && Config.ShowAimview)
                 AimviewWidget.Draw();
+
+            if (TeammateAimviewWidget.IsOpen && InRaid)
+                TeammateAimviewWidget.Draw();
         }
 
         private static void ApplyImGuiDarkStyle()
