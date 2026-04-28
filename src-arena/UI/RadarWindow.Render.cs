@@ -331,6 +331,8 @@ namespace eft_dma_radar.Arena.UI
                 DrawMainMenuBar();
                 DrawStatusBar();
                 DrawAimviewWidget();
+                DrawTeammateAimviewWidget();
+                DrawPlayerListWidget();
             }
             finally
             {
@@ -375,6 +377,12 @@ namespace eft_dma_radar.Arena.UI
 
                 bool av = Config.AimviewEnabled;
                 if (ImGui.MenuItem("\u25a3 Aimview", null, av)) Config.AimviewEnabled = !av;
+
+                bool tmAv = Config.TeammateAimviewEnabled;
+                if (ImGui.MenuItem("\u25a3 Teammate Aimview", null, tmAv)) Config.TeammateAimviewEnabled = !tmAv;
+
+                bool pl = Config.PlayerListEnabled;
+                if (ImGui.MenuItem("\u2630 Player List", null, pl)) Config.PlayerListEnabled = !pl;
 
                 bool espFs = Config.EspFullscreen;
                 if (ImGui.MenuItem("ESP Fullscreen (F11 in ESP)", null, espFs))

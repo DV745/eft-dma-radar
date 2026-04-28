@@ -95,6 +95,22 @@ namespace eft_dma_radar.Arena.Config
         [JsonPropertyName("aimviewEyeHeight")]
         public float AimviewEyeHeight { get; set; } = 1.5f;
 
+        // ── Teammate Aimview ──────────────────────────────────────────────────
+
+        /// <summary>If true, the Teammate Aimview window is open.</summary>
+        [JsonPropertyName("teammateAimviewEnabled")]
+        public bool TeammateAimviewEnabled { get; set; } = false;
+
+        /// <summary>In-game name of the teammate to watch in the Teammate Aimview.</summary>
+        [JsonPropertyName("teammateAimviewName")]
+        public string TeammateAimviewName { get; set; } = string.Empty;
+
+        // ── Player List ───────────────────────────────────────────────────────
+
+        /// <summary>If true, the Player List window is open.</summary>
+        [JsonPropertyName("playerListEnabled")]
+        public bool PlayerListEnabled { get; set; } = false;
+
         // ── Game / Camera ─────────────────────────────────────────────────────
 
         /// <summary>Width of the game's render resolution (used by CameraManager W2S).</summary>

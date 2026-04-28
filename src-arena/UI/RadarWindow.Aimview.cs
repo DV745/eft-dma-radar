@@ -420,5 +420,179 @@ namespace eft_dma_radar.Arena.UI
                 drawList.AddLine(a, b, playerColor, 1.5f);
             }
         }
+
+        /// <summary>Draws the Teammate Aimview ImGui window when enabled.</summary>
+        private static void DrawTeammateAimviewWidget()
+        {
+            if (!Config.TeammateAimviewEnabled) return;
+
+            ImGui.SetNextWindowSizeConstraints(new Vector2(200, 160), new Vector2(1024, 768));
+            ImGui.SetNextWindowSize(new Vector2(360, 270), ImGuiCond.FirstUseEver);
+
+            bool open = Config.TeammateAimviewEnabled;
+            var flags = ImGuiWindowFlags.NoCollapse |
+                        ImGuiWindowFlags.NoScrollbar |
+                        ImGuiWindowFlags.NoScrollWithMouse;
+
+            if (!ImGui.Begin("Teammate Aimview", ref open, flags))
+            {
+                if (open != Config.TeammateAimviewEnabled) Config.TeammateAimviewEnabled = open;
+                ImGui.End();
+                return;
+            }
+
+            try
+            {
+                if (open != Config.TeammateAimviewEnabled) Config.TeammateAimviewEnabled = open;
+
+                // Name input field
+                string name = Config.TeammateAimviewName;
+                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                if (ImGui.InputTextWithHint("##tm_name", "Enter teammate name...", ref name, 64))
+                    Config.TeammateAimviewName = name;
+
+                ImGui.Spacing();
+
+                var contentMin  = ImGui.GetCursorScreenPos();
+                var contentSize = ImGui.GetContentRegionAvail();
+
+                if (contentSize.X < 10 || contentSize.Y < 10) return;
+
+                var drawList   = ImGui.GetWindowDrawList();
+                var contentMax = contentMin + contentSize;
+                ImGui.InvisibleButton("##tm_aimview_canvas", contentSize);
+
+                // Resolve teammate from current player list
+                var gw = Memory.CurrentGameWorld;
+                Player? teammate = null;
+                if (gw is not null && !string.IsNullOrWhiteSpace(Config.TeammateAimviewName))
+                {
+                    foreach (var p in gw.Players)
+                    {
+                        if (p.IsLocalPlayer || !p.IsActive || !p.IsAlive || !p.HasValidPosition)
+                            continue;
+                        if (p.Name.Equals(Config.TeammateAimviewName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            teammate = p;
+                            break;
+                        }
+                    }
+                }
+
+                EnsureAimviewColors();
+                drawList.AddRectFilled(contentMin, contentMax, _avColorBg);
+                var center = contentMin + contentSize * 0.5f;
+                drawList.AddLine(new Vector2(contentMin.X, center.Y), new Vector2(contentMax.X, center.Y), _avColorCrosshair);
+                drawList.AddLine(new Vector2(center.X, contentMin.Y), new Vector2(center.X, contentMax.Y), _avColorCrosshair);
+
+                if (teammate is null || !teammate.HasValidPosition)
+                {
+                    string msg = string.IsNullOrWhiteSpace(Config.TeammateAimviewName)
+                        ? "Enter a teammate name above"
+                        : $"'{Config.TeammateAimviewName}' not found in raid";
+                    var sz = ImGui.CalcTextSize(msg);
+                    var pos = new Vector2(center.X - sz.X * 0.5f, center.Y - sz.Y * 0.5f);
+                    drawList.AddText(new Vector2(pos.X + 1, pos.Y + 1), _avColorShadow, msg);
+                    drawList.AddText(pos, _avColorDefault, msg);
+                    drawList.AddRect(contentMin, contentMax, _avColorBorder);
+                    return;
+                }
+
+                // Build synthetic projection basis from teammate yaw/pitch
+                int widgetW = (int)contentSize.X;
+                int widgetH = (int)contentSize.Y;
+                float maxDist = Config.AimviewMaxDistance;
+                float zoom    = Config.AimviewZoom;
+
+                var eyePos = new Vector3(teammate.Position.X,
+                                         teammate.Position.Y + Config.AimviewEyeHeight,
+                                         teammate.Position.Z);
+
+                float yaw   = teammate.RotationYaw   * (MathF.PI / 180f);
+                float pitch = teammate.RotationPitch * (MathF.PI / 180f);
+                (float sy, float cy) = MathF.SinCos(yaw);
+                (float sp, float cp) = MathF.SinCos(pitch);
+                var forward = Vector3.Normalize(new Vector3(sy * cp, -sp, cy * cp));
+                var right   = Vector3.Normalize(new Vector3(cy, 0f, -sy));
+                var up      = -Vector3.Normalize(Vector3.Cross(right, forward));
+
+                bool showLabels    = Config.AimviewShowLabels;
+                bool drawSkeletons = Config.AimviewDrawSkeletons;
+                bool hideAI        = Config.AimviewHideAI;
+
+                int drawn = 0, total = 0;
+
+                foreach (var p in gw!.Players)
+                {
+                    if (!p.IsActive || !p.IsAlive || !p.HasValidPosition) continue;
+                    if (ReferenceEquals(p, teammate)) continue; // skip the viewed player itself
+                    total++;
+                    if (hideAI && IsAIPlayer(p.Type)) continue;
+
+                    var worldPos = p.Position;
+                    if (worldPos.LengthSquared() < 1f) continue;
+
+                    float dist = Vector3.Distance(eyePos, worldPos);
+                    if (dist > maxDist || dist < 0.5f) continue;
+
+                    if (!TryProjectSynthetic(worldPos, eyePos, forward, right, up, zoom,
+                                             contentMin, widgetW, widgetH, out float sx, out float sy2))
+                        continue;
+
+                    if (sx < contentMin.X - 20 || sx > contentMax.X + 20 ||
+                        sy2 < contentMin.Y - 20 || sy2 > contentMax.Y + 20)
+                        continue;
+
+                    uint color = p.IsLocalPlayer
+                        ? _avColorLocal
+                        : GetAimviewPlayerColor(p);
+
+                    bool drewSkeleton = false;
+                    float labelOffset;
+                    if (drawSkeletons && p.Skeleton is { IsInitialized: true } sk)
+                    {
+                        bool ok = sk.UpdateScreenBufferSynthetic(eyePos, forward, right, up, zoom,
+                                                                  contentMin, widgetW, widgetH);
+                        if (ok && sk.HasScreenData)
+                        {
+                            DrawAimviewSkeleton(drawList, sk, contentMin, contentMax, color);
+                            drewSkeleton = true;
+                        }
+                    }
+
+                    if (!drewSkeleton)
+                    {
+                        float dotR = float.Clamp(6f - dist * 0.015f, 2f, 6f);
+                        drawList.AddCircleFilled(new Vector2(sx, sy2), dotR, color);
+                        drawList.AddCircle(new Vector2(sx, sy2), dotR, _avColorDotOutline);
+                        labelOffset = dotR + 2f;
+                    }
+                    else
+                    {
+                        labelOffset = 4f;
+                    }
+                    drawn++;
+
+                    if (showLabels)
+                    {
+                        string label = string.IsNullOrEmpty(p.Name)
+                            ? $"({(int)dist}m)"
+                            : $"{p.Name} ({(int)dist}m)";
+                        DrawAimviewLabel(drawList, label, sx, sy2, labelOffset, color, contentMin, contentMax);
+                    }
+                }
+
+                drawList.AddRect(contentMin, contentMax, _avColorBorder);
+
+                // HUD
+                string hud = $"TM:{teammate.Name}  yaw={teammate.RotationYaw:F0}  drawn={drawn}/{total}";
+                drawList.AddText(new Vector2(contentMin.X + 5, contentMin.Y + 3), _avColorShadow, hud);
+                drawList.AddText(new Vector2(contentMin.X + 4, contentMin.Y + 2), _avColorCrosshair, hud);
+            }
+            finally
+            {
+                ImGui.End();
+            }
+        }
     }
 }
