@@ -13,13 +13,13 @@ namespace eft_dma_radar.Arena.UI
         // Column header colors
         private static readonly Vector4 _plColorDim     = new(0.40f, 0.40f, 0.40f, 1f);
         private static readonly Vector4 _plColorLocal    = new(0.20f, 1.00f, 1.00f, 1f);
-        private static readonly Vector4 _plColorTeammate = new(0.31f, 0.86f, 0.31f, 1f);
+        private static readonly Vector4 _plColorTeammate = new(0.39f, 0.63f, 1.00f, 1f);
         private static readonly Vector4 _plColorEnemy    = new(0.90f, 0.24f, 0.24f, 1f);
         private static readonly Vector4 _plColorScav     = new(0.94f, 0.90f, 0.24f, 1f);
-        private static readonly Vector4 _plColorRaider   = new(1.00f, 0.71f, 0.12f, 1f);
-        private static readonly Vector4 _plColorBoss     = new(0.90f, 0.20f, 0.90f, 1f);
-        private static readonly Vector4 _plColorGuard    = new(0.78f, 0.55f, 0.20f, 1f);
-        private static readonly Vector4 _plColorPScav    = new(0.86f, 0.86f, 0.86f, 1f);
+        private static readonly Vector4 _plColorRaider   = new(0.86f, 0.39f, 0.71f, 1f);
+        private static readonly Vector4 _plColorBoss     = new(0.71f, 0.20f, 0.86f, 1f);
+        private static readonly Vector4 _plColorGuard    = new(0.86f, 0.39f, 0.71f, 1f);
+        private static readonly Vector4 _plColorPScav    = new(0.90f, 0.24f, 0.24f, 1f);
         private static readonly Vector4 _plColorDefault  = new(0.80f, 0.80f, 0.80f, 1f);
 
         // Team armband colors
@@ -116,7 +116,7 @@ namespace eft_dma_radar.Arena.UI
                                  ImGuiTableFlags.SizingFixedFit |
                                  ImGuiTableFlags.NoPadOuterX;
 
-                if (ImGui.BeginTable("ArenaPlayersTable", 7, tableFlags))
+                if (ImGui.BeginTable("ArenaPlayersTable", 8, tableFlags))
                 {
                     ImGui.TableSetupColumn("Name",   ImGuiTableColumnFlags.WidthFixed,   160f);
                     ImGui.TableSetupColumn("Type",   ImGuiTableColumnFlags.WidthFixed,    64f);
@@ -124,6 +124,7 @@ namespace eft_dma_radar.Arena.UI
                     ImGui.TableSetupColumn("Dist",   ImGuiTableColumnFlags.WidthFixed,    44f);
                     ImGui.TableSetupColumn("Δ Alt",  ImGuiTableColumnFlags.WidthFixed,    40f);
                     ImGui.TableSetupColumn("Yaw",    ImGuiTableColumnFlags.WidthFixed,    44f);
+                    ImGui.TableSetupColumn("Health", ImGuiTableColumnFlags.WidthFixed,    80f);
                     ImGui.TableSetupColumn("Status", ImGuiTableColumnFlags.WidthFixed,    50f);
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
@@ -148,14 +149,17 @@ namespace eft_dma_radar.Arena.UI
 
                         // ── Team ──
                         ImGui.TableNextColumn();
-                        if (p.TeamID >= 0)
+                        if (p.IsLocalPlayer)
                         {
-                            var teamColor = GetTeamColor((ArmbandColorType)p.TeamID);
-                            ImGui.TextColored(teamColor, ((ArmbandColorType)p.TeamID).ToString());
+                            ImGui.TextColored(_plColorLocal, "You");
+                        }
+                        else if (p.Type == PlayerType.Teammate)
+                        {
+                            ImGui.TextColored(_plColorTeammate, "Blue");
                         }
                         else
                         {
-                            ImGui.TextColored(_plColorDim, "--");
+                            ImGui.TextColored(_plColorEnemy, "Red");
                         }
 
                         // ── Distance ──
@@ -183,6 +187,24 @@ namespace eft_dma_radar.Arena.UI
                             ImGui.TextColored(color, $"{(int)p.RotationYaw}°");
                         else
                             ImGui.TextColored(_plColorDim, "--");
+
+                        // ── Health ──
+                        ImGui.TableNextColumn();
+                        if (p.IsLocalPlayer)
+                        {
+                            ImGui.TextColored(_plColorDim, "--");
+                        }
+                        else
+                        {
+                            var (healthLabel, healthColor) = p.HealthStatus switch
+                            {
+                                PlayerHealthStatus.Healthy      => ("Healthy",       new Vector4(0.30f, 0.85f, 0.30f, 1f)),
+                                PlayerHealthStatus.Injured      => ("Injured",       new Vector4(0.90f, 0.78f, 0.20f, 1f)),
+                                PlayerHealthStatus.BadlyInjured => ("Badly Injured", new Vector4(0.90f, 0.47f, 0.12f, 1f)),
+                                _                               => ("Dying",         new Vector4(0.86f, 0.16f, 0.16f, 1f)),
+                            };
+                            ImGui.TextColored(healthColor, healthLabel);
+                        }
 
                         // ── Status ──
                         ImGui.TableNextColumn();
@@ -228,7 +250,10 @@ namespace eft_dma_radar.Arena.UI
             {
                 ImGui.TextColored(_plColorDim, "Team: ");
                 ImGui.SameLine();
-                ImGui.TextColored(GetTeamColor((ArmbandColorType)p.TeamID), ((ArmbandColorType)p.TeamID).ToString());
+                bool isFriendly = p.Type == PlayerType.Teammate;
+                ImGui.TextColored(
+                    isFriendly ? _plColorTeammate : _plColorEnemy,
+                    isFriendly ? "Blue" : "Red");
             }
 
             if (p.HasValidPosition)
@@ -248,18 +273,15 @@ namespace eft_dma_radar.Arena.UI
 
         private static Vector4 GetPlayerListColor(Player p)
         {
-            if (p.IsLocalPlayer) return _plColorLocal;
+            if (p.IsLocalPlayer)               return _plColorLocal;
             if (p.Type == PlayerType.Teammate) return _plColorTeammate;
-            if (p.TeamID >= 0) return GetTeamColor((ArmbandColorType)p.TeamID);
             return p.Type switch
             {
-                PlayerType.USEC or PlayerType.BEAR => _plColorEnemy,
-                PlayerType.PScav                   => _plColorPScav,
-                PlayerType.AIScav                  => _plColorScav,
-                PlayerType.AIRaider                => _plColorRaider,
-                PlayerType.AIBoss                  => _plColorBoss,
-                PlayerType.AIGuard                 => _plColorGuard,
-                _                                  => _plColorDefault,
+                PlayerType.AIScav   => _plColorScav,
+                PlayerType.AIRaider => _plColorRaider,
+                PlayerType.AIBoss   => _plColorBoss,
+                PlayerType.AIGuard  => _plColorGuard,
+                _                   => _plColorEnemy, // red for human enemies
             };
         }
 

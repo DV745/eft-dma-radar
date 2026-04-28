@@ -142,7 +142,14 @@ namespace eft_dma_radar.Arena.UI
         {
             Vector2 centerWorld = default;
             if (local is { HasValidPosition: true })
+            {
                 centerWorld = new Vector2(local.Position.X, local.Position.Z);
+                _lastGridCenter = centerWorld;
+            }
+            else if (_lastGridCenter != default)
+            {
+                centerWorld = _lastGridCenter;
+            }
             centerWorld += _gridPanOffset;
 
             var w = size.X / scale;
@@ -220,73 +227,100 @@ namespace eft_dma_radar.Arena.UI
                 canvas.DrawLine(sp, new SKPoint(sp.X + fx * length, sp.Y + fy * length), SKPaints.Aimline);
             }
 
+            // Height triangles — draw to the left of the dot when height diff exceeds threshold
+            if (!isLocal && p.HasValidPosition)
+            {
+                const float HeightThreshold = 1.85f;
+                const float S = 4.5f;
+                float heightDiff = p.Position.Y - localPos.Y;
+                if (MathF.Abs(heightDiff) >= HeightThreshold)
+                {
+                    float cx = sp.X - r - S - 3f;
+                    float cy = sp.Y;
+                    bool up = heightDiff > 0f;
+                    using var path = new SKPath();
+                    if (up)
+                    {
+                        path.MoveTo(cx,             cy - S);
+                        path.LineTo(cx - S * 0.75f, cy + S * 0.6f);
+                        path.LineTo(cx + S * 0.75f, cy + S * 0.6f);
+                    }
+                    else
+                    {
+                        path.MoveTo(cx,             cy + S);
+                        path.LineTo(cx - S * 0.75f, cy - S * 0.6f);
+                        path.LineTo(cx + S * 0.75f, cy - S * 0.6f);
+                    }
+                    path.Close();
+                    canvas.DrawPath(path, SKPaints.ShapeBorder);
+                    canvas.DrawPath(path, fill);
+                }
+            }
+
             canvas.DrawCircle(sp, r, fill);
             canvas.DrawCircle(sp, r, SKPaints.ShapeBorder);
 
-            if (Config.ShowNames && !p.IsLocalPlayer && !string.IsNullOrEmpty(p.Name))
+            if (isLocal)
+            {
+                float tx = sp.X + r + 3f;
+                float ty = sp.Y - r;
+                canvas.DrawText("LocalPlayer", tx + 1, ty + 1, SKPaints.FontRegular11, SKPaints.TextShadow);
+                canvas.DrawText("LocalPlayer", tx,     ty,     SKPaints.FontRegular11, SKPaints.TextLocalPlayer);
+                return;
+            }
+
+            if (Config.ShowNames && !string.IsNullOrEmpty(p.Name))
             {
                 float tx = sp.X + r + 3f;
                 float ty = sp.Y - r;
 
-                // Silk-style info suffix: signed height (meters) + distance (meters).
-                // Neo Sans Std lacks the ▲/▼ glyphs (they render as tofu),
-                // so we use ASCII signed numbers, matching the Silk radar presentation.
-                string infoTag = string.Empty;
-                if (Config.ShowHeightDiff)
+                // Name line
+                string nameLabel = Config.ShowTeamTag
+                    ? (p.Type == PlayerType.Teammate ? $"{p.Name} [Blue]" : $"{p.Name} [Red]")
+                    : p.Name;
+
+                canvas.DrawText(nameLabel, tx + 1, ty + 1, SKPaints.FontRegular11, SKPaints.TextShadow);
+                canvas.DrawText(nameLabel, tx,     ty,     SKPaints.FontRegular11, text);
+
+                float infoY = ty + 12f;
+
+                // Height + distance info line
+                if (Config.ShowHeightDiff && p.HasValidPosition)
                 {
                     int h = (int)MathF.Round(p.Position.Y - localPos.Y);
                     int d = (int)Vector3.Distance(localPos, p.Position);
-                    infoTag = $"  {h:+0;-0;0}m  {d}m";
+                    string info = $"{h:+0;-0;0}m  {d}m";
+                    canvas.DrawText(info, tx + 1, infoY + 1, SKPaints.FontRegular9, SKPaints.TextShadow);
+                    canvas.DrawText(info, tx,     infoY,     SKPaints.FontRegular9, SKPaints.TextInfo);
+                    infoY += 11f;
                 }
 
-                string label;
-                if (Config.ShowTeamTag && p.TeamID >= 0)
-                    label = $"{p.Name} [{(ArmbandColorType)p.TeamID}]{infoTag}";
-                else if (infoTag.Length > 0)
-                    label = $"{p.Name}{infoTag}";
-                else
-                    label = p.Name;
-
-                canvas.DrawText(label, tx + 1, ty + 1, SKPaints.FontRegular11, SKPaints.TextShadow);
-                canvas.DrawText(label, tx,     ty,     SKPaints.FontRegular11, text);
+                // Health status line (omit when Healthy)
+                if (p.HealthStatus != PlayerHealthStatus.Healthy)
+                {
+                    var (healthText, healthPaint) = p.HealthStatus switch
+                    {
+                        PlayerHealthStatus.Injured      => ("Injured",       SKPaints.TextHealthInjured),
+                        PlayerHealthStatus.BadlyInjured => ("Badly Injured", SKPaints.TextHealthBadly),
+                        _                               => ("Dying",         SKPaints.TextHealthDying),
+                    };
+                    canvas.DrawText(healthText, tx + 1, infoY + 1, SKPaints.FontRegular9, SKPaints.TextShadow);
+                    canvas.DrawText(healthText, tx,     infoY,     SKPaints.FontRegular9, healthPaint);
+                }
             }
         }
 
         private static (SKPaint fill, SKPaint text) GetPlayerPaints(Player p)
         {
-            if (p.IsLocalPlayer)
-                return (SKPaints.PaintLocalPlayer, SKPaints.TextLocalPlayer);
-
-            // Teammates (same Arena armband team as LocalPlayer) get the teammate highlight.
-            if (p.Type == PlayerType.Teammate)
-                return (SKPaints.PaintTeammate, SKPaints.TextTeammate);
-
-            // Non-teammates: color by armband team when known.
-            if (p.TeamID >= 0)
-            {
-                return (ArmbandColorType)p.TeamID switch
-                {
-                    ArmbandColorType.red     => (SKPaints.PaintTeamRed,     SKPaints.TextTeamRed),
-                    ArmbandColorType.fuchsia => (SKPaints.PaintTeamFuchsia, SKPaints.TextTeamFuchsia),
-                    ArmbandColorType.yellow  => (SKPaints.PaintTeamYellow,  SKPaints.TextTeamYellow),
-                    ArmbandColorType.green   => (SKPaints.PaintTeamGreen,   SKPaints.TextTeamGreen),
-                    ArmbandColorType.azure   => (SKPaints.PaintTeamAzure,   SKPaints.TextTeamAzure),
-                    ArmbandColorType.white   => (SKPaints.PaintTeamWhite,   SKPaints.TextTeamWhite),
-                    ArmbandColorType.blue    => (SKPaints.PaintTeamBlue,    SKPaints.TextTeamBlue),
-                    _                        => (SKPaints.PaintDefault,     SKPaints.TextWhite),
-                };
-            }
-
+            if (p.IsLocalPlayer)               return (SKPaints.PaintLocalPlayer, SKPaints.TextLocalPlayer);
+            if (p.Type == PlayerType.Teammate) return (SKPaints.PaintTeammate,    SKPaints.TextTeammate);
             return p.Type switch
             {
-                PlayerType.USEC     => (SKPaints.PaintUSEC,   SKPaints.TextUSEC),
-                PlayerType.BEAR     => (SKPaints.PaintBEAR,   SKPaints.TextBEAR),
-                PlayerType.PScav    => (SKPaints.PaintPScav,  SKPaints.TextPScav),
                 PlayerType.AIScav   => (SKPaints.PaintScav,   SKPaints.TextScav),
                 PlayerType.AIRaider => (SKPaints.PaintRaider, SKPaints.TextRaider),
                 PlayerType.AIBoss   => (SKPaints.PaintBoss,   SKPaints.TextBoss),
                 PlayerType.AIGuard  => (SKPaints.PaintGuard,  SKPaints.TextGuard),
-                _                   => (SKPaints.PaintDefault, SKPaints.TextWhite),
+                _                   => (SKPaints.PaintUSEC,   SKPaints.TextUSEC), // red for human enemies
             };
         }
 

@@ -21,6 +21,18 @@
     }
 
     /// <summary>
+    /// Player health status derived from the ETagStatus bitmask.
+    /// Priority order: Dying > BadlyInjured > Injured > Healthy.
+    /// </summary>
+    internal enum PlayerHealthStatus
+    {
+        Healthy      = 0,
+        Injured      = 1,
+        BadlyInjured = 2,
+        Dying        = 3,
+    }
+
+    /// <summary>
     /// Represents a single player tracked in the current Arena match.
     /// Written by the registration worker (identity) and realtime worker (position/rotation).
     /// </summary>
@@ -64,6 +76,14 @@
 
         /// <summary>True when the position has been successfully computed at least once.</summary>
         public bool HasValidPosition;
+
+        // ── Health (written by registration worker) ──────────────────────
+
+        /// <summary>Simplified health status derived from ETagStatus bitmask.</summary>
+        public PlayerHealthStatus HealthStatus;
+
+        /// <summary>Cached ObservedHealthController address — avoids re-walking the OPC chain every tick.</summary>
+        internal ulong HealthControllerAddr;
 
         // ── Realtime data (written by realtime scatter thread) ────────────
 

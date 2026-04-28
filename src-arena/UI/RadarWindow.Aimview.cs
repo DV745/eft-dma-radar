@@ -29,14 +29,14 @@ namespace eft_dma_radar.Arena.UI
         private static void EnsureAimviewColors()
         {
             if (_aimviewColorsReady) return;
-            _avColorLocal       = ImGui.GetColorU32(new Vector4(0.20f, 1.00f, 1.00f, 1f));
-            _avColorTeammate    = ImGui.GetColorU32(new Vector4(0.31f, 0.86f, 0.31f, 1f));
+            _avColorLocal       = ImGui.GetColorU32(new Vector4(1.00f, 1.00f, 1.00f, 1f));
+            _avColorTeammate    = ImGui.GetColorU32(new Vector4(0.39f, 0.63f, 1.00f, 1f));
             _avColorEnemy       = ImGui.GetColorU32(new Vector4(0.90f, 0.24f, 0.24f, 1f));
             _avColorScav        = ImGui.GetColorU32(new Vector4(0.94f, 0.90f, 0.24f, 1f));
-            _avColorRaider      = ImGui.GetColorU32(new Vector4(1.00f, 0.71f, 0.12f, 1f));
-            _avColorBoss        = ImGui.GetColorU32(new Vector4(0.90f, 0.20f, 0.90f, 1f));
-            _avColorGuard       = ImGui.GetColorU32(new Vector4(0.78f, 0.55f, 0.20f, 1f));
-            _avColorPScav       = ImGui.GetColorU32(new Vector4(0.86f, 0.86f, 0.86f, 1f));
+            _avColorRaider      = ImGui.GetColorU32(new Vector4(0.86f, 0.39f, 0.71f, 1f));
+            _avColorBoss        = ImGui.GetColorU32(new Vector4(0.71f, 0.20f, 0.86f, 1f));
+            _avColorGuard       = ImGui.GetColorU32(new Vector4(0.86f, 0.39f, 0.71f, 1f));
+            _avColorPScav       = ImGui.GetColorU32(new Vector4(0.90f, 0.24f, 0.24f, 1f));
             _avColorDefault     = ImGui.GetColorU32(new Vector4(0.80f, 0.80f, 0.80f, 1f));
             _avColorBg          = ImGui.GetColorU32(new Vector4(0f, 0f, 0f, 0.75f));
             _avColorCrosshair   = ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 0.4f));
@@ -356,30 +356,13 @@ namespace eft_dma_radar.Arena.UI
         private static uint GetAimviewPlayerColor(GameWorld.Player p)
         {
             if (p.Type == GameWorld.PlayerType.Teammate) return _avColorTeammate;
-            if (p.TeamID >= 0)
-            {
-                return (ArmbandColorType)p.TeamID switch
-                {
-                    ArmbandColorType.red     => _avTeamRed,
-                    ArmbandColorType.fuchsia => _avTeamFuchsia,
-                    ArmbandColorType.yellow  => _avTeamYellow,
-                    ArmbandColorType.green   => _avTeamGreen,
-                    ArmbandColorType.azure   => _avTeamAzure,
-                    ArmbandColorType.white   => _avTeamWhite,
-                    ArmbandColorType.blue    => _avTeamBlue,
-                    _                        => _avColorEnemy,
-                };
-            }
             return p.Type switch
             {
-                GameWorld.PlayerType.USEC     => _avColorEnemy,
-                GameWorld.PlayerType.BEAR     => _avColorEnemy,
-                GameWorld.PlayerType.PScav    => _avColorPScav,
                 GameWorld.PlayerType.AIScav   => _avColorScav,
                 GameWorld.PlayerType.AIRaider => _avColorRaider,
                 GameWorld.PlayerType.AIBoss   => _avColorBoss,
                 GameWorld.PlayerType.AIGuard  => _avColorGuard,
-                _                             => _avColorDefault,
+                _                             => _avColorEnemy, // red for human enemies
             };
         }
 

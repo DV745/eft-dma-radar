@@ -47,6 +47,7 @@ namespace eft_dma_radar.Arena.UI
         // Grid-fallback zoom (when no map)
         private static float _pixelsPerMeter = 4.0f;
         private static Vector2 _gridPanOffset;
+        private static Vector2 _lastGridCenter;
 
         // Pinned ImGui font data
         private static GCHandle _imguiFontHandle;

@@ -403,7 +403,7 @@ namespace eft_dma_radar.Arena.UI
             if (!CameraManager.WorldToScreen(ref head, out var headScr, true, true)) return;
             if (!CameraManager.WorldToScreen(ref feet, out var feetScr, true, true)) return;
 
-            var (boxPaint, textPaint) = GetPaints(player.Type);
+            var (boxPaint, textPaint) = GetPaints(player);
 
             float boxH = MathF.Abs(feetScr.Y - headScr.Y);
             float cx = (headScr.X + feetScr.X) * 0.5f;
@@ -510,19 +510,19 @@ namespace eft_dma_radar.Arena.UI
             IsAntialias = true,
         };
 
-        private static (SKPaint box, SKPaint text) GetPaints(PlayerType type) => type switch
+        private static (SKPaint box, SKPaint text) GetPaints(Player player)
         {
-            PlayerType.LocalPlayer => (SKPaints.PaintLocalPlayer, SKPaints.TextLocalPlayer),
-            PlayerType.Teammate    => (SKPaints.PaintTeammate,    SKPaints.TextTeammate),
-            PlayerType.USEC        => (SKPaints.PaintUSEC,        SKPaints.TextUSEC),
-            PlayerType.BEAR        => (SKPaints.PaintBEAR,        SKPaints.TextBEAR),
-            PlayerType.PScav       => (SKPaints.PaintPScav,       SKPaints.TextPScav),
-            PlayerType.AIScav      => (SKPaints.PaintScav,        SKPaints.TextScav),
-            PlayerType.AIRaider    => (SKPaints.PaintRaider,      SKPaints.TextRaider),
-            PlayerType.AIBoss      => (SKPaints.PaintBoss,        SKPaints.TextBoss),
-            PlayerType.AIGuard     => (SKPaints.PaintGuard,       SKPaints.TextGuard),
-            _                      => (SKPaints.PaintDefault,     SKPaints.TextWhite),
-        };
+            if (player.IsLocalPlayer)               return (SKPaints.PaintLocalPlayer, SKPaints.TextLocalPlayer);
+            if (player.Type == PlayerType.Teammate) return (SKPaints.PaintTeammate,    SKPaints.TextTeammate);
+            return player.Type switch
+            {
+                PlayerType.AIScav   => (SKPaints.PaintScav,   SKPaints.TextScav),
+                PlayerType.AIRaider => (SKPaints.PaintRaider, SKPaints.TextRaider),
+                PlayerType.AIBoss   => (SKPaints.PaintBoss,   SKPaints.TextBoss),
+                PlayerType.AIGuard  => (SKPaints.PaintGuard,  SKPaints.TextGuard),
+                _                   => (SKPaints.PaintUSEC,   SKPaints.TextUSEC), // red for human enemies
+            };
+        }
 
         private static void DrawCenteredText(SKCanvas canvas, string text)
         {

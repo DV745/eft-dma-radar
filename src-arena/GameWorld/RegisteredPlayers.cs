@@ -275,7 +275,7 @@ namespace eft_dma_radar.Arena.GameWorld
                         ProfiledPosition cached = default;
                         bool foundCache = (player.ProfileId is string pid && _lastPositionByProfile.TryGetValue(pid, out cached))
                             || (!string.IsNullOrEmpty(player.Name) && _lastPositionByName.TryGetValue(player.Name, out cached));
-                        if (foundCache)
+                        if (foundCache && cached.Position.LengthSquared() > 1f)
                         {
                             player.Position         = cached.Position;
                             player.HasValidPosition = true;
@@ -475,6 +475,10 @@ namespace eft_dma_radar.Arena.GameWorld
                         if (localTeam >= 0 && p.TeamID == localTeam)
                             p.Type = PlayerType.Teammate;
                     }
+
+                    // Read health status for observed (non-local) players each registration tick.
+                    // Caches the HealthController address on first successful resolve.
+                    TryRefreshHealthStatus(p);
                 }
                 else
                 {
@@ -498,7 +502,8 @@ namespace eft_dma_radar.Arena.GameWorld
                     Log.WriteLine($"[RegisteredPlayers] Removed '{removed.Name}' ({removed.Type}) @ 0x{key:X}");
                     // Cache last-known position by ProfileId (stable across respawns) so re-discovery
                     // can restore the player at their prior location instead of <0,0,0>.
-                    if (!removed.IsLocalPlayer && removed.HasValidPosition)
+                    if (!removed.IsLocalPlayer && removed.HasValidPosition
+                        && removed.Position.LengthSquared() > 1f)
                     {
                         var cachedPos = new ProfiledPosition(removed.Position, removed.RotationYaw, removed.RotationPitch);
                         if (removed.ProfileId is string pid)
@@ -553,6 +558,51 @@ namespace eft_dma_radar.Arena.GameWorld
             int streak = Math.Min(++p.RotationInitFailStreak, 10);
             long delayMs = Math.Min(75L << Math.Min(streak, 4), 1_200L);
             p.NextRotationInitTick = nowTick + delayMs;
+        }
+
+        // ETagStatus bitmask values (mirrors silk HealthManager constants).
+        private const int ETagDying        = 8192;
+        private const int ETagBadlyInjured = 4096;
+        private const int ETagInjured      = 2048;
+
+        /// <summary>
+        /// Reads the ObservedHealthController ETagStatus bitmask and maps it to
+        /// <see cref="PlayerHealthStatus"/>. Caches the HealthController address on first
+        /// successful resolve so subsequent ticks skip the OPC pointer walk.
+        /// </summary>
+        private static void TryRefreshHealthStatus(Player p)
+        {
+            try
+            {
+                if (p.HealthControllerAddr == 0)
+                {
+                    if (!Memory.TryReadPtr(p.Base + Offsets.ObservedPlayerView.ObservedPlayerController, out var opc, false)
+                        || !opc.IsValidVirtualAddress())
+                        return;
+
+                    if (!Memory.TryReadPtr(opc + Offsets.ObservedPlayerController.HealthController, out var hc, false)
+                        || !hc.IsValidVirtualAddress())
+                        return;
+
+                    p.HealthControllerAddr = hc;
+                }
+
+                if (!Memory.TryReadValue<int>(p.HealthControllerAddr + Offsets.ObservedHealthController.HealthStatus, out var tag, false))
+                {
+                    p.HealthControllerAddr = 0; // stale — re-resolve next tick
+                    return;
+                }
+
+                p.HealthStatus =
+                    (tag & ETagDying)        != 0 ? PlayerHealthStatus.Dying        :
+                    (tag & ETagBadlyInjured) != 0 ? PlayerHealthStatus.BadlyInjured :
+                    (tag & ETagInjured)      != 0 ? PlayerHealthStatus.Injured      :
+                                                    PlayerHealthStatus.Healthy;
+            }
+            catch
+            {
+                p.HealthControllerAddr = 0;
+            }
         }
 
     }

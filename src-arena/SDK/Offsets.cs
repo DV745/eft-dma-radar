@@ -67,6 +67,12 @@ namespace SDK
             public static uint Culling            = 0x100; // <Culling>k__BackingField
         }
 
+        // ── ObservedHealthController (EFT.NextObservedPlayer.ObservedHealthController) ──
+        public readonly partial struct ObservedHealthController
+        {
+            public static uint HealthStatus = 0x10; // ETagStatus bitmask (int32)
+        }
+
         // ── Inventory chain (for armband-based TeamID detection) ─────────────
         public readonly partial struct InventoryController
         {

@@ -47,6 +47,26 @@ namespace eft_dma_radar.Arena.GameWorld
 
             for (int i = 0; i < active.Length; i++)
                 ProcessScatterResults(scatter, active[i]);
+
+            // Local player: supplement with camera-derived position when the camera is ready.
+            // The transform worldPos cache for the local EFT.Player can be stale (frozen at
+            // spawn) because it uses a look/raycast transform rather than the movement root.
+            // The view matrix is updated every camera worker tick and is the most reliable
+            // first-person position source — use it to keep the radar dot current.
+            var localPlayer = LocalPlayer;
+            if (localPlayer is not null && CameraManager.IsActive && CameraManager.IsReady)
+            {
+                var camPos = CameraManager.WorldPosition;
+                if (float.IsFinite(camPos.X) && float.IsFinite(camPos.Y) && float.IsFinite(camPos.Z)
+                    && camPos.LengthSquared() > 1f)
+                {
+                    // Camera sits at roughly eye level; subtract a standard eye height to get
+                    // approximate feet-level position (consistent with how ESP computes head/feet).
+                    const float EyeHeight = 1.55f;
+                    localPlayer.Position = new Vector3(camPos.X, camPos.Y - EyeHeight, camPos.Z);
+                    localPlayer.HasValidPosition = true;
+                }
+            }
         }
 
         private static void ProcessScatterResults(VmmScatter scatter, Player player)
@@ -99,7 +119,9 @@ namespace eft_dma_radar.Arena.GameWorld
                         {
                             // Previously had a valid position but now reads zero — hierarchy
                             // was likely freed/zeroed after a respawn. Treat as an error so
-                            // the auto-reinit path kicks in.
+                            // the auto-reinit path kicks in. Also clear HasValidPosition so
+                            // the player isn't rendered at world origin until reinit completes.
+                            player.HasValidPosition = false;
                             posOk = false;
                         }
                     }
