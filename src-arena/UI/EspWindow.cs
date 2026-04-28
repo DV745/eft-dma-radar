@@ -520,7 +520,9 @@ namespace eft_dma_radar.Arena.UI
                 PlayerType.AIRaider => (SKPaints.PaintRaider, SKPaints.TextRaider),
                 PlayerType.AIBoss   => (SKPaints.PaintBoss,   SKPaints.TextBoss),
                 PlayerType.AIGuard  => (SKPaints.PaintGuard,  SKPaints.TextGuard),
-                _                   => (SKPaints.PaintUSEC,   SKPaints.TextUSEC), // red for human enemies
+                PlayerType.USEC     => (SKPaints.PaintUSEC,   SKPaints.TextUSEC),
+                PlayerType.BEAR     => (SKPaints.PaintBEAR,   SKPaints.TextBEAR),
+                _                   => (SKPaints.PaintUSEC,   SKPaints.TextUSEC), // fallback red
             };
         }
 

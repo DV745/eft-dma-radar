@@ -362,7 +362,9 @@ namespace eft_dma_radar.Arena.UI
                 GameWorld.PlayerType.AIRaider => _avColorRaider,
                 GameWorld.PlayerType.AIBoss   => _avColorBoss,
                 GameWorld.PlayerType.AIGuard  => _avColorGuard,
-                _                             => _avColorEnemy, // red for human enemies
+                GameWorld.PlayerType.USEC     => _avColorEnemy,
+                GameWorld.PlayerType.BEAR     => _avColorEnemy,
+                _                             => _avColorEnemy, // fallback red
             };
         }
 

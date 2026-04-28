@@ -281,7 +281,9 @@ namespace eft_dma_radar.Arena.UI
                 PlayerType.AIRaider => _plColorRaider,
                 PlayerType.AIBoss   => _plColorBoss,
                 PlayerType.AIGuard  => _plColorGuard,
-                _                   => _plColorEnemy, // red for human enemies
+                PlayerType.USEC     => _plColorEnemy,
+                PlayerType.BEAR     => _plColorEnemy,
+                _                   => _plColorEnemy, // fallback red
             };
         }
 
