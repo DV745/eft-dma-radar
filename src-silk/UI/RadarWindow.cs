@@ -97,6 +97,7 @@ namespace eft_dma_radar.Silk.UI
 
         // Mouse hit-test dead zone — skip expensive entity scanning when mouse barely moved
         private static Vector2 _lastHitTestMousePos;
+        private static Vector2 _currentMousePos;   // always updated — used for tooltip anchoring
         private const float HitTestDeadZone = 3f; // pixels
 
         // ── Cached ImGui strings (rebuilt only when values change) ──────────

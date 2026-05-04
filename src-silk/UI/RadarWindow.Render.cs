@@ -409,7 +409,8 @@ namespace eft_dma_radar.Silk.UI
             }
 
             // Mouseover tooltips — drawn last so they're always on top
-            DrawMouseoverTooltip(canvas, mapParams, map.Config, localPlayer);
+            var mouseCanvasPos = new SKPoint(_currentMousePos.X / scale, _currentMousePos.Y / scale);
+            DrawMouseoverTooltip(canvas, mapParams, map.Config, localPlayer, mouseCanvasPos);
 
             // Killfeed overlay — screen-space, top-right corner
             if (Config.ShowKillFeed)

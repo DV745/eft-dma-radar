@@ -214,5 +214,26 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
         }
 
         private static string FormatPrice(int price) => LootFilter.FormatPrice(price);
+
+        /// <summary>
+        /// Returns the paint that matches the item's current filter state (used by tooltip).
+        /// </summary>
+        internal SKPaint GetTooltipPaint()
+        {
+            var result = Evaluate(DisplayPrice);
+            if (result.Wishlisted)      return SKPaints.LootWishlist;
+            if (result.QuestRequired)   return SKPaints.LootQuestItems;
+            if (result.CategoryMatch)
+                return result.Category switch
+                {
+                    LootFilter.LootCategory.Meds     => SKPaints.LootMeds,
+                    LootFilter.LootCategory.Food     => SKPaints.LootFood,
+                    LootFilter.LootCategory.Backpack => SKPaints.LootBackpacks,
+                    LootFilter.LootCategory.Key      => SKPaints.LootKeys,
+                    _ => SKPaints.LootImportant,
+                };
+            if (result.Important)       return SKPaints.LootImportant;
+            return SKPaints.LootNormal;
+        }
     }
 }

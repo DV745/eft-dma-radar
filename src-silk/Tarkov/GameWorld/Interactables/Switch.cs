@@ -63,6 +63,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Interactables
             canvas.DrawPath(path, SKPaints.ShapeBorder);
             canvas.DrawPath(path, SKPaints.PaintSwitch);
 
+            if (!config.ShowSwitchLabels)
+                return;
+
             // Name label
             float lx = screenPos.X + 7f;
             float ly = screenPos.Y + 4.5f;

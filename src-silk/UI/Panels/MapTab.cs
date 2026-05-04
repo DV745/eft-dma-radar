@@ -252,6 +252,28 @@ namespace eft_dma_radar.Silk.UI.Panels
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Show the BTR armored vehicle on the radar (Streets/Woods)");
 
+            ImGui.Spacing();
+            ImGui.SeparatorText("Switches");
+
+            bool showSwitches = Config.ShowSwitches;
+            if (ImGui.Checkbox("Show Switches", ref showSwitches))
+                Config.ShowSwitches = showSwitches;
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Show interactive switch markers on the radar (power, alarm, etc.)");
+
+            if (Config.ShowSwitches)
+            {
+                ImGui.Indent(16);
+
+                bool showSwitchLabels = Config.ShowSwitchLabels;
+                if (ImGui.Checkbox("Show Labels", ref showSwitchLabels))
+                    Config.ShowSwitchLabels = showSwitchLabels;
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Show name and distance labels on switch markers");
+
+                ImGui.Unindent(16);
+            }
+
             ImGui.Separator();
             ImGui.TextDisabled("Killfeed Overlay");
 

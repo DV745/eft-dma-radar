@@ -46,6 +46,9 @@ namespace eft_dma_radar.Silk.UI
 
         private static void OnMouseMove(IMouse mouse, Vector2 position)
         {
+            // Always track the real cursor position (used by tooltip anchor)
+            _currentMousePos = position;
+
             if (_killfeedDragging)
             {
                 var scale = UIScale;
@@ -88,8 +91,10 @@ namespace eft_dma_radar.Silk.UI
             }
 
             var mp = curParams.Value;
-            var mousePos = position;
-            float hitRadius = 12f * UIScale;
+            // Convert raw pixel position to canvas coords to match mp.ToScreenPos() output
+            var uiScale = UIScale;
+            var mousePos = new Vector2(position.X / uiScale, position.Y / uiScale);
+            float hitRadius = 12f;
 
             // Pre-compute world bounds for culling — entities off-screen can't be hovered
             var worldBounds = mp.GetWorldBounds(0f);

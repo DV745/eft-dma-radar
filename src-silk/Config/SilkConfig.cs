@@ -467,6 +467,9 @@ namespace eft_dma_radar.Silk.Config
         /// <summary>Show switch markers on the radar (power switches, etc.).</summary>
         public bool ShowSwitches { get; set; } = true;
 
+        /// <summary>Show name and distance labels on switch markers.</summary>
+        public bool ShowSwitchLabels { get; set; } = true;
+
         // ── Doors ───────────────────────────────────────────────────────────────
 
         /// <summary>Master toggle for keyed door rendering on the radar.</summary>

@@ -12,7 +12,7 @@ namespace eft_dma_radar.Silk.UI
         /// <summary>
         /// Draws a SkiaSharp tooltip near the hovered entity on the radar canvas.
         /// </summary>
-        private static void DrawMouseoverTooltip(SKCanvas canvas, MapParams mapParams, MapConfig mapConfig, Player localPlayer)
+        private static void DrawMouseoverTooltip(SKCanvas canvas, MapParams mapParams, MapConfig mapConfig, Player localPlayer, SKPoint mouseCanvasPos)
         {
             var hoveredPlayer = _mouseOverPlayer;
             var hoveredLoot = _mouseOverLoot;
@@ -22,33 +22,28 @@ namespace eft_dma_radar.Silk.UI
 
             if (hoveredPlayer is not null)
             {
-                var screenPos = mapParams.ToScreenPos(MapParams.ToMapPos(hoveredPlayer.Position, mapConfig));
                 BuildPlayerTooltipLines(hoveredPlayer, localPlayer);
-                DrawTooltipBox(canvas, screenPos, _tooltipLines);
+                DrawTooltipBox(canvas, mouseCanvasPos, _tooltipLines);
             }
             else if (hoveredCorpse is not null)
             {
-                var screenPos = mapParams.ToScreenPos(MapParams.ToMapPos(hoveredCorpse.Position, mapConfig));
                 BuildCorpseTooltipLines(hoveredCorpse, localPlayer);
-                DrawTooltipBox(canvas, screenPos, _tooltipLines);
+                DrawTooltipBox(canvas, mouseCanvasPos, _tooltipLines);
             }
             else if (hoveredLoot is not null)
             {
-                var screenPos = mapParams.ToScreenPos(MapParams.ToMapPos(hoveredLoot.Position, mapConfig));
                 BuildLootTooltipLines(hoveredLoot, localPlayer);
-                DrawTooltipBox(canvas, screenPos, _tooltipLines);
+                DrawTooltipBox(canvas, mouseCanvasPos, _tooltipLines);
             }
             else if (hoveredExfil is not null)
             {
-                var screenPos = mapParams.ToScreenPos(MapParams.ToMapPos(hoveredExfil.Position, mapConfig));
                 BuildExfilTooltipLines(hoveredExfil, localPlayer);
-                DrawTooltipBox(canvas, screenPos, _tooltipLines);
+                DrawTooltipBox(canvas, mouseCanvasPos, _tooltipLines);
             }
             else if (hoveredTransit is not null)
             {
-                var screenPos = mapParams.ToScreenPos(MapParams.ToMapPos(hoveredTransit.Position, mapConfig));
                 BuildTransitTooltipLines(hoveredTransit, localPlayer);
-                DrawTooltipBox(canvas, screenPos, _tooltipLines);
+                DrawTooltipBox(canvas, mouseCanvasPos, _tooltipLines);
             }
         }
 
@@ -140,14 +135,11 @@ namespace eft_dma_radar.Silk.UI
         {
             _tooltipLines.Clear();
             int dist = (int)Vector3.Distance(localPlayer.Position, loot.Position);
-            var filterData = LootFilter.FilterData;
-            bool wishlisted = filterData.IsWishlisted(loot.Id);
-            var paint = wishlisted ? SKPaints.TooltipWishlist
-                      : loot.IsImportant ? SKPaints.TooltipAccent
-                      : SKPaints.TooltipText;
+            var paint = loot.GetTooltipPaint();
 
             _tooltipLines.Add((loot.Name, paint));
 
+            bool wishlisted = LootFilter.FilterData.IsWishlisted(loot.Id);
             if (wishlisted)
                 _tooltipLines.Add(("\u2605 Wishlisted", SKPaints.TooltipWishlist));
 
