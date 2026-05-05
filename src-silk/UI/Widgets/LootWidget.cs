@@ -57,7 +57,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
             _groups.Clear();
             _sorted.Clear();
             _groupPoolIndex = 0;
-            long totalValue = 0;
+            long totalValue = 0;     // value of ALL items (ignores filters)
+            long filteredValue = 0;  // value of filter-passing items only
             int visibleCount = 0;
             bool searching = !string.IsNullOrWhiteSpace(_searchText);
 
@@ -70,6 +71,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     var item = loot[i];
                     int price = item.DisplayPrice;
                     var result = item.Evaluate(price);
+
+                    totalValue += price; // always accumulate full value
 
                     // When searching, include every item regardless of filter visibility.
                     // When not searching, skip items that don't pass normal filters.
@@ -91,7 +94,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     if (passesFilter)
                     {
                         visibleCount++;
-                        totalValue += price;
+                        filteredValue += price;
                     }
 
                     // Group by ShortName — keep closest distance and check importance
@@ -125,7 +128,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
             }
 
             // Summary header
-            DrawSummary(visibleCount, totalValue, loot?.Count ?? 0);
+            DrawSummary(visibleCount, totalValue, filteredValue, loot?.Count ?? 0);
 
             // Search bar
             ImGui.SetNextItemWidth(-1f);
@@ -158,14 +161,20 @@ namespace eft_dma_radar.Silk.UI.Widgets
             DrawTable();
         }
 
-        private static void DrawSummary(int visible, long totalValue, int total)
+        private static void DrawSummary(int visible, long allValue, long filteredValue, int total)
         {
-            // Left: value
-            if (totalValue > 0)
+            // Left: total value of ALL items, then filtered value in brackets
+            if (allValue > 0)
             {
-                ImGui.TextColored(new Vector4(0.3f, 1f, 0.3f, 1f), LootFilter.FormatPrice((int)totalValue));
+                ImGui.TextColored(new Vector4(0.3f, 1f, 0.3f, 1f), LootFilter.FormatPrice((int)allValue));
                 ImGui.SameLine();
                 ImGui.TextColored(new Vector4(0.6f, 0.6f, 0.6f, 1f), "total value");
+                if (filteredValue > 0 && filteredValue != allValue)
+                {
+                    ImGui.SameLine();
+                    ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f),
+                        $"({LootFilter.FormatPrice((int)filteredValue)} filtered)");
+                }
                 ImGui.SameLine();
             }
 
