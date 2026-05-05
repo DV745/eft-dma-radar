@@ -70,8 +70,14 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         /// </summary>
         public float MapRotation { get; private set; }
 
-        /// <summary>BSG group ID (party/squad). Players in the same group are teammates. -1 = unknown.</summary>
+        /// <summary>BSG group ID (party/squad) as a short integer. Players in the same group are teammates. -1 = unknown/solo.</summary>
         public int GroupID { get; set; } = -1;
+
+        /// <summary>
+        /// Network group ID resolved from the EFT squad GUID in memory.
+        /// Mapped to a compact integer by <see cref="GroupManager"/>. -1 = solo/unknown.
+        /// </summary>
+        public int NetworkGroupID { get; set; } = -1;
 
         /// <summary>Position-based spawn group ID assigned at first sighting. -1 = unassigned.</summary>
         public int SpawnGroupID { get; set; } = -1;
@@ -177,6 +183,39 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         internal volatile Skeleton? Skeleton;
 
         public override string ToString() => $"{Type} [{Name}]";
+    }
+
+    /// <summary>
+    /// Converts raw EFT squad GUID strings to compact sequential integers.
+    /// Thread-safe. Cleared at raid start/end so IDs are session-scoped.
+    /// </summary>
+    internal sealed class GroupManager
+    {
+        private readonly Dictionary<string, int> _groups = new(StringComparer.Ordinal);
+        private readonly object _lock = new();
+
+        /// <summary>
+        /// Returns the integer group ID for <paramref name="guid"/>, assigning a new one if unseen.
+        /// First unique GUID → 0, second → 1, etc.
+        /// </summary>
+        public int GetGroup(string guid)
+        {
+            lock (_lock)
+            {
+                if (!_groups.TryGetValue(guid, out int id))
+                {
+                    id = _groups.Count;
+                    _groups[guid] = id;
+                }
+                return id;
+            }
+        }
+
+        /// <summary>Clears all cached GUID → int mappings. Call on raid start/end.</summary>
+        public void Clear()
+        {
+            lock (_lock) { _groups.Clear(); }
+        }
     }
 
     /// <summary>

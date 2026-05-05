@@ -32,6 +32,12 @@ namespace eft_dma_radar.Silk.UI.Widgets
         private static uint _sortColumnId = 1; // Default: Price
         private static ImGuiSortDirection _sortDirection = ImGuiSortDirection.Descending;
 
+        // Search filter — persists across frames
+        private static string _searchText = string.Empty;
+
+        /// <summary>Active search text; empty means no filter.</summary>
+        public static string SearchText => _searchText;
+
         /// <summary>Draw the loot widget.</summary>
         public static void Draw()
         {
@@ -53,6 +59,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
             _groupPoolIndex = 0;
             long totalValue = 0;
             int visibleCount = 0;
+            bool searching = !string.IsNullOrWhiteSpace(_searchText);
 
             if (loot is not null)
             {
@@ -63,7 +70,16 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     var item = loot[i];
                     int price = item.DisplayPrice;
                     var result = item.Evaluate(price);
-                    if (!result.Visible)
+
+                    // When searching, include every item regardless of filter visibility.
+                    // When not searching, skip items that don't pass normal filters.
+                    bool passesFilter = result.Visible;
+                    if (!searching && !passesFilter)
+                        continue;
+                    // In search mode, also skip items that don't match the search text early
+                    if (searching && !passesFilter &&
+                        item.ShortName.IndexOf(_searchText, StringComparison.OrdinalIgnoreCase) < 0 &&
+                        item.Name.IndexOf(_searchText, StringComparison.OrdinalIgnoreCase) < 0)
                         continue;
 
                     float dist = Vector3.Distance(localPos, item.Position);
@@ -71,8 +87,12 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     bool wishlisted = result.Wishlisted;
                     bool questRequired = result.QuestRequired;
                     var category = result.Category;
-                    visibleCount++;
-                    totalValue += price;
+
+                    if (passesFilter)
+                    {
+                        visibleCount++;
+                        totalValue += price;
+                    }
 
                     // Group by ShortName — keep closest distance and check importance
                     if (_groups.TryGetValue(item.ShortName, out var group))
@@ -106,11 +126,31 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
             // Summary header
             DrawSummary(visibleCount, totalValue, loot?.Count ?? 0);
+
+            // Search bar
+            ImGui.SetNextItemWidth(-1f);
+            ImGui.InputTextWithHint("##loot_search", "Search items...", ref _searchText, 128);
+            searching = !string.IsNullOrWhiteSpace(_searchText);
+
             ImGui.Separator();
 
-            if (visibleCount == 0)
+            if (!searching && visibleCount == 0)
             {
                 ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f), "No loot matches current filters");
+                return;
+            }
+
+            // Apply search filter to the grouped list
+            if (searching)
+            {
+                _sorted.RemoveAll(g =>
+                    g.ShortName.IndexOf(_searchText, StringComparison.OrdinalIgnoreCase) < 0 &&
+                    g.FullName.IndexOf(_searchText,  StringComparison.OrdinalIgnoreCase) < 0);
+            }
+
+            if (_sorted.Count == 0)
+            {
+                ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f), "No items match search");
                 return;
             }
 
@@ -191,6 +231,8 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 ImGui.TextColored(color, g.ShortName);
                 if (ImGui.IsItemHovered() && g.FullName != g.ShortName)
                     ImGui.SetTooltip(g.FullName);
+                if (ImGui.IsItemClicked())
+                    RadarWindow.PingItem(g.ShortName);
 
                 // Price per item
                 ImGui.TableNextColumn();

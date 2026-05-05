@@ -33,6 +33,7 @@ namespace eft_dma_radar.Silk
             try
             {
                 Config = SilkConfig.Load();
+                SKPaints.ApplyColors(Config);
                 Log.WriteLine("[SilkProgram] Config loaded OK.");
 
                 // Wire debug logging from config or -debug command-line argument

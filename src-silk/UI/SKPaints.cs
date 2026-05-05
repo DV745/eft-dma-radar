@@ -194,6 +194,15 @@ namespace eft_dma_radar.Silk.UI
         /// <summary>Top-tier loot on a different floor — dimmed.</summary>
         public static SKPaint LootTopDimmed { get; } = NewTextPaint(new SKColor(255, 215, 0, 120));
 
+        /// <summary>Expanding ping ring drawn on the radar when an item is pinged from the loot table.</summary>
+        public static SKPaint PingRing { get; } = new()
+        {
+            Color = new SKColor(0, 230, 255, 220),
+            StrokeWidth = 2.2f,
+            Style = SKPaintStyle.Stroke,
+            IsAntialias = true,
+        };
+
         /// <summary>Halo ring drawn around high-value loot dots for visibility.</summary>
         public static SKPaint LootHaloRing { get; } = new()
         {
@@ -409,6 +418,15 @@ namespace eft_dma_radar.Silk.UI
 
         /// <summary>Wishlist highlight text inside tooltips — cyan.</summary>
         public static SKPaint TooltipWishlist { get; } = NewTextPaint(new SKColor(0, 230, 255));
+
+        /// <summary>Health: Injured — yellow.</summary>
+        public static SKPaint TooltipHealthInjured { get; } = NewTextPaint(new SKColor(230, 200, 50));
+
+        /// <summary>Health: Badly Injured — orange.</summary>
+        public static SKPaint TooltipHealthBadly { get; } = NewTextPaint(new SKColor(230, 120, 30));
+
+        /// <summary>Health: Dying — red.</summary>
+        public static SKPaint TooltipHealthDying { get; } = NewTextPaint(new SKColor(220, 40, 40));
 
         /// <summary>Font used for tooltip text.</summary>
         public static SKFont FontTooltip { get; } = new(CustomFonts.Regular, 11) { Subpixel = true };

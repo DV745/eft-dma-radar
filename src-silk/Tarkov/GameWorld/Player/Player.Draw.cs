@@ -55,6 +55,14 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         private static readonly SKPaint _healthBadly      = new() { Color = new SKColor(230, 120,  30, 220), IsAntialias = true };
         private static readonly SKPaint _healthDying      = new() { Color = new SKColor(220,  40,  40, 220), IsAntialias = true };
 
+        // Group label paint — dim cyan, smaller than name
+        private static readonly SKPaint _groupLabelPaint = new()
+        {
+            Color = new SKColor(80, 200, 220, 200),
+            IsStroke = false,
+            IsAntialias = true,
+        };
+
         // Local player weapon/energy label paints
         private static readonly SKPaint _localInfoPaint = new()
         {
@@ -92,7 +100,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         /// <summary>
         /// Draws this player on the radar canvas.
         /// </summary>
-        internal virtual void Draw(SKCanvas canvas, SKPoint pos, Player? localPlayer = null)
+        internal virtual void Draw(SKCanvas canvas, SKPoint pos, Player? localPlayer = null, bool groupHighlight = false)
         {
             if (!IsAlive)
             {
@@ -101,6 +109,15 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
             }
 
             var (fillPaint, textPaint, chevronPaint, aimlinePaint) = GetPaints();
+
+            // Override dot + name + aimline + chevron to bright green when this player belongs to a multi-member hovered group
+            if (groupHighlight)
+            {
+                fillPaint = SKPaints.PaintTeammate;
+                textPaint = SKPaints.TextTeammate;
+                aimlinePaint = SKPaints.AimlineTeammate;
+                chevronPaint = SKPaints.ChevronTeammate;
+            }
 
             // Compute rotation sin/cos once — shared by marker + aimline
             float rad = MapRotation * DegToRad;
@@ -137,11 +154,11 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
                     else if (heightDiff < -HEIGHT_INDICATOR_THRESHOLD)
                         DrawHeightArrow(canvas, pos, fillPaint, false);
 
-                    DrawLabel(canvas, pos, textPaint, name, _cachedInfo, weaponLine, HealthStatus, GearReady ? GearValue : 0);
+                    DrawLabel(canvas, pos, textPaint, name, _cachedInfo, weaponLine, HealthStatus, GearReady ? GearValue : 0, null);
                 }
                 else
                 {
-                    DrawLabel(canvas, pos, textPaint, name, null, weaponLine, HealthStatus, GearReady ? GearValue : 0);
+                    DrawLabel(canvas, pos, textPaint, name, null, weaponLine, HealthStatus, GearReady ? GearValue : 0, null);
                 }
             }
             else if (IsLocalPlayer)
@@ -293,7 +310,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         /// Draws the player name + optional compact H/D info line + optional weapon/ammo line.
         /// Health status (Injured/Badly Injured/Dying) is shown only when the player is damaged.
         /// </summary>
-        private static void DrawLabel(SKCanvas canvas, SKPoint point, SKPaint textPaint, string name, string? info, string? weapon = null, PlayerHealthStatus health = PlayerHealthStatus.Healthy, int gearValue = 0)
+        private static void DrawLabel(SKCanvas canvas, SKPoint point, SKPaint textPaint, string name, string? info, string? weapon = null, PlayerHealthStatus health = PlayerHealthStatus.Healthy, int gearValue = 0, string? groupLabel = null)
         {
             float x = point.X + DotRadius + 4f;
             float y = point.Y + 4.5f;
@@ -301,6 +318,15 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
             // Name — offset shadow then fill for clean contrast
             canvas.DrawText(name, x + 1, y + 1, SKPaints.FontRegular11, SKPaints.TextShadow);
             canvas.DrawText(name, x, y, SKPaints.FontRegular11, textPaint);
+
+            // Group label (SG:X or NG:X) — drawn inline after the name on the same baseline
+            if (groupLabel is not null)
+            {
+                float nameWidth = SKPaints.FontRegular11.MeasureText(name);
+                float glx = x + nameWidth + 3f;
+                canvas.DrawText(groupLabel, glx + 1, y + 1, _infoFont, _infoShadow);
+                canvas.DrawText(groupLabel, glx, y, _infoFont, _groupLabelPaint);
+            }
 
             float y2 = y + 12f;
 

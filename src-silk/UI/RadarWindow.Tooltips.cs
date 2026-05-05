@@ -56,11 +56,12 @@ namespace eft_dma_radar.Silk.UI
             // Name + faction
             string faction = player.Type switch
             {
-                PlayerType.USEC => "USEC",
-                PlayerType.BEAR => "BEAR",
-                PlayerType.PScav => "PScav",
+                PlayerType.Teammate     => "Teammate",
+                PlayerType.USEC         => "USEC",
+                PlayerType.BEAR         => "BEAR",
+                PlayerType.PScav        => "PScav",
                 PlayerType.SpecialPlayer => "Special",
-                PlayerType.Streamer => "Streamer",
+                PlayerType.Streamer     => "Streamer",
                 _ => "?"
             };
 
@@ -80,21 +81,30 @@ namespace eft_dma_radar.Silk.UI
                 _tooltipLines.Add(($"K/D: {fetchedProfile.KD:F1}  Raids: {fetchedProfile.Sessions}  SR: {fetchedProfile.SurvivedRate:F0}%  Hrs: {fetchedProfile.Hours}  {fetchedProfile.AccountType}", SKPaints.TooltipLabel));
             }
 
-            // Group
-            if (player.SpawnGroupID != -1)
-                _tooltipLines.Add(($"Group: {player.SpawnGroupID}", SKPaints.TooltipText));
+            // Group — only show when at least one other player shares the same group (not solo)
+            {
+                int groupKey = player.NetworkGroupID != -1
+                    ? player.NetworkGroupID
+                    : player.SpawnGroupID != -1 ? -(player.SpawnGroupID + 1) : int.MinValue;
+                if (groupKey != int.MinValue &&
+                    _groupSizeCounts.TryGetValue(groupKey, out int grpSz) && grpSz >= 2)
+                {
+                    int displayId = player.NetworkGroupID != -1 ? player.NetworkGroupID : player.SpawnGroupID;
+                    _tooltipLines.Add(($"Group: {displayId}", SKPaints.TextTeammate));
+                }
+            }
 
             // Health status (only show if not Healthy)
             if (player.HealthStatus != PlayerHealthStatus.Healthy)
             {
-                string healthLabel = player.HealthStatus switch
+                var (healthPaint, healthLabel) = player.HealthStatus switch
                 {
-                    PlayerHealthStatus.Dying => "Dying",
-                    PlayerHealthStatus.BadlyInjured => "Badly Injured",
-                    PlayerHealthStatus.Injured => "Injured",
-                    _ => "Healthy",
+                    PlayerHealthStatus.Dying        => (SKPaints.TooltipHealthDying,   "Dying"),
+                    PlayerHealthStatus.BadlyInjured => (SKPaints.TooltipHealthBadly,   "Badly Injured"),
+                    PlayerHealthStatus.Injured      => (SKPaints.TooltipHealthInjured, "Injured"),
+                    _                               => (SKPaints.TooltipAccent,        "Healthy"),
                 };
-                _tooltipLines.Add(($"Health: {healthLabel}", SKPaints.TooltipAccent));
+                _tooltipLines.Add(($"Health: {healthLabel}", healthPaint));
             }
 
             // Distance

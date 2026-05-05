@@ -91,6 +91,39 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                 player.Base = playerBase;
                 var entry = new PlayerEntry(playerBase, player, isObserved);
 
+                // Assign NetworkGroupID from memory
+                if (!isLocal)
+                {
+                    if (isObserved)
+                        player.NetworkGroupID = ReadObservedNetworkGroupID(playerBase);
+                    // (ClientPlayer / non-observed remote players don't expose a group GUID)
+                }
+                else
+                {
+                    // Local player — read from PlayerInfo.GroupId
+                    player.NetworkGroupID = ReadLocalNetworkGroupID(playerBase);
+                }
+
+                // Promote observed PMC to Teammate when they share our network group
+                if (!isLocal && isObserved && (type == PlayerType.USEC || type == PlayerType.BEAR))
+                {
+                    var localPlayer = LocalPlayer;
+                    if (localPlayer is not null &&
+                        player.NetworkGroupID != -1 &&
+                        player.NetworkGroupID == localPlayer.NetworkGroupID)
+                    {
+                        player.Type = PlayerType.Teammate;
+                        type = PlayerType.Teammate;
+                    }
+                }
+
+                // Assign spawn group ID (proximity-based) for observed human players
+                if (!isLocal && isObserved && (type == PlayerType.USEC || type == PlayerType.BEAR || type == PlayerType.Teammate || type == PlayerType.PScav))
+                {
+                    if (!IsExcludedFromSpawnGroups(_mapId))
+                        player.SpawnGroupID = GetOrAssignSpawnGroup(player.Position);
+                }
+
                 // Track in player history (non-local, human players only — filtered inside AddOrUpdate)
                 Memory.PlayerHistory.AddOrUpdate(player);
 
@@ -288,6 +321,54 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             };
         }
 
+        /// <summary>
+        /// Reads the network group GUID from an observed player and maps it to an integer.
+        /// Returns -1 on failure or when the player is solo (empty GUID).
+        /// </summary>
+        private static int ReadObservedNetworkGroupID(ulong playerBase)
+        {
+            try
+            {
+                var grpIdPtr = Memory.ReadPtr(playerBase + Offsets.ObservedPlayerView.GroupID, false);
+                if (!grpIdPtr.IsValidVirtualAddress()) return -1;
+                var guid = Memory.ReadUnityString(grpIdPtr, 64, false);
+                if (string.IsNullOrEmpty(guid)) return -1;
+                return _groupManager.GetGroup(guid);
+            }
+            catch { return -1; }
+        }
+
+        /// <summary>
+        /// Reads the network group GUID from the local (ClientPlayer) and maps it to an integer.
+        /// Returns -1 on failure or when the player is solo.
+        /// </summary>
+        private static int ReadLocalNetworkGroupID(ulong playerBase)
+        {
+            try
+            {
+                var profilePtr = Memory.ReadPtr(playerBase + Offsets.Player.Profile, false);
+                var infoPtr = Memory.ReadPtr(profilePtr + Offsets.Profile.Info, false);
+                var grpIdPtr = Memory.ReadPtr(infoPtr + Offsets.PlayerInfo.GroupId, false);
+                if (!grpIdPtr.IsValidVirtualAddress()) return -1;
+                var guid = Memory.ReadUnityString(grpIdPtr, 64, false);
+                if (string.IsNullOrEmpty(guid)) return -1;
+                return _groupManager.GetGroup(guid);
+            }
+            catch { return -1; }
+        }
+
+        /// <summary>Maps excluded from spawn-group labeling (small maps where proximity grouping is noise).</summary>
+        private static readonly HashSet<string> _spawnGroupExcludedMaps = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "factory4_day",
+            "factory4_night",
+            "laboratory",
+            "Labyrinth",
+        };
+
+        private static bool IsExcludedFromSpawnGroups(string mapId) =>
+            _spawnGroupExcludedMaps.Contains(mapId);
+
         #endregion
 
         #region Spawn Group Assignment
@@ -308,8 +389,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
         /// </summary>
         private int GetOrAssignSpawnGroup(Vector3 spawnPos)
         {
-            // Check for zero/invalid spawn positions
-            if (spawnPos == Vector3.Zero)
+            if (!IsValidSpawn(spawnPos))
                 return -1;
 
             foreach (var group in _spawnGroups)
@@ -322,6 +402,13 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             _spawnGroups.Add(new SpawnGroupEntry { GroupId = newId, SpawnPosition = spawnPos });
             return newId;
         }
+
+        /// <summary>Returns true when a spawn position is usable (non-zero, no NaN components).</summary>
+        private static bool IsValidSpawn(Vector3 v) =>
+            v != Vector3.Zero &&
+            !float.IsNaN(v.X) &&
+            !float.IsNaN(v.Y) &&
+            !float.IsNaN(v.Z);
 
         #endregion
 

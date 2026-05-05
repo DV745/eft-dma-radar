@@ -62,12 +62,18 @@ namespace eft_dma_radar.Silk.UI
         // Reusable render collections — avoids per-frame allocation
         private static readonly List<Player> _renderPlayers = new(64);
         private static readonly Dictionary<int, List<SKPoint>> _connectorGroups = new(8);
+        private static readonly Dictionary<int, int> _groupSizeCounts = new(8);
         private static readonly List<List<SKPoint>> _connectorPointPool = [];
         private static int _connectorPoolIndex;
 
         // Resource purge rate limiter
         private static long _lastPurgeTick;
         private const long PurgeIntervalMs = 1000;
+
+        // Ping effects — expanded rings on the radar for pinged loot items
+        private static readonly List<PingEffect> _activePings = new();
+        private const float PingDurationSeconds = 3f;
+        private const float PingMaxRadiusMap = 40f; // radius in canvas units at full expansion
 
         // Pinned font data for ImGui — must remain alive for the lifetime of the atlas
         private static GCHandle _imguiFontHandle;
@@ -183,6 +189,53 @@ namespace eft_dma_radar.Silk.UI
         {
             get => _mouseoverGroup;
             private set => _mouseoverGroup = value;
+        }
+
+        #endregion
+
+        #region Ping System
+
+        /// <summary>
+        /// Adds an expanding ring effect on the radar for every matching loot item.
+        /// Called from the loot table widget when the user clicks a row.
+        /// </summary>
+        internal static void PingItem(string itemName)
+        {
+            var loot = Memory.Loot;
+            if (loot is null)
+            {
+                Log.WriteLine($"[Ping] No loot list available.");
+                return;
+            }
+
+            bool found = false;
+            foreach (var item in loot)
+            {
+                if (item.ShortName.Equals(itemName, StringComparison.OrdinalIgnoreCase) ||
+                    item.Name.Equals(itemName, StringComparison.OrdinalIgnoreCase))
+                {
+                    lock (_activePings)
+                    {
+                        _activePings.Add(new PingEffect
+                        {
+                            Position = item.Position,
+                            StartTime = DateTime.UtcNow,
+                        });
+                    }
+                    found = true;
+                    Log.WriteLine($"[Ping] Pinged '{item.Name}' at {item.Position}");
+                }
+            }
+
+            if (!found)
+                Log.WriteLine($"[Ping] No loot found matching '{itemName}'.");
+        }
+
+        private struct PingEffect
+        {
+            public Vector3 Position;
+            public DateTime StartTime;
+            public double AgeSec => (DateTime.UtcNow - StartTime).TotalSeconds;
         }
 
         #endregion

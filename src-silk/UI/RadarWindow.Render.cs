@@ -1,5 +1,6 @@
 using eft_dma_radar.Silk.Tarkov;
 using eft_dma_radar.Silk.Tarkov.Unity.IL2CPP;
+using eft_dma_radar.Silk.UI.Widgets;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 
@@ -168,14 +169,30 @@ namespace eft_dma_radar.Silk.UI
                 if (loot is not null)
                 {
                     float playerY = localPlayerPos.Y;
+                    string lootSearch = LootWidget.SearchText;
+                    bool hasSearch = !string.IsNullOrWhiteSpace(lootSearch);
 
                     int visibleCount = 0;
                     foreach (var item in loot)
                     {
                         int price = item.DisplayPrice;
                         var result = item.Evaluate(price);
-                        if (!result.Visible)
-                            continue;
+
+                        if (hasSearch)
+                        {
+                            // In search mode: show any item matching the text, regardless of filters
+                            bool nameMatch =
+                                item.ShortName.IndexOf(lootSearch, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                item.Name.IndexOf(lootSearch, StringComparison.OrdinalIgnoreCase) >= 0;
+                            if (!nameMatch)
+                                continue;
+                        }
+                        else
+                        {
+                            if (!result.Visible)
+                                continue;
+                        }
+
                         if (!worldBounds.Contains(item.Position))
                             continue;
                         var sp = mapParams.ToScreenPos(MapParams.ToMapPos(item.Position, mapCfg));
@@ -390,6 +407,33 @@ namespace eft_dma_radar.Silk.UI
 
             if (normalPlayers is not null)
             {
+                // Count how many human players share each group key so we never
+                // highlight a solo player (group size must be >= 2).
+                // NetworkGroupID is ground truth; SpawnGroupID is proximity fallback.
+                // Use negative-(id+1) for SG keys to avoid collision with NG keys.
+                _groupSizeCounts.Clear();
+                foreach (var p in normalPlayers)
+                {
+                    if (!p.IsHuman) continue;
+                    int key = p.NetworkGroupID != -1
+                        ? p.NetworkGroupID
+                        : p.SpawnGroupID != -1 ? -(p.SpawnGroupID + 1) : int.MinValue;
+                    if (key == int.MinValue) continue;
+                    _groupSizeCounts.TryGetValue(key, out int c);
+                    _groupSizeCounts[key] = c + 1;
+                }
+
+                // Determine the group key of the hovered player (only meaningful if size >= 2)
+                int hoveredGroupKey = int.MinValue;
+                if (_mouseOverPlayer is { IsHuman: true } hov)
+                {
+                    int key = hov.NetworkGroupID != -1
+                        ? hov.NetworkGroupID
+                        : hov.SpawnGroupID != -1 ? -(hov.SpawnGroupID + 1) : int.MinValue;
+                    if (key != int.MinValue && _groupSizeCounts.TryGetValue(key, out int sz) && sz >= 2)
+                        hoveredGroupKey = key;
+                }
+
                 var btr = Memory.Btr;
                 foreach (var player in normalPlayers)
                 {
@@ -404,7 +448,18 @@ namespace eft_dma_radar.Silk.UI
                     btr?.TrySnapPassengerXZ(ref drawPos);
 
                     var sp = mapParams.ToScreenPos(MapParams.ToMapPos(drawPos, mapCfg));
-                    player.Draw(canvas, sp, localPlayer);
+
+                    // Highlight all members of the hovered group in bright green
+                    bool groupHighlight = false;
+                    if (hoveredGroupKey != int.MinValue && player.IsHuman)
+                    {
+                        int playerKey = player.NetworkGroupID != -1
+                            ? player.NetworkGroupID
+                            : player.SpawnGroupID != -1 ? -(player.SpawnGroupID + 1) : int.MinValue;
+                        groupHighlight = playerKey == hoveredGroupKey;
+                    }
+
+                    player.Draw(canvas, sp, localPlayer, groupHighlight);
                 }
             }
 
@@ -412,7 +467,9 @@ namespace eft_dma_radar.Silk.UI
             var mouseCanvasPos = new SKPoint(_currentMousePos.X / scale, _currentMousePos.Y / scale);
             DrawMouseoverTooltip(canvas, mapParams, map.Config, localPlayer, mouseCanvasPos);
 
-            // Killfeed overlay — screen-space, top-right corner
+            // Ping rings — expanding circles over pinged loot items
+            DrawPingEffects(canvas, mapParams, mapCfg);
+
             if (Config.ShowKillFeed)
                 DrawKillfeed(canvas, canvasSize);
         }
@@ -524,26 +581,34 @@ namespace eft_dma_radar.Silk.UI
 
             foreach (var p in players)
             {
-                if (p.IsHuman && p.IsHostile && p.SpawnGroupID != -1)
+                if (!p.IsHuman)
+                    continue;
+
+                // NetworkGroupID first (real EFT squad), SpawnGroupID as fallback
+                int groupKey;
+                if (p.NetworkGroupID != -1)
+                    groupKey = p.NetworkGroupID;
+                else if (p.SpawnGroupID != -1)
+                    groupKey = -(p.SpawnGroupID + 1); // offset so NG:0 != SG:0
+                else
+                    continue;
+
+                if (!_connectorGroups.TryGetValue(groupKey, out var list))
                 {
-                    if (!_connectorGroups.TryGetValue(p.SpawnGroupID, out var list))
+                    if (_connectorPoolIndex < _connectorPointPool.Count)
                     {
-                        // Reuse pooled list or create a new one
-                        if (_connectorPoolIndex < _connectorPointPool.Count)
-                        {
-                            list = _connectorPointPool[_connectorPoolIndex];
-                            list.Clear();
-                        }
-                        else
-                        {
-                            list = new List<SKPoint>(4);
-                            _connectorPointPool.Add(list);
-                        }
-                        _connectorPoolIndex++;
-                        _connectorGroups[p.SpawnGroupID] = list;
+                        list = _connectorPointPool[_connectorPoolIndex];
+                        list.Clear();
                     }
-                    list.Add(mapParams.ToScreenPos(MapParams.ToMapPos(p.Position, map.Config)));
+                    else
+                    {
+                        list = new List<SKPoint>(4);
+                        _connectorPointPool.Add(list);
+                    }
+                    _connectorPoolIndex++;
+                    _connectorGroups[groupKey] = list;
                 }
+                list.Add(mapParams.ToScreenPos(MapParams.ToMapPos(p.Position, map.Config)));
             }
             if (_connectorGroups.Count == 0)
                 return;
@@ -557,6 +622,35 @@ namespace eft_dma_radar.Silk.UI
                         grp[i].X, grp[i].Y,
                         grp[i + 1].X, grp[i + 1].Y,
                         SKPaints.PaintConnectorGroup);
+                }
+            }
+        }
+
+        private static void DrawPingEffects(SKCanvas canvas, MapParams mapParams, MapConfig mapCfg)
+        {
+            lock (_activePings)
+            {
+                // Prune expired pings
+                for (int i = _activePings.Count - 1; i >= 0; i--)
+                {
+                    if (_activePings[i].AgeSec >= PingDurationSeconds)
+                        _activePings.RemoveAt(i);
+                }
+
+                if (_activePings.Count == 0)
+                    return;
+
+                foreach (var ping in _activePings)
+                {
+                    float t = (float)(ping.AgeSec / PingDurationSeconds); // 0 → 1
+                    float radius = t * PingMaxRadiusMap;
+                    byte alpha = (byte)(255 * (1f - t));
+
+                    var sp = mapParams.ToScreenPos(MapParams.ToMapPos(ping.Position, mapCfg));
+
+                    using var paint = SKPaints.PingRing.Clone();
+                    paint.Color = paint.Color.WithAlpha(alpha);
+                    canvas.DrawCircle(sp.X, sp.Y, radius, paint);
                 }
             }
         }

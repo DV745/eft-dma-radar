@@ -27,8 +27,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
         // Maximum valid player count from the registered players list
         private const int MaxPlayerCount = 256;
 
-        // Spawn-group proximity threshold (squared distance, meters²)
-        private const float SpawnGroupDistanceSqr = 25f; // 5m radius
+        // Spawn-group proximity threshold (squared distance, meters²) — 15m radius as per reference
+        private const float SpawnGroupDistanceSqr = 225f; // 15m radius
 
         // Number of consecutive realtime failures before entering error state
         private const int ErrorThreshold = 3;
@@ -111,6 +111,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
         // Spawn-group tracking (position-proximity-based)
         private readonly List<SpawnGroupEntry> _spawnGroups = [];
         private int _nextSpawnGroupId = 1;
+
+        // Network group GUID → int mapper — session-scoped, cleared in constructor
+        private static readonly Player.GroupManager _groupManager = new();
 
         // Backoff for failed CreatePlayerEntry calls — prevents hammering uninitialized objects.
         // Key: player address, Value: (failure count, earliest UTC time to retry).
@@ -213,6 +216,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             // Health refresh tracking — rate-limited like gear/hands
             public DateTime NextHealthRefresh;
 
+            // Group ID refresh tracking — re-reads NetworkGroupID periodically
+            public DateTime NextGroupRefresh;
+
             // Per-player skeleton — created on the registration worker, updated on the camera worker.
             // Written by registration/camera worker, read by render thread — volatile on the skeleton ref
             // ensures cross-core visibility.
@@ -230,6 +236,10 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             // Clear stale HandsManager cache so re-discovered players on the same base
             // addresses don't hit the fast-path before their new Player objects are populated.
             HandsManager.ClearAll();
+            // Reset session-scoped group mappings
+            _groupManager.Clear();
+            _spawnGroups.Clear();
+            _nextSpawnGroupId = 1;
         }
 
         #endregion
@@ -569,6 +579,28 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
 
                         if (!entry.IsObserved && entry.Player is Player.LocalPlayer lp)
                             lp.UpdateEnergyHydration(entry.Base);
+                    }
+
+                    // Group ID refresh — re-read NetworkGroupID every 5s (cheap pointer chain)
+                    if (entry.IsObserved && now >= entry.NextGroupRefresh)
+                    {
+                        entry.NextGroupRefresh = now.AddSeconds(5.0);
+                        try
+                        {
+                            entry.Player.NetworkGroupID = ReadObservedNetworkGroupID(entry.Base);
+
+                            // Re-promote to Teammate if NG now matches local player (late resolution)
+                            var lp = LocalPlayer;
+                            if (lp is not null &&
+                                entry.Player.NetworkGroupID != -1 &&
+                                entry.Player.NetworkGroupID == lp.NetworkGroupID &&
+                                entry.Player.Type is PlayerType.USEC or PlayerType.BEAR &&
+                                !entry.Player.IsManualTeammate)
+                            {
+                                entry.Player.Type = PlayerType.Teammate;
+                            }
+                        }
+                        catch { /* non-fatal */ }
                     }
                 }
                 else

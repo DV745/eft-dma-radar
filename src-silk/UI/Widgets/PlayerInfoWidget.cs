@@ -80,17 +80,18 @@ namespace eft_dma_radar.Silk.UI.Widgets
                              ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY |
                              ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.NoPadOuterX;
 
-            if (ImGui.BeginTable("PlayersTable", 9, tableFlags))
+            if (ImGui.BeginTable("PlayersTable", 10, tableFlags))
             {
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 140f);
-                ImGui.TableSetupColumn("Lvl", ImGuiTableColumnFlags.WidthFixed, 28f);
-                ImGui.TableSetupColumn("K/D", ImGuiTableColumnFlags.WidthFixed, 38f);
-                ImGui.TableSetupColumn("Grp", ImGuiTableColumnFlags.WidthFixed, 32f);
-                ImGui.TableSetupColumn("Hands", ImGuiTableColumnFlags.WidthFixed, 60f);
-                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 55f);
-                ImGui.TableSetupColumn("Gear", ImGuiTableColumnFlags.WidthFixed, 40f);
-                ImGui.TableSetupColumn("Secure", ImGuiTableColumnFlags.WidthFixed, 50f);
-                ImGui.TableSetupColumn("Dist", ImGuiTableColumnFlags.WidthFixed, 45f);
+                ImGui.TableSetupColumn("Name",   ImGuiTableColumnFlags.WidthFixed, 140f);
+                ImGui.TableSetupColumn("Lvl",    ImGuiTableColumnFlags.WidthFixed,  28f);
+                ImGui.TableSetupColumn("K/D",    ImGuiTableColumnFlags.WidthFixed,  38f);
+                ImGui.TableSetupColumn("Grp",    ImGuiTableColumnFlags.WidthFixed,  32f);
+                ImGui.TableSetupColumn("Health", ImGuiTableColumnFlags.WidthFixed,  52f);
+                ImGui.TableSetupColumn("Hands",  ImGuiTableColumnFlags.WidthFixed,  60f);
+                ImGui.TableSetupColumn("Value",  ImGuiTableColumnFlags.WidthFixed,  55f);
+                ImGui.TableSetupColumn("Gear",   ImGuiTableColumnFlags.WidthFixed,  40f);
+                ImGui.TableSetupColumn("Secure", ImGuiTableColumnFlags.WidthFixed,  50f);
+                ImGui.TableSetupColumn("Dist",   ImGuiTableColumnFlags.WidthFixed,  45f);
                 ImGui.TableSetupScrollFreeze(0, 1);
                 ImGui.TableHeadersRow();
 
@@ -125,6 +126,17 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     // Group
                     ImGui.TableNextColumn();
                     ImGui.TextColored(color, player.SpawnGroupID == -1 ? "--" : player.SpawnGroupID.ToString());
+
+                    // Health
+                    ImGui.TableNextColumn();
+                    var (healthColor, healthText) = player.HealthStatus switch
+                    {
+                        PlayerHealthStatus.Dying        => (new Vector4(0.85f, 0.15f, 0.15f, 1f), "Dying"),
+                        PlayerHealthStatus.BadlyInjured => (new Vector4(0.90f, 0.45f, 0.10f, 1f), "Bad"),
+                        PlayerHealthStatus.Injured      => (new Vector4(0.90f, 0.80f, 0.15f, 1f), "Injured"),
+                        _                               => (new Vector4(0.30f, 0.85f, 0.30f, 1f), "Healthy"),
+                    };
+                    ImGui.TextColored(healthColor, healthText);
 
                     // Hands (item currently held)
                     ImGui.TableNextColumn();

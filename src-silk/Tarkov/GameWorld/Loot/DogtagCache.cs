@@ -111,6 +111,26 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
             // Cache level in-memory (per-raid)
             if (level > 0)
                 _levelCache[profileId] = level;
+
+            // Immediately push the resolved name to any live player with this ProfileId
+            // so the radar label updates without waiting for the next gear-refresh cycle.
+            if (!string.IsNullOrWhiteSpace(nickname))
+            {
+                var players = Memory.Players;
+                if (players is not null)
+                {
+                    foreach (var p in players)
+                    {
+                        if (!p.IsLocalPlayer &&
+                            string.Equals(p.ProfileId, profileId, StringComparison.OrdinalIgnoreCase) &&
+                            p.Name != nickname)
+                        {
+                            p.Name = nickname;
+                        }
+                    }
+                }
+            }
+
         }
 
         /// <summary>
