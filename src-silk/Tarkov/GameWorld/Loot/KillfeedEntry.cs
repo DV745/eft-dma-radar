@@ -35,11 +35,15 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
         /// <summary>
         /// Formatted display line for this entry.
         /// e.g. "Nikita [L72] ► John [M4A1]"
+        /// When <paramref name="streamerMode"/> is true, human player names are replaced with faction labels.
         /// </summary>
-        public string FormatDisplay()
+        public string FormatDisplay(bool streamerMode = false)
         {
+            string killer = streamerMode && KillerSide.IsHumanPlayer() ? KillerSide.StreamerLabel() : Killer;
+            string victim = streamerMode && VictimSide.IsHumanPlayer() ? VictimSide.StreamerLabel() : Victim;
+
             var sb = new System.Text.StringBuilder(64);
-            sb.Append(Killer);
+            sb.Append(killer);
             if (VictimLevel > 0)
             {
                 sb.Append(" [L");
@@ -47,7 +51,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                 sb.Append(']');
             }
             sb.Append(" \u25ba ");  // ►
-            sb.Append(Victim);
+            sb.Append(victim);
             if (!string.IsNullOrWhiteSpace(Weapon))
             {
                 sb.Append(" [");

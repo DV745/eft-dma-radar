@@ -534,9 +534,10 @@ namespace eft_dma_radar.Silk.UI
             float maxW = entries.Length == 0
                 ? SKPaints.FontKillfeed.MeasureText(EmptyText)
                 : 0f;
+            bool streamerMode = Config.StreamerMode;
             for (int i = 0; i < entries.Length; i++)
             {
-                float w = SKPaints.FontKillfeed.MeasureText(entries[i].FormatDisplay());
+                float w = SKPaints.FontKillfeed.MeasureText(entries[i].FormatDisplay(streamerMode));
                 if (w > maxW) maxW = w;
             }
 
@@ -599,13 +600,13 @@ namespace eft_dma_radar.Silk.UI
                 var col = textPaint.Color.WithAlpha(a);
 
                 // Shadow
-                canvas.DrawText(entry.FormatDisplay(), tx + 1, ty + 1,
+                canvas.DrawText(entry.FormatDisplay(streamerMode), tx + 1, ty + 1,
                     SKPaints.FontKillfeed, SKPaints.TextShadow);
 
                 // Text (reuse existing paint with alpha modulated via temporary color override)
                 using var paint = textPaint.Clone();
                 paint.Color = col;
-                canvas.DrawText(entry.FormatDisplay(), tx, ty, SKPaints.FontKillfeed, paint);
+                canvas.DrawText(entry.FormatDisplay(streamerMode), tx, ty, SKPaints.FontKillfeed, paint);
             }
         }
 
