@@ -1314,6 +1314,15 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                                 };
                             }
 
+                            // Replace local player's real name with "LocalPlayer" in the killfeed
+                            var localPlayer = Memory.LocalPlayer;
+                            if (localPlayer is not null
+                                && !string.IsNullOrWhiteSpace(killerProfileId)
+                                && string.Equals(localPlayer.ProfileId, killerProfileId, StringComparison.OrdinalIgnoreCase))
+                            {
+                                killerName = "LocalPlayer";
+                            }
+
                             KillfeedManager.Push(killerName, nickname, killerWeapon ?? "", level, killerSide, victimSide);
                             _killfeedPushed.Add(interactiveClass);
                         }
