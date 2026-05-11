@@ -157,7 +157,9 @@ namespace eft_dma_radar.Silk.UI
             if (!InRaid)
                 return;
 
-            int zoomChange = scroll.Y > 0 ? -ZOOM_STEP : ZOOM_STEP;
+            int scrollTicks = (int)Math.Round(Math.Abs(scroll.Y));
+            if (scrollTicks == 0) scrollTicks = 1;
+            int zoomChange = scroll.Y > 0 ? -(ZOOM_STEP * scrollTicks) : (ZOOM_STEP * scrollTicks);
             var newZoom = Math.Max(1, Math.Min(200, _zoom + zoomChange));
 
             if (newZoom == _zoom)

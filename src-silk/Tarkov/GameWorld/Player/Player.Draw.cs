@@ -281,15 +281,25 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         {
             var config = SilkProgram.Config;
 
-            // Base length — shorter for AI, configurable for humans and bosses
-            float length = (IsHuman || Type == PlayerType.AIBoss)
-                ? config.AimlineLength
-                : MathF.Min(config.AimlineLength * 0.5f, 10f);
+            bool isAINonBoss = Type is PlayerType.AIScav or PlayerType.AIRaider or PlayerType.BtrOperator;
+
+            // AI non-boss aimlines are toggled separately; bosses are always shown when ShowAimlines is on
+            if (isAINonBoss && !config.ShowAIAimlines)
+                return;
+
+            // Base length — AI non-boss use their own configurable length; humans and bosses use the main length
+            float length = isAINonBoss
+                ? config.AimlineLengthAI
+                : config.AimlineLength;
 
             // High Alert — extend aimline when hostile is facing local player.
             // Reuses the cached flag from HighAlertManager (updated every realtime tick)
             // so we don't redo the Distance + Normalize + Acos + Log math per frame.
-            if (config.HighAlert && (IsHostile || Type == PlayerType.AIBoss) && IsFacingLocalPlayer)
+            if (isAINonBoss && config.ShowAIAimlines && config.HighAlertAI && IsFacingLocalPlayer)
+            {
+                length = HighAlertLength;
+            }
+            else if (!isAINonBoss && config.HighAlert && (IsHostile || Type == PlayerType.AIBoss) && IsFacingLocalPlayer)
             {
                 length = HighAlertLength;
             }

@@ -131,7 +131,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
                 return;
 
             var listCount = Memory.ReadValue<int>(questsDataPtr + ManagedList.Count, false);
-            if (listCount <= 0 || listCount > 500)
+            if (listCount <= 0 || listCount > 1500)
                 return;
 
             var activeQuests = new List<Quest>();
@@ -139,6 +139,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
             var allLocationConditions = new List<QuestLocation>();
             var allCompletedConditions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var allStartedQuestIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            // Track which quest IDs were found in the profile (any status 1/2/3/4/5...)
+            var profileQuestIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             var currentMapBsgId = _mapToId.GetValueOrDefault(_mapId, "");
 
@@ -150,7 +152,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
                     continue;
 
                 ProcessQuestEntry(qDataEntry, currentMapBsgId, activeQuests,
-                    allRequiredItems, allLocationConditions, allCompletedConditions, allStartedQuestIds);
+                    allRequiredItems, allLocationConditions, allCompletedConditions, allStartedQuestIds,
+                    profileQuestIds);
             }
 
             ActiveQuests = activeQuests;
@@ -167,11 +170,10 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
             HashSet<string> allRequiredItems,
             List<QuestLocation> allLocationConditions,
             HashSet<string> allCompletedConditions,
-            HashSet<string> allStartedQuestIds)
+            HashSet<string> allStartedQuestIds,
+            HashSet<string> profileQuestIds)
         {
             if (!Memory.TryReadValue(qDataEntry + Offsets.QuestData.Status, out int qStatus))
-                return;
-            if (qStatus != 2) // 2 == Started
                 return;
 
             if (!Memory.TryReadPtr(qDataEntry + Offsets.QuestData.Id, out var qIdPtr))
@@ -180,7 +182,15 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
             if (string.IsNullOrEmpty(qId))
                 return;
 
-            allStartedQuestIds.Add(qId);
+            // Mark as seen in profile (any status — including completed/failed)
+            profileQuestIds.Add(qId);
+
+            // 1 = AvailableForStart, 2 = Started, 3 = AvailableForFinish
+            if (qStatus != 1 && qStatus != 2 && qStatus != 3)
+                return;
+
+            if (qStatus == 2 || qStatus == 3)
+                allStartedQuestIds.Add(qId);
 
             // Kappa filter
             if (Config.QuestKappaFilter
@@ -205,14 +215,19 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
             // When selection filter is active, only the selected quest contributes
             // locations/required items to the radar. Other quests are still added to
             // ActiveQuests so the UI lists them.
+            // AvailableForStart (1) and Started (2) both contribute required items so that
+            // quest items sitting statically in the world are highlighted even before the
+            // quest has been formally started.
             bool selectedOnly = Config.QuestSelectedOnly && !string.IsNullOrEmpty(Config.QuestSelectedId);
-            bool contributeToRadar = !selectedOnly
-                || string.Equals(Config.QuestSelectedId, qId, StringComparison.OrdinalIgnoreCase);
+            bool contributeToRadar = (qStatus == 1 || qStatus == 2)
+                && (!selectedOnly || string.Equals(Config.QuestSelectedId, qId, StringComparison.OrdinalIgnoreCase));
 
             // Build quest from API data
+            var questStatus = (QuestStatus)qStatus;
             var quest = CreateQuestFromApiData(
                 qId, questCompletedConditions, currentMapBsgId,
-                contributeToRadar ? allLocationConditions : null);
+                contributeToRadar ? allLocationConditions : null,
+                questStatus);
             if (quest is null)
                 return;
 
@@ -233,7 +248,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
             string questId,
             HashSet<string> completedConditions,
             string currentMapBsgId,
-            List<QuestLocation>? allLocationConditions)
+            List<QuestLocation>? allLocationConditions,
+            QuestStatus questStatus = QuestStatus.Started)
         {
             if (!EftDataManager.TaskData.TryGetValue(questId, out var taskData))
                 return null;
@@ -302,6 +318,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
                 Id = questId,
                 Name = taskData.Name ?? "Unknown Quest",
                 KappaRequired = taskData.KappaRequired,
+                Status = questStatus,
                 Objectives = objectives,
                 RequiredItems = requiredItems,
                 CompletedConditions = completedConditions,
@@ -312,9 +329,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
         {
             return apiType?.ToLowerInvariant() switch
             {
-                "find" or "giveitem" => QuestObjectiveType.FindItem,
-                "mark" or "plantitem" => QuestObjectiveType.PlaceItem,
-                "visit" => QuestObjectiveType.VisitLocation,
+                "find" or "finditem" or "findquestitem" or "giveitem" or "givequestitem" => QuestObjectiveType.FindItem,
+                "mark" or "plantitem" or "plantquestitem" => QuestObjectiveType.PlaceItem,
+                "visit" or "extract" => QuestObjectiveType.VisitLocation,
                 _ => QuestObjectiveType.Other,
             };
         }

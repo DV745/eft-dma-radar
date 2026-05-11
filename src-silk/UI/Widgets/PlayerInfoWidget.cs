@@ -132,7 +132,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     var (healthColor, healthText) = player.HealthStatus switch
                     {
                         PlayerHealthStatus.Dying        => (new Vector4(0.85f, 0.15f, 0.15f, 1f), "Dying"),
-                        PlayerHealthStatus.BadlyInjured => (new Vector4(0.90f, 0.45f, 0.10f, 1f), "Bad"),
+                        PlayerHealthStatus.BadlyInjured => (new Vector4(0.90f, 0.45f, 0.10f, 1f), "Badly Injured"),
                         PlayerHealthStatus.Injured      => (new Vector4(0.90f, 0.80f, 0.15f, 1f), "Injured"),
                         _                               => (new Vector4(0.30f, 0.85f, 0.30f, 1f), "Healthy"),
                     };

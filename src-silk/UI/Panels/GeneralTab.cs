@@ -62,6 +62,12 @@ namespace eft_dma_radar.Silk.UI.Panels
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Hide loot and clutter; focus on players only  [B]");
 
+            bool streamerMode = Config.StreamerMode;
+            if (ImGui.Checkbox("Streamer Mode", ref streamerMode))
+                Config.StreamerMode = streamerMode;
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Hide all player names on the radar and killfeed");
+
             ImGui.Spacing();
             ImGui.SeparatorText("Hideout");
 

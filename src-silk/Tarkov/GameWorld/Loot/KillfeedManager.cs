@@ -35,7 +35,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
             string victim,
             string weapon,
             int victimLevel,
-            PlayerType killerSide)
+            PlayerType killerSide,
+            PlayerType victimSide = PlayerType.Default)
         {
             var entry = new KillfeedEntry
             {
@@ -44,6 +45,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                 Weapon = weapon,
                 VictimLevel = victimLevel,
                 KillerSide = killerSide,
+                VictimSide = victimSide,
                 Timestamp = DateTime.UtcNow,
             };
 

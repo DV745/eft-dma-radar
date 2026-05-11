@@ -64,15 +64,11 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                 return;
             _lastRefreshTimestamp = now;
 
-            // Read the LootList pointer array once — shared by all phases
+            // Read the LootList pointer array once — shared by all phases.
+            // If the read fails (transient pointer update mid-raid), keep stale snapshots
+            // rather than blanking the radar — same policy as scatter failures below.
             if (!TryReadLootListPtrs(out var ptrs))
-            {
-                _loot = [];
-                _corpses = [];
-                _containers = [];
-                _airdrops = [];
                 return;
-            }
 
             // ── Unified scatter pass: identifies loot + corpses + containers in one batched read ──
             // This eliminates hundreds of serial Il2CppClass.ReadName() calls that were
@@ -723,6 +719,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                             continue;
 
                         bool isQuestItem = pending[i].IsQuestItem;
+                        bool isPickedUp = false;
+
                         TarkovMarketItem? marketItem;
                         if (!EftDataManager.AllItems.TryGetValue(bsgId, out marketItem))
                         {
@@ -765,7 +763,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                             if (pos == Vector3.Zero)
                                 continue;
 
-                            var item = new LootItem(marketItem, pos) { IsQuestItem = isQuestItem };
+                            var item = new LootItem(marketItem, pos) { IsQuestItem = isQuestItem, IsPickedUp = isPickedUp };
                             item.RefreshImportance();
                             result.Add(item);
                         }
@@ -1262,6 +1260,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                         var nickname = ReadDogtagString(dogtag + Offsets.DogtagComponent.Nickname);
                         var accountId = ReadDogtagString(dogtag + Offsets.DogtagComponent.AccountId);
                         Memory.TryReadValue<int>(dogtag + Offsets.DogtagComponent.Level, out var level);
+                        Memory.TryReadValue<int>(dogtag + Offsets.DogtagComponent.Side, out var victimSideRaw);
 
                         DogtagCache.Seed(profileId, nickname, accountId, level);
 
@@ -1284,23 +1283,38 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
                         if (!string.IsNullOrWhiteSpace(killerProfileId))
                             DogtagCache.Seed(killerProfileId, killerName, killerAccountId, 0);
 
-                        // Push killfeed event — resolve killer's PlayerType from live player list
+                        // Push killfeed event — resolve killer's and victim's PlayerType from live player list
                         if (!string.IsNullOrWhiteSpace(killerName) && !string.IsNullOrWhiteSpace(nickname))
                         {
                             var killerSide = PlayerType.Default;
+                            var victimSide = PlayerType.Default;
                             var livePlayers = Memory.Players;
-                            if (livePlayers is not null && !string.IsNullOrWhiteSpace(killerProfileId))
+                            if (livePlayers is not null)
                             {
                                 foreach (var lp in livePlayers)
                                 {
-                                    if (string.Equals(lp.ProfileId, killerProfileId, StringComparison.OrdinalIgnoreCase))
-                                    {
+                                    if (!string.IsNullOrWhiteSpace(killerProfileId)
+                                        && string.Equals(lp.ProfileId, killerProfileId, StringComparison.OrdinalIgnoreCase))
                                         killerSide = lp.Type;
-                                        break;
-                                    }
+
+                                    if (string.Equals(lp.ProfileId, profileId, StringComparison.OrdinalIgnoreCase))
+                                        victimSide = lp.Type;
                                 }
                             }
-                            KillfeedManager.Push(killerName, nickname, killerWeapon ?? "", level, killerSide);
+
+                            // Fallback: derive victim side from dogtag Side field (1=USEC, 2=BEAR, 3=Savage/PScav)
+                            if (victimSide == PlayerType.Default)
+                            {
+                                victimSide = victimSideRaw switch
+                                {
+                                    1 => PlayerType.USEC,
+                                    2 => PlayerType.BEAR,
+                                    3 => PlayerType.PScav,
+                                    _ => PlayerType.Default,
+                                };
+                            }
+
+                            KillfeedManager.Push(killerName, nickname, killerWeapon ?? "", level, killerSide, victimSide);
                             _killfeedPushed.Add(interactiveClass);
                         }
 

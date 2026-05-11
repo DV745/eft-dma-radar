@@ -129,7 +129,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
             {
                 if (!string.IsNullOrWhiteSpace(entry.Nickname))
                 {
-                    player.Name = entry.Nickname;
+                    if (!SilkProgram.Config.StreamerMode)
+                        player.Name = entry.Nickname;
                     applied = true;
                 }
 

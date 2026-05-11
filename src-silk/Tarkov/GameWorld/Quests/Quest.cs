@@ -11,6 +11,14 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
         Other,
     }
 
+    /// <summary>In-game EQuestStatus values relevant to the radar.</summary>
+    internal enum QuestStatus
+    {
+        AvailableForStart = 1,
+        Started = 2,
+        AvailableForFinish = 3,
+    }
+
     /// <summary>
     /// Represents a quest with its objectives and completion status.
     /// </summary>
@@ -19,6 +27,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
         public string Id { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public bool KappaRequired { get; init; }
+        public QuestStatus Status { get; init; } = QuestStatus.Started;
         public List<QuestObjective> Objectives { get; init; } = [];
         public HashSet<string> RequiredItems { get; init; } = new(StringComparer.OrdinalIgnoreCase);
         public HashSet<string> CompletedConditions { get; init; } = new(StringComparer.OrdinalIgnoreCase);

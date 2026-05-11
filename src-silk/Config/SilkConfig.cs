@@ -298,8 +298,17 @@ namespace eft_dma_radar.Silk.Config
         /// <summary>Aimline length in pixels for human players (PMC/PScav).</summary>
         public int AimlineLength { get; set; } = 15;
 
+        /// <summary>Show aimlines for AI players (Scavs, Raiders, Rogues, BTR Operators). Boss aimlines are always shown.</summary>
+        public bool ShowAIAimlines { get; set; } = true;
+
+        /// <summary>Aimline length in pixels for AI players (Scavs, Raiders, Rogues, BTR Operators).</summary>
+        public int AimlineLengthAI { get; set; } = 15;
+
         /// <summary>Extend aimline when an enemy is facing the local player (High Alert).</summary>
         public bool HighAlert { get; set; } = true;
+
+        /// <summary>Extend aimline when an AI (Scav/Raider/Rogue/BTR) is facing the local player (High Alert).</summary>
+        public bool HighAlertAI { get; set; } = true;
 
         // ── Widget Visibility ───────────────────────────────────────────────────
 
@@ -395,6 +404,12 @@ namespace eft_dma_radar.Silk.Config
 
         /// <summary>Hide exfils that are closed or not available to the local player.</summary>
         public bool HideInactiveExfils { get; set; } = true;
+
+        // ── Streamer Mode ────────────────────────────────────────────────────────
+
+        /// <summary>When enabled, all player names are hidden on the radar and killfeed.</summary>
+        [JsonPropertyName("streamerMode")]
+        public bool StreamerMode { get; set; } = false;
 
         // ── Quests ──────────────────────────────────────────────────────────────
 
@@ -726,6 +741,7 @@ namespace eft_dma_radar.Silk.Config
             AimviewMaxCorpses = Math.Clamp(AimviewMaxCorpses, 0, 32);
             AimviewMaxContainers = Math.Clamp(AimviewMaxContainers, 0, 64);
             AimlineLength = Math.Clamp(AimlineLength, 0, 500);
+            AimlineLengthAI = Math.Clamp(AimlineLengthAI, 0, 500);
 
             GameMonitorWidth = Math.Clamp(GameMonitorWidth, 640, 7680);
             GameMonitorHeight = Math.Clamp(GameMonitorHeight, 480, 4320);

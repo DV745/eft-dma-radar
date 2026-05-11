@@ -128,11 +128,17 @@ namespace eft_dma_radar.Silk.UI.Panels
 
                 // Killer
                 ImGui.TableSetColumnIndex(1);
-                ImGui.TextColored(fadedCol, e.Killer);
+                string killerDisplay = Config.StreamerMode && e.KillerSide.IsHumanPlayer()
+                    ? e.KillerSide.StreamerLabel()
+                    : e.Killer;
+                ImGui.TextColored(fadedCol, killerDisplay);
 
                 // Victim
                 ImGui.TableSetColumnIndex(2);
-                ImGui.TextColored(ColWhite with { W = alpha }, e.Victim);
+                string victimDisplay = Config.StreamerMode && e.VictimSide.IsHumanPlayer()
+                    ? e.VictimSide.StreamerLabel()
+                    : e.Victim;
+                ImGui.TextColored(ColWhite with { W = alpha }, victimDisplay);
 
                 // Level
                 ImGui.TableSetColumnIndex(3);

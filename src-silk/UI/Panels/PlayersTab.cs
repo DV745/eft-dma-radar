@@ -40,16 +40,41 @@ namespace eft_dma_radar.Silk.UI.Panels
 
                 ImGui.SetNextItemWidth(180);
                 int aimlineLength = Config.AimlineLength;
-                if (ImGui.SliderInt("Length", ref aimlineLength, 0, 100))
+                if (ImGui.SliderInt("Length (Human/Boss)", ref aimlineLength, 0, 100))
                     Config.AimlineLength = aimlineLength;
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Aimline length in pixels (human players)");
+                    ImGui.SetTooltip("Aimline length in pixels for human players and bosses");
 
                 bool highAlert = Config.HighAlert;
                 if (ImGui.Checkbox("High Alert", ref highAlert))
                     Config.HighAlert = highAlert;
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Extend aimline when an enemy is aiming at you");
+
+                ImGui.Unindent(16);
+            }
+
+            bool showAIAimlines = Config.ShowAIAimlines;
+            if (ImGui.Checkbox("Show AI Aimlines", ref showAIAimlines))
+                Config.ShowAIAimlines = showAIAimlines;
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Show aimlines for Scavs, Raiders, Rogues and BTR Operators (Boss aimlines are always shown)");
+
+            if (Config.ShowAIAimlines)
+            {
+                ImGui.Indent(16);
+                ImGui.SetNextItemWidth(180);
+                int aimlineLengthAI = Config.AimlineLengthAI;
+                if (ImGui.SliderInt("Length (AI)", ref aimlineLengthAI, 0, 100))
+                    Config.AimlineLengthAI = aimlineLengthAI;
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Aimline length in pixels for AI players (Scavs, Raiders, Rogues, BTR Operators)");
+
+                bool highAlertAI = Config.HighAlertAI;
+                if (ImGui.Checkbox("High Alert (AI)", ref highAlertAI))
+                    Config.HighAlertAI = highAlertAI;
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Extend aimline when an AI (Scav/Raider/Rogue/BTR) is aiming at you");
 
                 ImGui.Unindent(16);
             }

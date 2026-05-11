@@ -15,6 +15,13 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
         /// </summary>
         public bool IsQuestItem { get; init; }
 
+        /// <summary>
+        /// True when this quest item's GameObject has been deactivated by the server,
+        /// meaning it was already picked up by someone. Hidden from the radar unless
+        /// <see cref="SilkConfig.LootShowQuestItems"/> is enabled.
+        /// </summary>
+        public bool IsPickedUp { get; init; }
+
         // Cached label to avoid per-frame string allocation
         private string? _cachedLabel;
         private int _cachedLabelKey = int.MinValue;
@@ -38,6 +45,31 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
         {
             if (IsQuestItem)
             {
+                // If the item was already picked up, only show it when the "Quest Items"
+                // toggle is explicitly on — never highlight it as required.
+                if (IsPickedUp)
+                {
+                    if (!SilkProgram.Config.LootShowQuestItems)
+                        return LootFilter.FilterResult.Hidden;
+                    return new LootFilter.FilterResult { Visible = true, Important = false, QuestRequired = true };
+                }
+
+                // Always check if this item is required by an active quest — independent of
+                // the radar-zones toggle (ShowQuests). This is what makes quest items highlight
+                // on the radar map even when the "Quest Items" generic toggle is off.
+                var qm = Memory.QuestManager;
+                if (qm is not null && qm.IsItemRequired(Id))
+                {
+                    return new LootFilter.FilterResult
+                    {
+                        Visible = true,
+                        Important = true,
+                        QuestRequired = true,
+                        Tier = LootFilter.GetTier(displayPrice),
+                    };
+                }
+
+                // Fall back to the generic quest-items toggle (shows ALL engine-flagged items)
                 if (!SilkProgram.Config.LootShowQuestItems)
                     return LootFilter.FilterResult.Hidden;
 

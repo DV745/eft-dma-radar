@@ -36,7 +36,12 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player.Plugins
             {
                 if (p is null || p.IsLocalPlayer || !p.IsAlive || !p.HasValidPosition)
                     continue;
-                if (!p.IsHostile && p.Type != PlayerType.AIBoss)
+
+                bool isAINonBoss = p.Type is PlayerType.AIScav or PlayerType.AIRaider or PlayerType.BtrOperator;
+
+                // Run the facing check for: hostile humans, bosses, and AI non-boss types.
+                // Teammates and unclassified friendlies are always cleared.
+                if (!p.IsHostile && p.Type != PlayerType.AIBoss && !isAINonBoss)
                 {
                     p.IsFacingLocalPlayer = false;
                     continue;

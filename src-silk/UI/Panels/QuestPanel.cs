@@ -2,6 +2,7 @@ using System.Numerics;
 
 using eft_dma_radar.Silk.DMA;
 using eft_dma_radar.Silk.Misc.Data;
+using eft_dma_radar.Silk.Tarkov.GameWorld.Quests;
 
 using ImGuiNET;
 
@@ -396,7 +397,9 @@ namespace eft_dma_radar.Silk.UI.Panels
             }
 
             // Quest name — clickable to toggle collapse
-            var questLabel = quest.Name;
+            var questLabel = quest.Status == QuestStatus.AvailableForStart
+                ? $"{quest.Name} [Available]"
+                : quest.Name;
             if (ImGui.Selectable(questLabel, isSelected, ImGuiSelectableFlags.None, new Vector2(ImGui.GetContentRegionAvail().X - 80, 0)))
             {
                 if (isCollapsed)
@@ -405,15 +408,7 @@ namespace eft_dma_radar.Silk.UI.Panels
                     _collapsedQuests.Add(quest.Id);
             }
 
-            // Map tag on the same line (right-aligned)
-            var mapTag = GetQuestMapTag(quest.Id);
-            if (!string.IsNullOrEmpty(mapTag))
-            {
-                ImGui.SameLine(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize(mapTag).X);
-                ImGui.TextColored(ColBlue, mapTag);
-            }
-
-            // Right-click context menu for selection / blacklist
+            // Right-click context menu — must be called immediately after the selectable
             if (ImGui.BeginPopupContextItem("quest_ctx"))
             {
                 if (isSelected)
@@ -440,6 +435,14 @@ namespace eft_dma_radar.Silk.UI.Panels
                     Config.Save();
                 }
                 ImGui.EndPopup();
+            }
+
+            // Map tag on the same line (right-aligned)
+            var mapTag = GetQuestMapTag(quest.Id);
+            if (!string.IsNullOrEmpty(mapTag))
+            {
+                ImGui.SameLine(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize(mapTag).X);
+                ImGui.TextColored(ColBlue, mapTag);
             }
 
             if (!isCollapsed)
@@ -514,6 +517,16 @@ namespace eft_dma_radar.Silk.UI.Panels
                         var name = GetItemDisplayName(apiObj.MarkerItem.Id, apiObj.MarkerItem.ShortName ?? apiObj.MarkerItem.Name);
                         ImGui.TextColored(ColOrange, $"      \u2691 {name}");
                     }
+                }
+
+                // Show zone indicator for plant/mark/find-at-location objectives
+                if (!isCompleted && apiObj.Zones is { Count: > 0 })
+                {
+                    var objectiveTypeLower = apiObj.Type?.ToLowerInvariant() ?? "";
+                    bool isPlantOrMark = objectiveTypeLower is "plantitem" or "plantquestitem" or "mark";
+                    bool isFindAtZone  = (objectiveTypeLower is "findquestitem" or "finditem") && apiObj.Zones.Count > 0;
+                    if (isPlantOrMark || isFindAtZone)
+                        ImGui.TextColored(ColCyan, $"      \u25ce Zone marked on radar");
                 }
 
                 // Show required items (find/turn in)

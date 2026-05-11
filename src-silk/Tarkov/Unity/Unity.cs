@@ -16,6 +16,7 @@ namespace eft_dma_radar.Silk.Tarkov.Unity
         public const uint GO_ObjectClass   = 0x80;  // GameObject → ObjectClass (m_Object)
         public const uint GO_Components    = 0x58;  // GameObject → ComponentArray
         public const uint GO_Name          = 0x88;  // GameObject → Name string pointer
+        public const uint GO_IsActive      = 0x14;  // GameObject → m_IsActive (byte/bool)
 
         // ── Component ───────────────────────────────────────────────────────
         public const uint Comp_ObjectClass = 0x20;  // Component → ObjectClass (InteractiveClass)

@@ -23,6 +23,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
         /// <summary>Player type of the killer, used for colouring the entry.</summary>
         public PlayerType KillerSide { get; init; }
 
+        /// <summary>Player type of the victim (BEAR, USEC, PScav, etc.).</summary>
+        public PlayerType VictimSide { get; init; }
+
         /// <summary>UTC timestamp when this entry was pushed.</summary>
         public DateTime Timestamp { get; init; } = DateTime.UtcNow;
 

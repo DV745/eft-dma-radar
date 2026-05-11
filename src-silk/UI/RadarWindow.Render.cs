@@ -211,6 +211,42 @@ namespace eft_dma_radar.Silk.UI
             else
             {
                 LootFilter.SetCounts(0, 0);
+
+                // Even when general loot is hidden, draw items required by active quests
+                // so quest helpers work without forcing ShowLoot on.
+                if (!Config.BattleMode && Config.ShowQuests)
+                {
+                    var loot = Memory.Loot;
+                    if (loot is not null)
+                    {
+                        float playerY = localPlayerPos.Y;
+                        var qm = Memory.QuestManager;
+                        if (qm is not null)
+                        {
+                            foreach (var item in loot)
+                            {
+                                if (!qm.IsItemRequired(item.Id))
+                                    continue;
+
+                                if (!worldBounds.Contains(item.Position))
+                                    continue;
+
+                                int price = item.DisplayPrice;
+                                var result = new LootFilter.FilterResult
+                                {
+                                    Visible = true,
+                                    Important = true,
+                                    QuestRequired = true,
+                                    Tier = LootFilter.GetTier(price),
+                                };
+                                var sp = mapParams.ToScreenPos(MapParams.ToMapPos(item.Position, mapCfg));
+                                float dy = item.Position.Y - playerY;
+                                bool underMap = dy < -15f;
+                                item.Draw(canvas, sp, price, result, underMap, dy);
+                            }
+                        }
+                    }
+                }
             }
 
             // Corpses

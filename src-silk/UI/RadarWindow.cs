@@ -99,7 +99,7 @@ namespace eft_dma_radar.Silk.UI
 
         // Zoom constants
         private const float ZOOM_TO_MOUSE_STRENGTH = 5f;
-        private const int ZOOM_STEP = 5;
+        private const int ZOOM_STEP = 2;
 
         // Mouse hit-test dead zone — skip expensive entity scanning when mouse barely moved
         private static Vector2 _lastHitTestMousePos;
