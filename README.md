@@ -1,6 +1,6 @@
 # EFT DMA Radar — Silk.NET Edition
 
-> **⚠️ This project is no longer actively maintained by the original developers**
+> **⚠️ This project is no longer actively maintained by the original developers.**
 > 
 > This fork aims to add some extra functionality that is not present in the main repo, as well as keeping it up to date with tarkov updates.
 
