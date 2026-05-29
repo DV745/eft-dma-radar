@@ -49,12 +49,12 @@ namespace eft_dma_radar.Arena.Unity
             /// 0x40 slot pointed to a self+0x58 wrapper whose +0x48 aliased a managed pointer
             /// (producing the "taIndex out of range" / garbage-negative index reads).
             /// </summary>
-            public const uint HierarchyOffset = 0x58;
+            public const uint HierarchyOffset = 0x40;
             /// <summary>
             /// int32 transform index paired with HierarchyOffset. Values consistently fall in
             /// the small scene range (e.g. 0x23=35, 0x5F=95, 0x6F=111, 0x77=119) across players.
             /// </summary>
-            public const uint IndexOffset = 0x60;
+            public const uint IndexOffset = 0x48;
         }
         public static class TransformHierarchy
         {
@@ -82,9 +82,9 @@ namespace eft_dma_radar.Arena.Unity
             // sentinel <0,-1000,0>), +0xA0 → int[] parent indices (first entry = -1
             // for root, branching pattern matches humanoid skeleton).
             /// <summary>TransformHierarchy + X → pointer to parent-indices array (int[]).</summary>
-            public const uint IndicesOffset  = 0xA0;
+            public const uint IndicesOffset  = 0x80;
             /// <summary>TransformHierarchy + X → pointer to vertices array (TrsX[]).</summary>
-            public const uint VerticesOffset = 0x50;
+            public const uint VerticesOffset = 0xA0;
         }
         public static class UnityAnimator { public const uint Speed = 0x4B0; }
     }

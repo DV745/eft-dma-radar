@@ -36,6 +36,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Quests
             { "laboratory", "5b0fc42d86f7744a585f9105" },
             { "Sandbox", "653e6760052c01c1c805532f" },
             { "Sandbox_high", "65b8d6f5cdde2479cb2a3125" },
+            { "Icebreaker", "69af492a4819ea4ba10a69c5" },
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         // Cached zone lookups — rebuilt when filter settings change

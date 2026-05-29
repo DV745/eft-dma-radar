@@ -26,6 +26,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
                 ["tarkovstreets"] = "Streets",
                 ["Sandbox"] = "Ground Zero",
                 ["Sandbox_high"] = "Ground Zero",
+                ["icebreaker"] = "Icebreaker",
             }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
     }
 }

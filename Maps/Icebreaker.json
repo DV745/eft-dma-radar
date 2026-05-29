@@ -1,0 +1,77 @@
+{
+  "mapID": [
+    "Icebreaker"
+  ],
+  "x": 563.6976,
+  "y": 2091.6936,
+  "scale": 24.22101,
+  "svgScale": 1,
+  "disableDimming": false,
+  "mapLayers": [
+    {
+      "minHeight": null,
+      "maxHeight": null,
+      "filename": "Icebreaker.svg"
+    },
+    {
+      "minHeight": null,
+      "maxHeight": 12,
+      "filename": "Icebreaker_f0.svg"
+    },
+    {
+      "minHeight": 12,
+      "maxHeight": 15,
+      "filename": "Icebreaker_f1.svg"
+    },
+    {
+      "minHeight": 15,
+      "maxHeight": 18,
+      "filename": "Icebreaker_f2.svg"
+    },
+    {
+      "minHeight": 18,
+      "maxHeight": 21,
+      "filename": "Icebreaker_f3.svg"
+    },
+    {
+      "minHeight": 21,
+      "maxHeight": 24,
+      "filename": "Icebreaker_f4.svg"
+    },
+    {
+      "minHeight": 24,
+      "maxHeight": 27,
+      "filename": "Icebreaker_f5.svg"
+    },
+    {
+      "minHeight": 27,
+      "maxHeight": 30,
+      "filename": "Icebreaker_f6.svg"
+    },
+    {
+      "minHeight": 30,
+      "maxHeight": 33,
+      "filename": "Icebreaker_f7.svg"
+    },
+    {
+      "minHeight": 33,
+      "maxHeight": 36,
+      "filename": "Icebreaker_f8.svg"
+    },
+    {
+      "minHeight": 36,
+      "maxHeight": 39,
+      "filename": "Icebreaker_f9.svg"
+    },
+    {
+      "minHeight": 39,
+      "maxHeight": 42,
+      "filename": "Icebreaker_f10.svg"
+    },
+    {
+      "minHeight": 42,
+      "maxHeight": null,
+      "filename": "Icebreaker_f11.svg"
+    }
+  ]
+}

@@ -59,6 +59,7 @@ namespace eft_dma_radar.Silk.UI.Panels
             { "5b0fc42d86f7744a585f9105", "Labs" },
             { "653e6760052c01c1c805532f", "Ground Zero" },
             { "65b8d6f5cdde2479cb2a3125", "Ground Zero" },
+            { "69af492a4819ea4ba10a69c5", "Icebreaker" },
         };
 
         // ── Engine map ID → BSG map ID ───────────────────────────────────────
@@ -77,6 +78,7 @@ namespace eft_dma_radar.Silk.UI.Panels
             { "laboratory", "5b0fc42d86f7744a585f9105" },
             { "Sandbox", "653e6760052c01c1c805532f" },
             { "Sandbox_high", "65b8d6f5cdde2479cb2a3125" },
+            { "Icebreaker", "69af492a4819ea4ba10a69c5" },
         };
 
         // ── Map filter options (for the combo box) ───────────────────────────

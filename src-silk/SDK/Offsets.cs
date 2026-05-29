@@ -43,16 +43,16 @@ namespace SDK
         {
             public static uint BtrController = 0x28;
             public static uint TransitController = 0x38;
-            public static uint ExfilController = 0x58;
+            public static uint ExfilController = 0x68;
             public static uint ClientShellingController = 0xA8;
-            public static uint LocationId = 0xD0;
-            public static uint LootList = 0x198;
-            public static uint RegisteredPlayers = 0x1B8;
+            public static uint LocationId = 0xE8;
+            public static uint LootList = 0x1B0;
+            public static uint RegisteredPlayers = 0x1D0;
             public static uint BorderZones = 0x1F0;
-            public static uint MainPlayer = 0x210;
+            public static uint MainPlayer = 0x230;
             public static uint World = 0x218;
-            public static uint SynchronizableObjectLogicProcessor = 0x248;
-            public static uint Grenades = 0x288;
+            public static uint SynchronizableObjectLogicProcessor = 0x270;
+            public static uint Grenades = 0x2B0;
         }
         public readonly partial struct TransitController
         {
@@ -220,7 +220,7 @@ namespace SDK
         {
             public static uint _status = 0x58;
             public static uint Settings = 0x98;
-            public static uint EligibleEntryPoints = 0xC0;
+            public static uint EligibleEntryPoints = 0xF8;
         }
         public readonly partial struct ScavExfil
         {
@@ -240,19 +240,19 @@ namespace SDK
             public static uint _characterController = 0x40;
             public static uint MovementContext = 0x60;
             public static uint _playerBody = 0x190;
-            public static uint ProceduralWeaponAnimation = 0x338;
+            public static uint ProceduralWeaponAnimation = 0x3B0;
             public static uint _animators = 0x648;
             public static uint EnabledAnimators = 0x678;
-            public static uint Corpse = 0x688;
-            public static uint Location = 0x878;
+            public static uint Corpse = 0x718;
+            public static uint Location = 0x918;
             public static uint InteractableObject = 0x890;
-            public static uint Profile = 0x908;
-            public static uint Physical = 0x920;
+            public static uint Profile = 0x9B0;
+            public static uint Physical = 0x9C8;
             public static uint AIData = 0x948;
             public static uint _healthController = 0x968;
-            public static uint _inventoryController = 0x980;
-            public static uint _handsController = 0x988;
-            public static uint _playerLookRaycastTransform = 0xA18;
+            public static uint _inventoryController = 0xA28;
+            public static uint _handsController = 0xA30;
+            public static uint _playerLookRaycastTransform = 0xAC0;
             public static uint InteractionRayOriginOnStartOperation = 0xA24;
             public static uint InteractionRayDirectionOnStartOperation = 0xA30;
             public static uint IsYourPlayer = 0xA91;
