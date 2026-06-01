@@ -41,7 +41,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
             // One-pass build: count + collect human hostiles
             _hostilePlayers.Clear();
-            int pmcCount = 0, pscavCount = 0, aiCount = 0, bossCount = 0;
+            int pmcCount = 0, pscavCount = 0, aiCount = 0, bossCount = 0, teammateCount = 0;
 
             foreach (var p in allPlayers)
             {
@@ -54,9 +54,10 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     case PlayerType.PScav: pscavCount++; break;
                     case PlayerType.AIBoss: bossCount++; break;
                     case PlayerType.AIScav or PlayerType.AIRaider: aiCount++; break;
+                    case PlayerType.Teammate: teammateCount++; break;
                 }
 
-                if (p.IsHuman && p.IsHostile)
+                if (p.IsHuman)
                     _hostilePlayers.Add(p);
             }
 
@@ -65,12 +66,12 @@ namespace eft_dma_radar.Silk.UI.Widgets
                 Vector3.DistanceSquared(_sortOrigin, a.Position).CompareTo(Vector3.DistanceSquared(_sortOrigin, b.Position)));
 
             ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f),
-                $"PMC: {pmcCount}  PScav: {pscavCount}  AI: {aiCount}  Boss: {bossCount}");
+                $"PMC: {pmcCount}  PScav: {pscavCount}  AI: {aiCount}  Boss: {bossCount}  Teammates: {teammateCount}");
             ImGui.Separator();
 
             if (_hostilePlayers.Count == 0)
             {
-                ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f), "No human hostiles detected");
+                ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f), "No human players detected");
                 return;
             }
 
@@ -102,7 +103,10 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
                     // Name
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(color, $"{GetTypePrefix(player.Type)}{player.Name}");
+                    var displayName = SilkProgram.Config.StreamerMode && player.HasRealName()
+                        ? player.Type.StreamerLabel()
+                        : player.Name;
+                    ImGui.TextColored(color, $"{GetTypePrefix(player.Type)}{displayName}");
 
                     // Gear tooltip on name hover
                     if (ImGui.IsItemHovered())
@@ -221,7 +225,10 @@ namespace eft_dma_radar.Silk.UI.Widgets
             int distance = (int)Vector3.Distance(localPos, player.Position);
 
             // ── Identity ──
-            ImGui.TextColored(color, $"{GetTypePrefix(player.Type)}{player.Name}");
+            var tooltipName = SilkProgram.Config.StreamerMode && player.HasRealName()
+                ? player.Type.StreamerLabel()
+                : player.Name;
+            ImGui.TextColored(color, $"{GetTypePrefix(player.Type)}{tooltipName}");
             if (player.Level > 0)
             {
                 ImGui.SameLine();
@@ -371,6 +378,7 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
         private static Vector4 GetPlayerColor(PlayerType t) => t switch
         {
+            PlayerType.Teammate    => SKPaints.ToVec4(SKPaints.PaintTeammate.Color),
             PlayerType.USEC        => SKPaints.ToVec4(SKPaints.PaintUSEC.Color),
             PlayerType.BEAR        => SKPaints.ToVec4(SKPaints.PaintBEAR.Color),
             PlayerType.PScav       => SKPaints.ToVec4(SKPaints.PaintPScav.Color),

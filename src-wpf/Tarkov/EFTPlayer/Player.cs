@@ -1097,6 +1097,14 @@ namespace eft_dma_radar.Tarkov.EFTPlayer
                         Name = "Zombie",
                         Type = PlayerType.AIScav
                     };
+                case "bossWedge":
+                case "BossBoatswain":
+                case "BossBlackDiv":
+                    return new AIRole()
+                    {
+                        Name = "Wedge",
+                        Type = PlayerType.AIBoss
+                    };
                 // Rogue (ex-USEC) voice lines
                 case "VSRF_01":
                 case "VSRF_02":

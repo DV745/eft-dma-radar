@@ -113,6 +113,14 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         public bool IsHostile => IsHuman && Type is not PlayerType.Teammate;
 
         /// <summary>
+        /// Returns true for player types whose <see cref="Name"/> is a real identity that streamer
+        /// mode should hide. USEC/BEAR names are already anonymous IDs (e.g. "Usec14") so they are
+        /// excluded — only PScav, manually tagged Teammates, Streamers, and SpecialPlayers have real names.
+        /// </summary>
+        public bool HasRealName() => Type is PlayerType.PScav or PlayerType.Teammate
+            or PlayerType.Streamer or PlayerType.SpecialPlayer;
+
+        /// <summary>
         /// Draw priority for Z-ordering on the radar. Higher = drawn later (on top).
         /// Cached on <see cref="Type"/> assignment to avoid per-sort switch overhead.
         /// </summary>

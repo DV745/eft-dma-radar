@@ -247,7 +247,11 @@ namespace eft_dma_radar.Silk.UI.Widgets
 
                     if (showLabels)
                     {
-                        string label = $"{player.Name} ({(int)dist}m)";
+                        var config2 = SilkProgram.Config;
+                        string playerName = config2.StreamerMode && player.HasRealName()
+                            ? player.Type.StreamerLabel()
+                            : player.Name;
+                        string label = $"{playerName} ({(int)dist}m)";
                         DrawLabel(drawList, label, screenX, screenY, labelOffset, color,
                             projCtx.ContentMin, projCtx.ContentMax, config.AimviewLabelScale);
                     }

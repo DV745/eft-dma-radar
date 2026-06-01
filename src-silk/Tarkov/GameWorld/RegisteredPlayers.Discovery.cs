@@ -104,13 +104,11 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                     player.NetworkGroupID = ReadLocalNetworkGroupID(playerBase);
                 }
 
-                // Promote observed PMC to Teammate when they share our network group
+                // Promote observed PMC to Teammate when they share our network group OR spawn nearby
                 if (!isLocal && isObserved && (type == PlayerType.USEC || type == PlayerType.BEAR))
                 {
                     var localPlayer = LocalPlayer;
-                    if (localPlayer is not null &&
-                        player.NetworkGroupID != -1 &&
-                        player.NetworkGroupID == localPlayer.NetworkGroupID)
+                    if (localPlayer is not null && IsLocalSquadMember(player, localPlayer))
                     {
                         player.Type = PlayerType.Teammate;
                         type = PlayerType.Teammate;
@@ -141,6 +139,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                 entry.NextGearRefresh = now.AddMilliseconds(slot * 250);
                 entry.NextHandsRefresh = now.AddMilliseconds(slot * 150);
                 entry.NextHealthRefresh = now.AddMilliseconds(slot * 200);
+                // Trigger an early group ID re-check for all players (local and observed) so
+                // teammate promotion fires quickly even if the group GUID wasn't ready at spawn.
+                entry.NextGroupRefresh = now.AddSeconds(2.0);
 
                 // ObservedHealthController resolution is DEFERRED off the registration-critical path.
                 // It is a 3-hop DMA chain that previously ran for every newly discovered observed
@@ -369,6 +370,22 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
         private static bool IsExcludedFromSpawnGroups(string mapId) =>
             _spawnGroupExcludedMaps.Contains(mapId);
 
+        /// <summary>
+        /// Returns true if <paramref name="observed"/> belongs to the local player's squad.
+        /// Checks NetworkGroupID first; falls back to spawn-proximity (same as WPF PlayerListWorker).
+        /// </summary>
+        private static bool IsLocalSquadMember(Player.Player observed, Player.Player local)
+        {
+            if (observed.NetworkGroupID != -1 &&
+                observed.NetworkGroupID == local.NetworkGroupID)
+                return true;
+
+            // Proximity fallback — catches cases where the group GUID hasn't resolved yet
+            var lpPos = local.Position;
+            return IsValidSpawn(lpPos) &&
+                   Vector3.DistanceSquared(lpPos, observed.Position) <= SpawnGroupDistanceSqr;
+        }
+
         #endregion
 
         #region Spawn Group Assignment
@@ -444,6 +461,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             ["BossZombieTagilla"] = new("Zombie Tagilla", PlayerType.AIBoss),
             ["Zombie_Fast"] = new("Zombie", PlayerType.AIScav),
             ["Zombie_Medium"] = new("Zombie", PlayerType.AIScav),
+            ["bossWedge"] = new("Wedge", PlayerType.AIBoss),
+            ["BossBoatswain"] = new("Wedge", PlayerType.AIBoss),
+            ["BossBlackDiv"] = new("Wedge", PlayerType.AIBoss),
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
@@ -465,6 +485,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                     _ when voiceLine.Contains("usec", StringComparison.OrdinalIgnoreCase) => new("Raider", PlayerType.AIRaider),
                     _ when voiceLine.Contains("bear", StringComparison.OrdinalIgnoreCase) => new("Raider", PlayerType.AIRaider),
                     _ when voiceLine.Contains("black_division", StringComparison.OrdinalIgnoreCase) => new("BD", PlayerType.AIRaider),
+                    _ when voiceLine.Contains("pmcBotBlackDiv", StringComparison.OrdinalIgnoreCase) => new("Wedge Guard", PlayerType.AIRaider),
+                    _ when voiceLine.Contains("bossBullyBlackDiv", StringComparison.OrdinalIgnoreCase) => new("Wedge Guard", PlayerType.AIRaider),
+                    _ when voiceLine.Contains("followerBullyBlackDiv", StringComparison.OrdinalIgnoreCase) => new("Wedge Guard", PlayerType.AIRaider),
                     _ when voiceLine.Contains("vsrf", StringComparison.OrdinalIgnoreCase) => new("Vsrf", PlayerType.AIRaider),
                     _ when voiceLine.Contains("civilian", StringComparison.OrdinalIgnoreCase) => new("Civ", PlayerType.AIScav),
                     _ => new("Scav", PlayerType.AIScav)

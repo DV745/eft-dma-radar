@@ -129,7 +129,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Loot
             {
                 if (!string.IsNullOrWhiteSpace(entry.Nickname))
                 {
-                    if (!SilkProgram.Config.StreamerMode)
+                    // Always apply real name to teammates (you need to know who your friend is).
+                    // For all other human players, suppress in streamer mode.
+                    if (!SilkProgram.Config.StreamerMode || player.Type is PlayerType.Teammate)
                         player.Name = entry.Nickname;
                     applied = true;
                 }

@@ -230,6 +230,11 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
                     ["Emercom Checkpoint"] = "Emercom Checkpoint",
                     ["Nakatani Basement Stairs"] = "Nakatani Basement Stairs",
                 }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase),
+
+                ["icebreaker"] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["Helicopter"] = "Helicopter",
+                }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase),
             }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
     }
 }

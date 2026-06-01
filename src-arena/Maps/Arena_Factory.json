@@ -1,0 +1,16 @@
+{
+  "mapID": [
+    "Arena_Factory"
+  ],
+  "x": 64.7,
+  "y": 67.5,
+  "scale": 0.994,
+  "svgScale": 36.00,
+  "mapLayers": [
+	    {
+		"minHeight": 2.8,
+		"maxHeight": 6.5,
+		"filename": "Arena_Factory.svg"
+    }
+  ]
+}

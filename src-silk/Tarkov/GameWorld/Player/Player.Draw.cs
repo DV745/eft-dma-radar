@@ -131,7 +131,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
 
             if (!IsLocalPlayer)
             {
-                string name = Name;
+                string name = SilkProgram.Config.StreamerMode && HasRealName()
+                    ? Type.StreamerLabel()
+                    : Name;
                 string? weaponLine = InHandsItem is not null
                     ? (InHandsAmmo is not null ? $"{InHandsItem} ({InHandsAmmo})" : InHandsItem)
                     : null;

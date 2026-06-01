@@ -582,22 +582,32 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                     }
 
                     // Group ID refresh — re-read NetworkGroupID every 5s (cheap pointer chain)
-                    if (entry.IsObserved && now >= entry.NextGroupRefresh)
+                    if (now >= entry.NextGroupRefresh)
                     {
                         entry.NextGroupRefresh = now.AddSeconds(5.0);
                         try
                         {
-                            entry.Player.NetworkGroupID = ReadObservedNetworkGroupID(entry.Base);
+                            if (entry.IsObserved)
+                            {
+                                entry.Player.NetworkGroupID = ReadObservedNetworkGroupID(entry.Base);
+                            }
+                            else if (entry.Player.IsLocalPlayer)
+                            {
+                                // Re-read local player's group ID — it may be -1 at discovery time
+                                // if the group GUID hadn't been populated in memory yet.
+                                entry.Player.NetworkGroupID = ReadLocalNetworkGroupID(entry.Base);
+                            }
 
                             // Re-promote to Teammate if NG now matches local player (late resolution)
+                            // Also uses proximity fallback — same as WPF IsLocalSquadMember
                             var lp = LocalPlayer;
-                            if (lp is not null &&
-                                entry.Player.NetworkGroupID != -1 &&
-                                entry.Player.NetworkGroupID == lp.NetworkGroupID &&
+                            if (entry.IsObserved && lp is not null &&
                                 entry.Player.Type is PlayerType.USEC or PlayerType.BEAR &&
-                                !entry.Player.IsManualTeammate)
+                                !entry.Player.IsManualTeammate &&
+                                IsLocalSquadMember(entry.Player, lp))
                             {
                                 entry.Player.Type = PlayerType.Teammate;
+                                Log.WriteLine($"[RegisteredPlayers] Late-promoted '{entry.Player.Name}' to Teammate (group={entry.Player.NetworkGroupID})");
                             }
                         }
                         catch { /* non-fatal */ }
