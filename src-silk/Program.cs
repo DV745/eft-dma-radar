@@ -61,6 +61,8 @@ namespace eft_dma_radar.Silk
 
                 EftDataManager.ModuleInit();
 
+                TarkovDevService.Start();
+
                 LootFilter.LoadFilterData();
 
                 MapManager.ModuleInit();

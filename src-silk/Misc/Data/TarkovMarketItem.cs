@@ -15,10 +15,17 @@ namespace eft_dma_radar.Silk.Misc.Data
         public string ShortName { get; init; } = string.Empty;
 
         [JsonPropertyName("price")]
-        public long TraderPrice { get; init; }
+        public long TraderPrice { get; private set; }
 
         [JsonPropertyName("fleaPrice")]
-        public long FleaPrice { get; init; }
+        public long FleaPrice { get; private set; }
+
+        /// <summary>Patches live prices fetched from tarkov.dev at runtime.</summary>
+        internal void UpdateLivePrices(long fleaPrice, long traderPrice)
+        {
+            if (fleaPrice > 0) FleaPrice = fleaPrice;
+            if (traderPrice > 0) TraderPrice = traderPrice;
+        }
 
         [JsonPropertyName("slots")]
         public int Slots { get; init; } = 1;

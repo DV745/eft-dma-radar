@@ -1105,6 +1105,14 @@ namespace eft_dma_radar.Tarkov.EFTPlayer
                         Name = "Wedge",
                         Type = PlayerType.AIBoss
                     };
+                case "bossBullyBlackDiv":
+                case "followerBullyBlackDiv":
+                case "pmcBotBlackDiv":
+                    return new AIRole()
+                    {
+                        Name = "Wedge Guard",
+                        Type = PlayerType.AIRaider
+                    };
                 // Rogue (ex-USEC) voice lines
                 case "VSRF_01":
                 case "VSRF_02":

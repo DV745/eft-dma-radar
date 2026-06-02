@@ -462,8 +462,9 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             ["Zombie_Fast"] = new("Zombie", PlayerType.AIScav),
             ["Zombie_Medium"] = new("Zombie", PlayerType.AIScav),
             ["bossWedge"] = new("Wedge", PlayerType.AIBoss),
-            ["BossBoatswain"] = new("Wedge", PlayerType.AIBoss),
-            ["BossBlackDiv"] = new("Wedge", PlayerType.AIBoss),
+            ["bossBullyBlackDiv"] = new("Wedge Guard", PlayerType.AIRaider),
+            ["followerBullyBlackDiv"] = new("Wedge Guard", PlayerType.AIRaider),
+            ["pmcBotBlackDiv"] = new("Wedge Guard", PlayerType.AIRaider),
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
@@ -485,9 +486,6 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                     _ when voiceLine.Contains("usec", StringComparison.OrdinalIgnoreCase) => new("Raider", PlayerType.AIRaider),
                     _ when voiceLine.Contains("bear", StringComparison.OrdinalIgnoreCase) => new("Raider", PlayerType.AIRaider),
                     _ when voiceLine.Contains("black_division", StringComparison.OrdinalIgnoreCase) => new("BD", PlayerType.AIRaider),
-                    _ when voiceLine.Contains("pmcBotBlackDiv", StringComparison.OrdinalIgnoreCase) => new("Wedge Guard", PlayerType.AIRaider),
-                    _ when voiceLine.Contains("bossBullyBlackDiv", StringComparison.OrdinalIgnoreCase) => new("Wedge Guard", PlayerType.AIRaider),
-                    _ when voiceLine.Contains("followerBullyBlackDiv", StringComparison.OrdinalIgnoreCase) => new("Wedge Guard", PlayerType.AIRaider),
                     _ when voiceLine.Contains("vsrf", StringComparison.OrdinalIgnoreCase) => new("Vsrf", PlayerType.AIRaider),
                     _ when voiceLine.Contains("civilian", StringComparison.OrdinalIgnoreCase) => new("Civ", PlayerType.AIScav),
                     _ => new("Scav", PlayerType.AIScav)
