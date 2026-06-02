@@ -94,14 +94,16 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
                 {
                     if (Memory.TryReadPtr(_addr + Offsets.Exfil.EligibleEntryPoints, out var entriesArrPtr, false))
                         ReadStringArray(entriesArrPtr, PmcEntries);
+                    _eligibilityRead = true;
                 }
                 else
                 {
                     if (Memory.TryReadPtr(_addr + Offsets.ScavExfil.EligibleIds, out var idsListPtr, false))
                         ReadStringList(idsListPtr, ScavIds);
+                    // Only stop retrying once the list is populated; it may be empty on early ticks
+                    if (ScavIds.Count > 0)
+                        _eligibilityRead = true;
                 }
-
-                _eligibilityRead = true;
             }
             catch (Exception ex)
             {
@@ -114,8 +116,12 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
         /// </summary>
         public bool IsAvailableFor(Player.LocalPlayer localPlayer)
         {
+            // For scavs: if ScavIds hasn't been populated yet, treat as eligible so the exfil remains visible
+            bool scavEligible = localPlayer.IsScav &&
+                (ScavIds.Count == 0 || ScavIds.Contains(localPlayer.LocalProfileId ?? "NULL"));
+
             bool eligible = (localPlayer.IsPmc && PmcEntries.Contains(localPlayer.EntryPoint ?? "NULL"))
-                         || (localPlayer.IsScav && ScavIds.Contains(localPlayer.LocalProfileId ?? "NULL"))
+                         || scavEligible
                          || IsSecret;
 
             return eligible && Status != ExfilStatus.Closed;

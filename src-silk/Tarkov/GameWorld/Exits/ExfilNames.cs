@@ -233,7 +233,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
 
                 ["icebreaker"] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    ["Helicopter"] = "Helicopter",
+                    ["Heli"] = "Helicopter",
                 }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase),
             }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
     }

@@ -24,6 +24,7 @@ namespace eft_dma_radar.Silk.Misc.Data
             {
               items {
                 id
+                avg24hPrice
                 sellFor {
                   vendor { name }
                   priceRUB
@@ -82,12 +83,12 @@ namespace eft_dma_radar.Silk.Misc.Data
                     if (!EftDataManager.AllItems.TryGetValue(item.Id, out var existing))
                         continue;
 
-                    // Use the live flea listing price. If there is no flea entry the item
-                    // is flea-banned — set to 0 so GetDisplayPrice falls back to trader price.
-                    long fleaPrice = item.SellFor?
-                        .Where(s => s.Vendor?.Name == "Flea Market" && s.PriceRub.HasValue)
-                        .Select(s => s.PriceRub!.Value)
-                        .FirstOrDefault() ?? 0;
+                    // Use 24hr average for stability. If the item is flea-banned
+                    // (no Flea Market entry in sellFor), set to 0 so GetDisplayPrice
+                    // falls back to trader price.
+                    bool isFleaBanned = item.SellFor?.Any(
+                        s => s.Vendor?.Name == "Flea Market") != true;
+                    long fleaPrice = isFleaBanned ? 0 : (item.Avg24hPrice ?? 0);
 
                     long traderPrice = item.SellFor?
                         .Where(s => s.Vendor?.Name != null && s.Vendor.Name != "Flea Market" && s.PriceRub.HasValue)
@@ -122,6 +123,7 @@ namespace eft_dma_radar.Silk.Misc.Data
         private sealed class TarkovDevItem
         {
             public string? Id { get; set; }
+            public long? Avg24hPrice { get; set; }
             public List<SellFor>? SellFor { get; set; }
         }
 
