@@ -461,10 +461,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             ["BossZombieTagilla"] = new("Zombie Tagilla", PlayerType.AIBoss),
             ["Zombie_Fast"] = new("Zombie", PlayerType.AIScav),
             ["Zombie_Medium"] = new("Zombie", PlayerType.AIScav),
-            ["bossWedge"] = new("Wedge", PlayerType.AIBoss),
-            ["bossBullyBlackDiv"] = new("Wedge Guard", PlayerType.AIRaider),
-            ["followerBullyBlackDiv"] = new("Wedge Guard", PlayerType.AIRaider),
-            ["pmcBotBlackDiv"] = new("Wedge Guard", PlayerType.AIRaider),
+            ["Boss_Wedge"] = new("Wedge", PlayerType.AIBoss),
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
