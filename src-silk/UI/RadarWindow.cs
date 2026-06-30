@@ -70,6 +70,13 @@ namespace eft_dma_radar.Silk.UI
         private static long _lastPurgeTick;
         private const long PurgeIntervalMs = 1000;
 
+        // One-shot death screenshot capture state (resets on raid start)
+        private static bool _wasInRaidLastFrame;
+        private static bool _deathScreenshotCapturedThisRaid;
+        private static SKImage? _lastInRaidSnapshot;     // CPU-backed, safe to encode at any time
+        private static long _lastInRaidSnapshotTick;
+        private const long InRaidSnapshotIntervalMs = 1000; // 1 fps is enough; CPU redraw only
+
         // Ping effects — expanded rings on the radar for pinged loot items
         private static readonly List<PingEffect> _activePings = new();
         private const float PingDurationSeconds = 3f;

@@ -854,7 +854,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
 
                 // Initialize ExfilManager now that we know the local player's side
                 var lp = _registeredPlayers.LocalPlayer as Player.LocalPlayer;
-                _exfilManager = new ExfilManager(_base, MapID, lp?.IsPmc ?? true);
+                _exfilManager = new ExfilManager(_base, MapID, lp is null || lp.IsPmc || !lp.IsScav);
 
                 // Initialize QuestManager with the local player's profile pointer
                 if (lp is not null && lp.ProfilePtr != 0)
@@ -1314,3 +1314,4 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
         #endregion
     }
 }
+

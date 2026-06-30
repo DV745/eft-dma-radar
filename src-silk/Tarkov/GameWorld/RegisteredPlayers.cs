@@ -601,10 +601,10 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                             // Re-promote to Teammate if NG now matches local player (late resolution)
                             // Also uses proximity fallback — same as WPF IsLocalSquadMember
                             var lp = LocalPlayer;
-                            if (entry.IsObserved && lp is not null &&
+                            if (entry.IsObserved && lp is Player.LocalPlayer localLp &&
                                 entry.Player.Type is PlayerType.USEC or PlayerType.BEAR &&
                                 !entry.Player.IsManualTeammate &&
-                                IsLocalSquadMember(entry.Player, lp))
+                                IsLocalSquadMember(entry.Player, localLp, localLp.IsPmc))
                             {
                                 entry.Player.Type = PlayerType.Teammate;
                                 Log.WriteLine($"[RegisteredPlayers] Late-promoted '{entry.Player.Name}' to Teammate (group={entry.Player.NetworkGroupID})");

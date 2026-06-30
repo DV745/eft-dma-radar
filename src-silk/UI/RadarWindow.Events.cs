@@ -50,6 +50,8 @@ namespace eft_dma_radar.Silk.UI
             if (_iconGlyphRangesHandle.IsAllocated)
                 _iconGlyphRangesHandle.Free();
             _skSurface?.Dispose();
+            _lastInRaidSnapshot?.Dispose();
+            _lastInRaidSnapshot = null;
             _skBackendRenderTarget?.Dispose();
             _grContext?.Dispose();
             _input?.Dispose();

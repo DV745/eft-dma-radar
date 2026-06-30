@@ -610,6 +610,7 @@ namespace eft_dma_radar.Misc.Data
                 ["Interchange Cooperation"] = "Scav Camp (Co-Op)",
                 ["Hole Exfill"] = "Hole in the Fence",
                 ["Saferoom Exfil"] = "Saferoom Exfil",
+                ["shopping_sniper_exit"] = "Path to River (Flare)",
                 // SCAV
                 ["Emercom Checkpoint"] = "Emercom Checkpoint",
                 ["Railway Exfil"] = "Railway Exfil",
@@ -669,7 +670,7 @@ namespace eft_dma_radar.Misc.Data
                 ["RUAF Roadblock_scav"] = "RUAF Roadblock",
                 ["Warehouse 17"] = "Warehouse 17",
                 ["Factory Shacks"] = "Factory Shacks",
-                ["Warehouse 4"] = "Warehouse 4",
+                ["Warehouse 4" ] = "Warehouse 4",
                 ["Old Azs Gate"] = "Old Gas Station",
                 ["Factory Far Corner"] = "Factory Far Corner",
                 ["Administration Gate"] = "Administration Gate",

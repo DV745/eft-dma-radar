@@ -36,9 +36,38 @@ namespace eft_dma_radar.Silk.UI
                     _grContext.PurgeUnlockedResources(false);
                 }
 
+                bool inRaidNow = InRaid;
+                if (inRaidNow && !_wasInRaidLastFrame)
+                {
+                    _deathScreenshotCapturedThisRaid = false;
+                    _lastInRaidSnapshot?.Dispose();
+                    _lastInRaidSnapshot = null;
+                    _lastInRaidSnapshotTick = 0;
+                }
+
                 // Skia scene render
                 var fbSize = _window.FramebufferSize;
                 DrawSkiaScene(ref fbSize);
+
+                // Keep a throttled CPU-rendered copy of the current in-raid frame so we
+                // can save it after raid-end.  We re-draw the scene into a software SKSurface
+                // (no OpenGL / no GPU readback) so there is zero pipeline stall and no flicker.
+                // The snapshot path is skipped entirely when the feature is disabled.
+                if (inRaidNow && Config.SaveDeathScreenshot)
+                {
+                    long nowTick = Environment.TickCount64;
+                    if (nowTick - _lastInRaidSnapshotTick >= InRaidSnapshotIntervalMs)
+                    {
+                        _lastInRaidSnapshotTick = nowTick;
+                        CaptureInRaidSnapshotCpu(fbSize);
+                    }
+                }
+
+                // On raid end, save the last in-raid snapshot once.
+                if (Config.SaveDeathScreenshot && !inRaidNow && _wasInRaidLastFrame && !_deathScreenshotCapturedThisRaid)
+                    TrySaveDeathScreenshot();
+
+                _wasInRaidLastFrame = inRaidNow;
 
                 // ImGui UI render
                 DrawImGuiUI(ref fbSize, delta);
@@ -46,6 +75,77 @@ namespace eft_dma_radar.Silk.UI
             catch (Exception ex)
             {
                 Log.WriteLine($"***** CRITICAL RENDER ERROR: {ex}");
+            }
+        }
+
+        private static void TrySaveDeathScreenshot()
+        {
+            try
+            {
+                if (_lastInRaidSnapshot is null)
+                    return;
+
+                using var data = _lastInRaidSnapshot.Encode(SKEncodedImageFormat.Png, 100);
+                if (data is null)
+                    return;
+
+                string dir = AppContext.BaseDirectory;
+                string fileName = $"radar-screenshot-{DateTime.Now:yyyyMMdd-HHmmss}.png";
+                string fullPath = Path.Combine(dir, fileName);
+
+                using var fs = File.Create(fullPath);
+                data.SaveTo(fs);
+
+                _deathScreenshotCapturedThisRaid = true;
+                Log.WriteLine($"[RadarWindow] Death/Extract screenshot saved: {fullPath}");
+                Memory.ShowNotification?.Invoke($"Death/Extract screenshot saved: {fileName}", NotificationLevel.Info);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(AppLogLevel.Warning, $"[RadarWindow] Failed to save death/extract screenshot: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Re-renders the current radar scene into a CPU-backed (software) Skia surface and
+        /// caches the resulting <see cref="SKImage"/> for later PNG encoding.
+        /// This never touches the GPU surface and never issues a readback, so there is
+        /// no pipeline stall and no frame flicker.
+        /// </summary>
+        private static void CaptureInRaidSnapshotCpu(Vector2D<int> fbSize)
+        {
+            try
+            {
+                if (LocalPlayer is not Player localPlayer) return;
+                var map = MapManager.Map;
+                if (map is null || !localPlayer.HasValidPosition) return;
+                if (fbSize.X <= 0 || fbSize.Y <= 0) return;
+
+                var info = new SKImageInfo(fbSize.X, fbSize.Y, SKColorType.Rgba8888, SKAlphaType.Premul);
+                using var cpuSurface = SKSurface.Create(info);
+                if (cpuSurface is null) return;
+
+                var canvas = cpuSurface.Canvas;
+                canvas.Clear(SKColors.Black);
+                canvas.Save();
+                try
+                {
+                    var scale = UIScale;
+                    canvas.Scale(scale, scale);
+                    DrawRadar(canvas, localPlayer, map, scale);
+                }
+                finally
+                {
+                    canvas.Restore();
+                }
+
+                var snap = cpuSurface.Snapshot();
+                _lastInRaidSnapshot?.Dispose();
+                _lastInRaidSnapshot = snap;
+            }
+            catch (Exception ex)
+            {
+                Log.Write(AppLogLevel.Debug, $"[RadarWindow] CaptureInRaidSnapshotCpu failed: {ex.Message}");
             }
         }
 

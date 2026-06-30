@@ -99,6 +99,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
                     ["Interchange Cooperation"] = "Scav Camp (Co-Op)",
                     ["Hole Exfill"] = "Hole in the Fence",
                     ["Saferoom Exfil"] = "Saferoom Exfil",
+                    ["shopping_sniper_exit"] = "Path to River (Flare)",
                     ["Emercom Checkpoint"] = "Emercom Checkpoint",
                     ["Railway Exfil"] = "Railway Exfil",
                     ["Scav Camp (Co-Op)"] = "Scav Camp (Co-Op)",

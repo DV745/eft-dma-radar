@@ -16,6 +16,8 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
         private volatile IReadOnlyList<TransitPoint> _transits = [];
         private int _initAttempts;
         private const int MaxInitAttempts = 20;
+        private int _transitInitAttempts;
+        private const int MaxTransitInitAttempts = 40;
         private DateTime _lastRefresh;
         private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(3);
 
@@ -54,6 +56,26 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
 
                 if (exfils.Count > 0)
                     Log.WriteLine($"[ExfilManager] Initialized {exfils.Count} exfils, {_transits.Count} transits on attempt {_initAttempts}");
+            }
+
+            // Transit points can come online later than exfils. Retry independently.
+            if (_transits.Count == 0 && _transitInitAttempts < MaxTransitInitAttempts)
+            {
+                _transitInitAttempts++;
+                try
+                {
+                    var transitList = new List<TransitPoint>();
+                    ReadTransits(transitList);
+                    if (transitList.Count > 0)
+                    {
+                        _transits = transitList;
+                        Log.WriteLine($"[ExfilManager] Initialized {transitList.Count} transits on attempt {_transitInitAttempts}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(AppLogLevel.Debug, $"[ExfilManager] Transit read error: {ex.Message}");
+                }
             }
 
             if (exfils.Count == 0)
@@ -170,35 +192,39 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
         /// <summary>
         /// Reads transit points from the TransitController's IL2CPP dictionary.
         /// IL2CPP Dictionary layout:
-        ///   0x18: _entries (Entry[])
-        ///   0x20: _count (int)
-        ///   Entry[] data starts at 0x20, each entry is 24 bytes.
+        ///   +0x18: _entries (Entry[])
+        ///   +0x20: _count (int)
+        ///   Entry[] data starts at +0x20, each entry is 24 bytes.
         ///   Value pointer at offset 16 within each entry.
         /// </summary>
         private void ReadTransits(List<TransitPoint> list)
         {
             if (!Memory.TryReadPtr(_lgw + Offsets.ClientLocalGameWorld.TransitController, out var transitController, false)
                 || transitController == 0)
+            {
+                Log.WriteLine($"[ExfilManager] TransitController is null (lgw=0x{_lgw:X}, offset=0x{Offsets.ClientLocalGameWorld.TransitController:X})");
+                return;
+            }
+
+            // Locate the pointsById dictionary — scan if the hardcoded offset is stale
+            if (!FindTransitDictionary(transitController, out var dictPtr, out var count))
                 return;
 
-            if (!Memory.TryReadPtr(transitController + Offsets.TransitController.TransitPoints, out var dictPtr, false)
-                || dictPtr == 0)
-                return;
-
-            const uint IL2CPP_DICT_COUNT = 0x20;
             const uint IL2CPP_DICT_ENTRIES = 0x18;
             const uint IL2CPP_ENTRIES_START = 0x20;
             const int IL2CPP_ENTRY_SIZE = 24;
             const int IL2CPP_ENTRY_VALUE_OFFSET = 16;
 
-            var count = Memory.ReadValue<int>(dictPtr + IL2CPP_DICT_COUNT, false);
-            if (count <= 0 || count > 100)
-                return;
-
             if (!Memory.TryReadPtr(dictPtr + IL2CPP_DICT_ENTRIES, out var entriesPtr, false) || entriesPtr == 0)
+            {
+                Log.WriteLine($"[ExfilManager] TransitPoints entries array is null (dict=0x{dictPtr:X})");
                 return;
+            }
+
+            Log.WriteLine($"[ExfilManager] Reading {count} transit entries from dict=0x{dictPtr:X}");
 
             var entriesBase = entriesPtr + IL2CPP_ENTRIES_START;
+            var staticSentinel = new Vector3(0f, -100f, 0f);
 
             for (int i = 0; i < count; i++)
             {
@@ -210,14 +236,88 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
                         continue;
 
                     var transit = new TransitPoint(transitAddr, _mapId);
+
+                    // Skip transits with no resolved position (static data miss)
+                    if (transit.Position == staticSentinel || transit.Position == Vector3.Zero)
+                    {
+                        Log.WriteLine($"[ExfilManager] Transit '{transit.Name}' has no resolved position — check DEFAULT_DATA.json for map '{_mapId}'");
+                        continue;
+                    }
+
                     list.Add(transit);
-                    Log.Write(AppLogLevel.Debug, $"[ExfilManager] Loaded transit: '{transit.Name}' active={transit.IsActive} @ {transit.Position}");
+                    Log.WriteLine($"[ExfilManager] Loaded transit: '{transit.Name}' active={transit.IsActive} @ {transit.Position}");
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(AppLogLevel.Debug, $"[ExfilManager] Failed to read transit[{i}]: {ex.Message}");
+                    Log.WriteLine($"[ExfilManager] Failed to read transit[{i}]: {ex.Message}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Tries the configured <see cref="Offsets.TransitController.TransitPoints"/> offset first.
+        /// If that offset does not yield a valid IL2CPP Dictionary, scans every 8-byte aligned slot
+        /// in the TransitController object (0x08…0x90) for the real dictionary pointer and logs
+        /// the correct offset so the hardcoded constant can be updated.
+        /// </summary>
+        private static bool FindTransitDictionary(ulong transitController, out ulong dictPtr, out int count)
+        {
+            const uint IL2CPP_DICT_COUNT = 0x20;
+            const uint IL2CPP_DICT_ENTRIES = 0x18;
+
+            // Fast path — try the configured offset
+            var configuredOffset = Offsets.TransitController.TransitPoints;
+            if (Memory.TryReadPtr(transitController + configuredOffset, out dictPtr, false)
+                && IsValidTransitDict(dictPtr, IL2CPP_DICT_COUNT, IL2CPP_DICT_ENTRIES, out count))
+                return true;
+
+            Log.WriteLine(
+                $"[ExfilManager] Configured TransitPoints offset 0x{configuredOffset:X} invalid " +
+                $"(ptr=0x{dictPtr:X}); scanning TransitController @ 0x{transitController:X}...");
+
+            // Slow path — scan all aligned slots
+            for (uint off = 0x08; off <= 0x90; off += 8)
+            {
+                if (off == configuredOffset) continue; // already tried
+                if (!Memory.TryReadPtr(transitController + off, out var candidate, false)) continue;
+                if (!IsValidTransitDict(candidate, IL2CPP_DICT_COUNT, IL2CPP_DICT_ENTRIES, out count)) continue;
+
+                Log.WriteLine(
+                    $"[ExfilManager] *** Found transit dict at offset 0x{off:X} " +
+                    $"(ptr=0x{candidate:X}, count={count}). " +
+                    $"Update Offsets.TransitController.TransitPoints = 0x{off:X}; ***");
+
+                dictPtr = candidate;
+                return true;
+            }
+
+            // Dump raw slots to help diagnose further
+            count = 0;
+            dictPtr = 0;
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"[ExfilManager] TransitController scan — no valid dict found. Raw slots:");
+            for (uint off = 0x08; off <= 0x90; off += 8)
+            {
+                if (Memory.TryReadValue<ulong>(transitController + off, out var raw, false))
+                    sb.Append($"  +0x{off:X}=0x{raw:X}");
+            }
+            Log.WriteLine(sb.ToString());
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="ptr"/> looks like an initialised IL2CPP Dictionary
+        /// with a plausible entry count (1..50) and a non-null entries array.
+        /// </summary>
+        private static bool IsValidTransitDict(ulong ptr, uint countOffset, uint entriesOffset, out int count)
+        {
+            count = 0;
+            // Reject obvious sentinels / low addresses
+            if (ptr < 0x10000 || ptr > 0x00007FFFFFFFFFFF) return false;
+            if (!Memory.TryReadValue<int>(ptr + countOffset, out count, false)) return false;
+            if (count <= 0 || count > 50) return false;
+            if (!Memory.TryReadPtr(ptr + entriesOffset, out var entriesPtr, false) || entriesPtr == 0) return false;
+            return true;
         }
     }
 }

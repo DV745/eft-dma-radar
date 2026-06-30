@@ -24,6 +24,15 @@ namespace eft_dma_radar.Silk.UI.Panels
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Toggle between player-follow and free-pan  [F]");
 
+            bool saveDeathScreenshot = Config.SaveDeathScreenshot;
+            if (ImGui.Checkbox("Save Death/Extract Screenshot", ref saveDeathScreenshot))
+            {
+                Config.SaveDeathScreenshot = saveDeathScreenshot;
+                Config.Save();
+            }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Save a one-time radar PNG on raid end to the executable folder");
+
             DrawMapSetupSection();
 
             ImGui.Spacing();

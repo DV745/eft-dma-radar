@@ -108,7 +108,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                 if (!isLocal && isObserved && (type == PlayerType.USEC || type == PlayerType.BEAR))
                 {
                     var localPlayer = LocalPlayer;
-                    if (localPlayer is not null && IsLocalSquadMember(player, localPlayer))
+                    if (localPlayer is LocalPlayer lp && IsLocalSquadMember(player, lp, lp.IsPmc))
                     {
                         player.Type = PlayerType.Teammate;
                         type = PlayerType.Teammate;
@@ -372,18 +372,25 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
 
         /// <summary>
         /// Returns true if <paramref name="observed"/> belongs to the local player's squad.
-        /// Checks NetworkGroupID first; falls back to spawn-proximity (same as WPF PlayerListWorker).
+        /// Checks NetworkGroupID first; optional spawn-proximity fallback is used for PMCs.
         /// </summary>
-        private static bool IsLocalSquadMember(Player.Player observed, Player.Player local)
+        private static bool IsLocalSquadMember(Player.Player observed, Player.Player local, bool allowProximityFallback)
         {
             if (observed.NetworkGroupID != -1 &&
                 observed.NetworkGroupID == local.NetworkGroupID)
                 return true;
 
-            // Proximity fallback — catches cases where the group GUID hasn't resolved yet
+            if (!allowProximityFallback)
+                return false;
+
+            // Proximity fallback — catches cases where the group GUID hasn't resolved yet.
+            // Both positions must be valid (non-zero) to avoid false positives at raid start
+            // when observed player transforms haven't been initialized yet (position = Vector3.Zero).
             var lpPos = local.Position;
+            var obsPos = observed.Position;
             return IsValidSpawn(lpPos) &&
-                   Vector3.DistanceSquared(lpPos, observed.Position) <= SpawnGroupDistanceSqr;
+                   IsValidSpawn(obsPos) &&
+                   Vector3.DistanceSquared(lpPos, obsPos) <= SpawnGroupDistanceSqr;
         }
 
         #endregion

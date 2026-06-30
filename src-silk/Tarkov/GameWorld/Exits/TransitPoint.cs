@@ -29,18 +29,22 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
             // Read active flag
             IsActive = Memory.ReadValue<bool>(parameters + Offsets.TransitParameters.active, false);
 
-            // Read destination location (map ID)
+            // Read destination location (map ID string from game)
+            string rawLocation = "Unknown";
             string destinationLabel = "Unknown";
             if (Memory.TryReadPtr(parameters + Offsets.TransitParameters.location, out var locationPtr, false)
                 && Memory.TryReadUnityString(locationPtr, out var location)
                 && !string.IsNullOrWhiteSpace(location))
             {
+                rawLocation = location;
                 destinationLabel = MapNames.Names.TryGetValue(location, out var friendly)
                     ? friendly
                     : location;
             }
 
             Name = $"Transit to {destinationLabel}";
+
+            Log.WriteLine($"[TransitPoint] addr=0x{baseAddr:X} rawLocation='{rawLocation}' destinationLabel='{destinationLabel}' active={IsActive} mapId='{mapId}'");
 
             // Resolve position from static JSON map data
             Position = GetStaticPosition(mapId, destinationLabel);
@@ -96,11 +100,23 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
         /// </summary>
         private static Vector3 GetStaticPosition(string mapId, string destinationLabel)
         {
-            if (string.IsNullOrEmpty(mapId) || !EftDataManager.MapData.TryGetValue(mapId, out var mapData))
+            if (string.IsNullOrEmpty(mapId))
+            {
+                Log.WriteLine($"[TransitPoint] mapId is null/empty");
                 return new Vector3(0, -100, 0);
+            }
+
+            if (!EftDataManager.MapData.TryGetValue(mapId, out var mapData))
+            {
+                Log.WriteLine($"[TransitPoint] MapData has no key '{mapId}' (available: {string.Join(", ", EftDataManager.MapData.Keys)})");
+                return new Vector3(0, -100, 0);
+            }
 
             if (mapData.Transits is not { Count: > 0 })
+            {
+                Log.WriteLine($"[TransitPoint] No transits in MapData for '{mapId}'");
                 return new Vector3(0, -100, 0);
+            }
 
             var searchTerm = NormalizeForComparison(destinationLabel);
 
@@ -119,8 +135,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
                 }
             }
 
-            Log.Write(AppLogLevel.Debug,
-                $"[TransitPoint] No matching transit for '{destinationLabel}' in map '{mapId}'");
+            Log.WriteLine($"[TransitPoint] No match for '{destinationLabel}' in map '{mapId}' (available: {string.Join(", ", mapData.Transits.Select(t => t.Description))})");
             return new Vector3(0, -100, 0);
         }
 

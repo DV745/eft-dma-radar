@@ -405,6 +405,12 @@ namespace eft_dma_radar.Silk.Config
         /// <summary>Hide exfils that are closed or not available to the local player.</summary>
         public bool HideInactiveExfils { get; set; } = true;
 
+        /// <summary>
+        /// Save a one-time PNG of the radar when leaving raid (death/end) to the executable folder.
+        /// Disabled by default to avoid unbounded disk growth.
+        /// </summary>
+        public bool SaveDeathScreenshot { get; set; } = false;
+
         // ── Streamer Mode ────────────────────────────────────────────────────────
 
         /// <summary>When enabled, all player names are hidden on the radar and killfeed.</summary>
