@@ -54,6 +54,7 @@ namespace eft_dma_radar.Silk.UI.Maps
                 ["city"]            = "City",
                 ["labyrinth"]       = "Labyrinth",
                 ["icebreaker"]      = "Icebreaker",
+                ["laboratory_dark"] = "Labs (Dark)",
             }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
     }
 

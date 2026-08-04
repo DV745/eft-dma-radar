@@ -95207,6 +95207,2238 @@
       "iconLinkFallback": null,
       "imageLink": null,
       "caliber": null
+    },
+    {
+      "bsgID": "69f9ebbcaae020b0db02f65d",
+      "name": "Norinco QBZ-191 5.8x42 assault rifle",
+      "shortName": "QBZ-191",
+      "price": 18900,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Assault rifle",
+        "Weapon",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9ebf07596e93e340c0a16",
+      "name": "QBZ-191 5.8x42 266mm barrel",
+      "shortName": "QBZ-191 266mm",
+      "price": 16750,
+      "fleaPrice": 44444,
+      "slots": 2,
+      "categories": [
+        "Barrel",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9ec0cddaf0c377d0eb748",
+      "name": "QBZ-191 gas block",
+      "shortName": "QBZ-191 gas",
+      "price": 5400,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Gas block",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9ec5a7596e93e340c0a1e",
+      "name": "QBZ-191 5.8x42 30-round magazine",
+      "shortName": "QBZ-191 30rd",
+      "price": 3200,
+      "fleaPrice": 5555,
+      "slots": 2,
+      "categories": [
+        "Magazine",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9ec80aae020b0db02f670",
+      "name": "Norinco QMK-171A sight mount",
+      "shortName": "QMK-171A",
+      "price": 2100,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9eca1ddaf0c377d0eb74e",
+      "name": "QBZ-191 Bird Cage 5.8x42 flash hider",
+      "shortName": "QBZ-191 Bird Cage",
+      "price": 5720,
+      "fleaPrice": 8200,
+      "slots": 1,
+      "categories": [
+        "Flashhider",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9ecb8df2c2358a9041858",
+      "name": "QBZ-191 pistol grip",
+      "shortName": "QBZ-191 grip",
+      "price": 8700,
+      "fleaPrice": 12000,
+      "slots": 1,
+      "categories": [
+        "Pistol grip",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9ecc5df2c2358a904185c",
+      "name": "QBZ-191 5.8x42 upper receiver",
+      "shortName": "QBZ-191 upper",
+      "price": 12198,
+      "fleaPrice": 40000,
+      "slots": 2,
+      "categories": [
+        "Receiver",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f0a86b45e1d5210c6955",
+      "name": "QBZ-191 flip-up rear sight",
+      "shortName": "QBZ-191 rear sight",
+      "price": 1900,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ironsight",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f0b58676a3db2a096808",
+      "name": "QBZ-191 buttstock",
+      "shortName": "QBZ-191 stock",
+      "price": 10890,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f0c325db06fcf60a88e6",
+      "name": "QBZ-191 buffer tube",
+      "shortName": "QBZ-191 tube",
+      "price": 2175,
+      "fleaPrice": 1000,
+      "slots": 2,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f0d3df2c2358a9041867",
+      "name": "Norinco VQX-191 5.8x42 sound suppressor",
+      "shortName": "VQX-191",
+      "price": 49000,
+      "fleaPrice": 150000,
+      "slots": 2,
+      "categories": [
+        "Silencer",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f0e4df2c2358a904186b",
+      "name": "Norinco QMK-171A 3x scope",
+      "shortName": "QMK-171A 3x",
+      "price": 15730,
+      "fleaPrice": 18888,
+      "slots": 2,
+      "categories": [
+        "Assault scope",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f111df2c2358a904186f",
+      "name": "QBZ-191 polymer handguard",
+      "shortName": "QBZ-191 poly",
+      "price": 9800,
+      "fleaPrice": 11111,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f12c25db06fcf60a88f1",
+      "name": "QBZ-191 Jia Zhou TRS M-LOK 10 inch handguard",
+      "shortName": "TRS 10 M-LOK",
+      "price": 16100,
+      "fleaPrice": 60000,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69f9f1356b45e1d5210c6961",
+      "name": "QBZ-191 Jia Zhou TRS M-LOK 13.5 inch handguard",
+      "shortName": "TRS 13.5 M-LOK",
+      "price": 29500,
+      "fleaPrice": 111111,
+      "slots": 3,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69fa0168e72acd254602c64a",
+      "name": "Norinco short rail",
+      "shortName": "QBZ-191 short rail",
+      "price": 1100,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69fa0173c5a215197a0e0c85",
+      "name": "Norinco long rail",
+      "shortName": "QBZ-191 long rail",
+      "price": 2125,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "69fb18608a19a890b70a6ba4",
+      "name": "QBZ-191 5.8x42 368mm barrel",
+      "shortName": "QBZ-191 368mm",
+      "price": 38995,
+      "fleaPrice": 0,
+      "slots": 3,
+      "categories": [
+        "Barrel",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a07208057b2695f9d001e63",
+      "name": "5.8x42mm DBP191",
+      "shortName": "DBP191",
+      "price": 190,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ammo",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": "Caliber58x42"
+    },
+    {
+      "bsgID": "6a42661705016139300b2085",
+      "name": "5.8x42mm DBX95",
+      "shortName": "DBX95",
+      "price": 120,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ammo",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": "Caliber58x42"
+    },
+    {
+      "bsgID": "6a42662fcb506840dd053827",
+      "name": "5.8x42mm DVC12",
+      "shortName": "DVC12",
+      "price": 1120,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ammo",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": "Caliber58x42"
+    },
+    {
+      "bsgID": "6a426637ddc63098d100ae67",
+      "name": "5.8x42mm DVX12",
+      "shortName": "DVX12",
+      "price": 1050,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ammo",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": "Caliber58x42"
+    },
+    {
+      "bsgID": "6a146aad698504bec30e56b5",
+      "name": "HK UMP Hogue buffer tube adapter",
+      "shortName": "UMP Hogue",
+      "price": 4700,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a146c81f77fa1814701c172",
+      "name": "HK UMP Extended M-LOK handguard",
+      "shortName": "UMP M-LOK",
+      "price": 8300,
+      "fleaPrice": 23333,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a146caa5d89d60a3b0b0ccb",
+      "name": "HK UMP .45 ACP 16.5 inch threaded barrel",
+      "shortName": "UMP 16.5\"",
+      "price": 15800,
+      "fleaPrice": 0,
+      "slots": 3,
+      "categories": [
+        "Barrel",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a146cd20d72113135000a1f",
+      "name": "HK UMP .45 ACP 11.5 inch threaded barrel",
+      "shortName": "UMP 11.5\"",
+      "price": 10299,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Barrel",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a147ad5eff5b3bf690c2c0d",
+      "name": "AR-15 Daniel Defense RIS III 9.5 handguard (Black)",
+      "shortName": "RIS III 9.5",
+      "price": 13200,
+      "fleaPrice": 17777,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a147ae25071bc42610640b5",
+      "name": "AR-15 Daniel Defense RIS III 9.5 lower handguard (Black)",
+      "shortName": "RIS II 9.5",
+      "price": 4400,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1567ce0cce01965f0bee01",
+      "name": "AR-15 Daniel Defense RIS III 9.5 handguard (Mil Spec+)",
+      "shortName": "RIS II 9.5",
+      "price": 13200,
+      "fleaPrice": 34999,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1567e0af9c1c57b700776f",
+      "name": "AR-15 Daniel Defense RIS III 9.5 lower handguard (Mil Spec+)",
+      "shortName": "RIS II 9.5",
+      "price": 4400,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a156a75cbb8d0c82606c525",
+      "name": "AR-15 Daniel Defense RIS III 12.5 handguard (Black)",
+      "shortName": "RIS II 9.5",
+      "price": 18450,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a156a9407619a15b1023be7",
+      "name": "AR-15 Daniel Defense RIS III 12.5 handguard (Mil Spec+)",
+      "shortName": "RIS II 9.5",
+      "price": 18450,
+      "fleaPrice": 45555,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a156ac407619a15b1023bf0",
+      "name": "AR-15 Daniel Defense RIS III 12.5 lower handguard (Black)",
+      "shortName": "RIS II 9.5",
+      "price": 6300,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1571b8060f61ca2c03e06f",
+      "name": "AR-15 Daniel Defense RIS III 12.5 lower handguard (Mil Spec+)",
+      "shortName": "RIS II 9.5",
+      "price": 6300,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1577a0bf497aade1002754",
+      "name": "AR-15 Daniel Defense Enhanced Pistol Grip (Black)",
+      "shortName": "MOE Pistol",
+      "price": 13650,
+      "fleaPrice": 22000,
+      "slots": 1,
+      "categories": [
+        "Pistol grip",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1577b09bbb889992032c14",
+      "name": "AR-15 Daniel Defense Enhanced Pistol Grip (Mil Spec+)",
+      "shortName": "MOE Pistol",
+      "price": 13650,
+      "fleaPrice": 80000,
+      "slots": 1,
+      "categories": [
+        "Pistol grip",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15785370efdef7be017253",
+      "name": "AR-15 Daniel Defense Fixed Front Sight",
+      "shortName": "DD Fixed Front",
+      "price": 1800,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ironsight",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1578658d059ca69c0a7853",
+      "name": "AR-15 Daniel Defense Fixed Rear Sight",
+      "shortName": "DD Fixed Rear",
+      "price": 1320,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ironsight",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1579afcbb8d0c82606c541",
+      "name": "AR-15 5.56x45 Lancer L5 AWM 30-round magazine",
+      "shortName": "L5 AWM",
+      "price": 3233,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Magazine",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1579bfb507e45a68038d7f",
+      "name": "AR-15 5.56x45 Lancer L5 AWM 30-round magazine (Tan)",
+      "shortName": "L5 AWM Tan",
+      "price": 3233,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Magazine",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a157b9e5ef5195441036c12",
+      "name": "HK 416 Geissele SMR HK 10.5 inch handguard (Black)",
+      "shortName": "handguard_416_geissele_smr_hk_105_inch ",
+      "price": 17770,
+      "fleaPrice": 50000,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a157e289bbb889992032c22",
+      "name": "Geissele SMR HK short rail",
+      "shortName": "SMR HK short",
+      "price": 2800,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a157e31b507e45a68038d88",
+      "name": "Geissele SMR HK long rail",
+      "shortName": "mount_smrhk_geissele_long_rail_section ",
+      "price": 3200,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a157f34cbb8d0c82606c54c",
+      "name": "HK 416 Geissele SMR HK 10.5 inch handguard (DDC)",
+      "shortName": "handguard_416_geissele_smr_hk_105_inch_ddc ",
+      "price": 17770,
+      "fleaPrice": 99999,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a157f5d8d059ca69c0a7864",
+      "name": "HK 416 Geissele SMR HK 14.5 inch handguard (Black)",
+      "shortName": "SMR HK 14.5",
+      "price": 27321,
+      "fleaPrice": 111111,
+      "slots": 3,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a157fa8af9c1c57b700778f",
+      "name": "HK 416 Geissele SMR HK 14.5 inch handguard (DDC)",
+      "shortName": "SMR HK 14.5 DDC",
+      "price": 27321,
+      "fleaPrice": 300000,
+      "slots": 3,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a158dd9060f61ca2c03e08e",
+      "name": "AKS-74U Samson K-Rail 3 handguard",
+      "shortName": "K-Rail 3",
+      "price": 8600,
+      "fleaPrice": 15000,
+      "slots": 1,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a158e29e5267ba21c07f927",
+      "name": "AKS-74 Armacon Monolit 5 buffer tube adapter",
+      "shortName": "Mono5",
+      "price": 5890,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a158e4abf497aade10030e0",
+      "name": "HUXWRX HX-QD 7.62x51 sound suppressor",
+      "shortName": "HX-QD",
+      "price": 72000,
+      "fleaPrice": 48999,
+      "slots": 2,
+      "categories": [
+        "Silencer",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a158e63060f61ca2c03e096",
+      "name": "AR-10 HUXWRX 7.62x51 flash hider",
+      "shortName": "HUXWRX FH",
+      "price": 7380,
+      "fleaPrice": 22222,
+      "slots": 1,
+      "categories": [
+        "Flashhider",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a158e90bf497aade10030e4",
+      "name": "HK417/G28 Geissele M110A1 14.5 inch handguard",
+      "shortName": "M110A1 14.5",
+      "price": 32700,
+      "fleaPrice": 90000,
+      "slots": 3,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15ae2ae5267ba21c07f98f",
+      "name": "HK 416A5 5.56x45 assault rifle (RAL 8000)",
+      "shortName": "416A5 RAL8000",
+      "price": 21800,
+      "fleaPrice": 115000,
+      "slots": 1,
+      "categories": [
+        "Assault rifle",
+        "Weapon",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15ae3e81a4baf60b09bc33",
+      "name": "HK 416A5 5.56x45 upper receiver (RAL 8000)",
+      "shortName": "416A5 upper RAL8000",
+      "price": 6500,
+      "fleaPrice": 50000,
+      "slots": 2,
+      "categories": [
+        "Receiver",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1708253dfad1cb790c91ed",
+      "name": "AK-308 M-LOK handguard",
+      "shortName": "AK-308 M-LOK",
+      "price": 14600,
+      "fleaPrice": 25000,
+      "slots": 1,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a16dc8b12144b7727017dad",
+      "name": "AK-74 thread type JMac Customs LAF-24 multi-caliber muzzle brake",
+      "shortName": "LAF-24",
+      "price": 10250,
+      "fleaPrice": 30000,
+      "slots": 1,
+      "categories": [
+        "Flashhider",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a16f3a28873771c3704a132",
+      "name": "AR-15 5.56x45 Daniel Defense 32-round magazine",
+      "shortName": "5.56x45 PMAG GEN M3 30",
+      "price": 4629,
+      "fleaPrice": 67676,
+      "slots": 2,
+      "categories": [
+        "Magazine",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15bf94e5267ba21c07f9b1",
+      "name": "AR-15 CAA SBS stock",
+      "shortName": "CAA SBS",
+      "price": 8490,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15bfa58d059ca69c0a78c0",
+      "name": "AR-15 CAA SBS stock (Khaki Tropen)",
+      "shortName": "CAA SBS Khaki",
+      "price": 8490,
+      "fleaPrice": 17666,
+      "slots": 2,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1d4dae46b486ac34084778",
+      "name": "AR-15 HK Extended Latch charging handle (RAL 8000)",
+      "shortName": "HK Latch RAL8000",
+      "price": 2917,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Charging handle",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15aef607619a15b1023c51",
+      "name": "AR-15 HK Slim Line buttstock (RAL 8000)",
+      "shortName": "HK Slim RAL8000",
+      "price": 9100,
+      "fleaPrice": 19000,
+      "slots": 2,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1d4c9246a6dc414a014973",
+      "name": "AR-15 LMT SOPMOD stock (FDE)",
+      "shortName": "LMT SOPMOD FDE",
+      "price": 4699,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3ceab8194a2625b40c8641",
+      "name": "B&T Howa Print-X 5.56x45 sound suppressor",
+      "shortName": "Print-X",
+      "price": 63700,
+      "fleaPrice": 131555,
+      "slots": 2,
+      "categories": [
+        "Silencer",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3ceaff7047a606b90f5321",
+      "name": "DEON March-F 1-8x24 Shorty 30mm riflescope",
+      "shortName": "March-F 1-8x24",
+      "price": 74700,
+      "fleaPrice": 155555,
+      "slots": 2,
+      "categories": [
+        "Scope",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a16f3711c209e26040a5410",
+      "name": "Daniel Defense Vertical Foregrip (Black)",
+      "shortName": "DD VFG Black",
+      "price": 11300,
+      "fleaPrice": 11111,
+      "slots": 1,
+      "categories": [
+        "Foregrip",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a16f3811c209e26040a5413",
+      "name": "Daniel Defense Vertical Foregrip (Mil Spec+)",
+      "shortName": "DD VFG MSP",
+      "price": 11300,
+      "fleaPrice": 29999,
+      "slots": 1,
+      "categories": [
+        "Foregrip",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3e92eb64b1d1fcc50ebbfb",
+      "name": "FN SCAR KDG RCH charging handle",
+      "shortName": "KDG RCH",
+      "price": 2400,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Charging handle",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3e936964b1d1fcc50ebbff",
+      "name": "FN SCAR PMM BCD Lever bolt release",
+      "shortName": "PMM BCD",
+      "price": 6200,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Charging handle",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3e92fdb0de53ae72082abb",
+      "name": "FN SCAR Sure Cycle Frag Angled charging handle",
+      "shortName": "SC Frag Angled",
+      "price": 7400,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Charging handle",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15b1fdbf497aade1003af2",
+      "name": "HK 416 5.56x45 14.5 inch barrel",
+      "shortName": "260мм AR-15 5.56х45",
+      "price": 27400,
+      "fleaPrice": 0,
+      "slots": 3,
+      "categories": [
+        "Barrel",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a15b13db507e45a68038de8",
+      "name": "HK 416 Quad Rail handguard (RAL 8000)",
+      "shortName": "416 Quad RAL8000",
+      "price": 8100,
+      "fleaPrice": 14000,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a28137cc55ac6942e06ba16",
+      "name": "HK417 7.62x51 13 inch barrel",
+      "shortName": "HK417 13\"",
+      "price": 21759,
+      "fleaPrice": 0,
+      "slots": 3,
+      "categories": [
+        "Barrel",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3ceaf01ac10a22850e295a",
+      "name": "Howa 30mm ring scope mount",
+      "shortName": "Howa 30mm ring",
+      "price": 2120,
+      "fleaPrice": 50000,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3bffbebc377285900b85cf",
+      "name": "Howa Type 20 5.56x45 assault rifle",
+      "shortName": "Type 20",
+      "price": 9000,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Assault rifle",
+        "Weapon",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3935772db31ca1c800fe26",
+      "name": "KA-BAR USMC Fighter knife",
+      "shortName": "KA-BAR Fighter",
+      "price": 43312,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Knife",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a39358c658f5889ba050ef3",
+      "name": "Microtech Jagdkommando knife",
+      "shortName": "Jagdkommando",
+      "price": 86040,
+      "fleaPrice": 0,
+      "slots": 3,
+      "categories": [
+        "Knife",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a18508bae175e037a0be420",
+      "name": "Monstrum Tactical Marksman 3x30 Prism Scope",
+      "shortName": "Marksman 3x30",
+      "price": 23340,
+      "fleaPrice": 30000,
+      "slots": 2,
+      "categories": [
+        "Assault scope",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a182c39b913af92800d8b5d",
+      "name": "PK Front Zveno buffer tube adapter",
+      "shortName": "Zveno front",
+      "price": 6740,
+      "fleaPrice": 20000,
+      "slots": 1,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a182c6fec91b71b110147db",
+      "name": "PK Hexagon DTKP 7.62x54 sound suppressor",
+      "shortName": "PK Hex DTKP",
+      "price": 64999,
+      "fleaPrice": 100000,
+      "slots": 2,
+      "categories": [
+        "Silencer",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a182c0fae175e037a0be40c",
+      "name": "PK Hexagon handguard",
+      "shortName": "PK Hexagon",
+      "price": 17250,
+      "fleaPrice": 40000,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a182c6008074115230957e9",
+      "name": "PKP Hexagon DTKP 7.62x54 sound suppressor",
+      "shortName": "PKP Hex DTKP",
+      "price": 64999,
+      "fleaPrice": 99999,
+      "slots": 2,
+      "categories": [
+        "Silencer",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a19487a4afae114f106ba39",
+      "name": "Trijicon ACOG TA02 4x32 scope",
+      "shortName": "TA02 4x32",
+      "price": 29915,
+      "fleaPrice": 45800,
+      "slots": 2,
+      "categories": [
+        "Assault scope",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a16dc0b82cfbdc3ab09f58a",
+      "name": "Trijicon MRO high profile mount",
+      "shortName": "MRO high",
+      "price": 1593,
+      "fleaPrice": 55555,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a16dc17b7b9778bee072c65",
+      "name": "Trijicon MRO low profile mount",
+      "shortName": "MRO low",
+      "price": 1593,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Mount",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a16dec146b811b32d0583ef",
+      "name": "Trijicon MRO reflex sight",
+      "shortName": "MRO",
+      "price": 18999,
+      "fleaPrice": 39999,
+      "slots": 1,
+      "categories": [
+        "Compact reflex sight",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3cea4494a96a17e00c4b69",
+      "name": "Type 20 5.56x45 13 inch barrel",
+      "shortName": "370мм AR-15 5.56х45",
+      "price": 18990,
+      "fleaPrice": 31111,
+      "slots": 2,
+      "categories": [
+        "Barrel",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3cea96194a2625b40c863d",
+      "name": "Type 20 5.56x45 compensator",
+      "shortName": "Type 20 comp",
+      "price": 9200,
+      "fleaPrice": 66666,
+      "slots": 1,
+      "categories": [
+        "Flashhider",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3ce9c28ce058e3a2059b15",
+      "name": "Type 20 5.56x45 upper receiver",
+      "shortName": "Type 20 upper",
+      "price": 6900,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Receiver",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3cea2b9768ff15af06d5e9",
+      "name": "Type 20 M-LOK handguard",
+      "shortName": "Type 20 M-LOK",
+      "price": 12300,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Handguard",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3ce9e9123fa14cd00631e8",
+      "name": "Type 20 buttstock",
+      "shortName": "Type 20 stock",
+      "price": 8230,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Stock",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3cf2f17047a606b90f532e",
+      "name": "Type 20 charging handle",
+      "shortName": "Type 20 CH",
+      "price": 1400,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Charging handle",
+        "Gear mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3ceadb6280cb85bc03f99a",
+      "name": "Type 20 flip-up front sight",
+      "shortName": "Type 20 front",
+      "price": 2100,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ironsight",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3ceacd8ce058e3a2059b28",
+      "name": "Type 20 flip-up rear sight",
+      "shortName": "Type 20 rear",
+      "price": 1800,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Ironsight",
+        "Sights",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3cea5e94a96a17e00c4b6f",
+      "name": "Type 20 gas block",
+      "shortName": "Type 20 gas",
+      "price": 3288,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Gas block",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3cea0d277d1c54b5008e27",
+      "name": "Type 20 pistol grip",
+      "shortName": "Type 20 grip",
+      "price": 8250,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Pistol grip",
+        "Essential mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a1eb32c6cd328ea90037455",
+      "name": "HUXWRX HX-QD 7.62x51 sound suppressor (Tan)",
+      "shortName": "HX-QD Tan",
+      "price": 72000,
+      "fleaPrice": 30000,
+      "slots": 2,
+      "categories": [
+        "Silencer",
+        "Muzzle device",
+        "Functional mod",
+        "Weapon mod",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3183258f113efdb7093622",
+      "name": "Classified documents",
+      "shortName": "Item_barter_info_secretdoc",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a31807f17005505b70d5827",
+      "name": "Financial documents",
+      "shortName": "Item_barter_info_finance",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3182dc6cd8de21cf0a3a7d",
+      "name": "Medical documents",
+      "shortName": "Item_barter_info_medicine",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a31830dde69ceafd805afa0",
+      "name": "Technical documentation",
+      "shortName": "Item_barter_info_operating",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a31824878450ec91c0ea1ae",
+      "name": "Blueprints and technical documentation",
+      "shortName": "Item_barter_info_scheme",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 4,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3181f178450ec91c0ea1aa",
+      "name": "Project documentation",
+      "shortName": "Item_barter_info_project",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3182b72fd891345e047eef",
+      "name": "User documentation",
+      "shortName": "Item_barter_info_user",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a31828557705071410ca00e",
+      "name": "Test documentation",
+      "shortName": "Item_barter_info_testing",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a317b9692cfdcddcb02a58e",
+      "name": "PMC personnel files",
+      "shortName": "Item_barter_info_personal",
+      "price": 10000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Battle pass document",
+        "Stackable item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3563dacdaebb512e0a009c",
+      "name": "Briefcase with documents",
+      "shortName": "Briefcase",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 4,
+      "categories": [
+        "Random loot container",
+        "Searchable item",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a5f9cfcc409750b6e065592",
+      "name": "Black Division encryption keys",
+      "shortName": "BD keys",
+      "price": 41000,
+      "fleaPrice": 0,
+      "slots": 2,
+      "categories": [
+        "Info",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a5f9c25e8c84d8b0602f22a",
+      "name": "Black Division rugged laptop",
+      "shortName": "BD laptop",
+      "price": 110000,
+      "fleaPrice": 0,
+      "slots": 6,
+      "categories": [
+        "Special item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "Data from Black Division laptop",
+      "name": "Data from Black Division laptop",
+      "shortName": "Защищенная флешка",
+      "price": -1,
+      "fleaPrice": -1,
+      "slots": 1,
+      "categories": [
+        "Quest Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a55f339fe4be93a04090acc",
+      "name": "Data from Fence's laptop",
+      "shortName": "item_info_note_report_AP_errand_s1_01",
+      "price": 10483,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Notes",
+        "Completable",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "Laptop from an unknown facility",
+      "name": "Laptop from an unknown facility",
+      "shortName": "Unknown laptop",
+      "price": -1,
+      "fleaPrice": -1,
+      "slots": 6,
+      "categories": [
+        "Quest Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "Therapist's message",
+      "name": "Therapist's message",
+      "shortName": "Therapist msg",
+      "price": -1,
+      "fleaPrice": -1,
+      "slots": 1,
+      "categories": [
+        "Quest Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "BattlePassDocument",
+      "name": "BattlePassDocument",
+      "shortName": "Item",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Info",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a60bd87e6623686fa0b8a71",
+      "name": "Twitch Seasons 2026 case (Common)",
+      "shortName": "item_container_event_Twitch_Drops_ICE_2026_common_1.0",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 4,
+      "categories": [
+        "Random loot container",
+        "Searchable item",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a60d657cb57bbff5701e062",
+      "name": "Twitch Seasons 2026 case (Epic)",
+      "shortName": "item_container_event_Twitch_Drops_ICE_2026_superrar_Drop_1.0",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 4,
+      "categories": [
+        "Random loot container",
+        "Searchable item",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a60d4d71687b74e1603f61d",
+      "name": "Twitch Seasons 2026 case (Rare)",
+      "shortName": "item_container_event_Twitch_Drops_ICE_2026_rar_Drop_1.0",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 4,
+      "categories": [
+        "Random loot container",
+        "Searchable item",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a144084b2b53cd4130fd5ee",
+      "name": "Wooden gear crate",
+      "shortName": "Wooden crate",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 15,
+      "categories": [
+        "Random loot container",
+        "Searchable item",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a39244f3f411d06e104675a",
+      "name": "Plastic gear crate",
+      "shortName": "Plastic crate",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 20,
+      "categories": [
+        "Random loot container",
+        "Searchable item",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a3567f687d90a0deb066c1b",
+      "name": "Black Division gear crate",
+      "shortName": "BD crate",
+      "price": 0,
+      "fleaPrice": 0,
+      "slots": 8,
+      "categories": [
+        "Random loot container",
+        "Searchable item",
+        "Compound item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
+    },
+    {
+      "bsgID": "6a5f9c49b8281c31a1062aea",
+      "name": "14-4 KORD SSD",
+      "shortName": "KORD SSD",
+      "price": 65000,
+      "fleaPrice": 0,
+      "slots": 1,
+      "categories": [
+        "Special item",
+        "Item"
+      ],
+      "iconLink": null,
+      "iconLinkFallback": null,
+      "imageLink": null,
+      "caliber": null
     }
   ],
   "tasks": [

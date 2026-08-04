@@ -27,6 +27,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Exits
                 ["Sandbox"] = "Ground Zero",
                 ["Sandbox_high"] = "Ground Zero",
                 ["icebreaker"] = "Icebreaker",
+                ["laboratory_dark"] = "Labs (Dark)",
             }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
     }
 }

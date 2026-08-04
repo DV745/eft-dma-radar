@@ -51,8 +51,8 @@ namespace SDK
             public static uint BorderZones = 0x1F0;
             public static uint MainPlayer = 0x230;
             public static uint World = 0x218;
-            public static uint SynchronizableObjectLogicProcessor = 0x270;
-            public static uint Grenades = 0x2B0;
+            public static uint SynchronizableObjectLogicProcessor = 0x278;
+            public static uint Grenades = 0x2B8;
         }
         public readonly partial struct TransitController
         {
@@ -239,20 +239,20 @@ namespace SDK
         {
             public static uint _characterController = 0x40;
             public static uint MovementContext = 0x60;
-            public static uint _playerBody = 0x190;
-            public static uint ProceduralWeaponAnimation = 0x3B0;
+            public static uint _playerBody = 0x1A0;
+            public static uint ProceduralWeaponAnimation = 0x3C0;
             public static uint _animators = 0x648;
             public static uint EnabledAnimators = 0x678;
-            public static uint Corpse = 0x718;
-            public static uint Location = 0x918;
+            public static uint Corpse = 0x728;
+            public static uint Location = 0x928;
             public static uint InteractableObject = 0x890;
-            public static uint Profile = 0x9B0;
-            public static uint Physical = 0x9C8;
+            public static uint Profile = 0x9C0;
+            public static uint Physical = 0x9D8;
             public static uint AIData = 0x948;
-            public static uint _healthController = 0x968;
-            public static uint _inventoryController = 0xA28;
-            public static uint _handsController = 0xA30;
-            public static uint _playerLookRaycastTransform = 0xAC0;
+            public static uint _healthController = 0xA20;
+            public static uint _inventoryController = 0xA38;
+            public static uint _handsController = 0xA40;
+            public static uint _playerLookRaycastTransform = 0xAD0;
             public static uint InteractionRayOriginOnStartOperation = 0xA24;
             public static uint InteractionRayDirectionOnStartOperation = 0xA30;
             public static uint IsYourPlayer = 0xA91;
@@ -266,12 +266,12 @@ namespace SDK
             public static uint Voice = 0x40;
             public static uint VisibleToCameraType = 0x60;
             public static uint GroupID = 0x80;
-            public static uint Side = 0x94;
-            public static uint IsAI = 0xA0;
+            public static uint Side = 0xB4;
+            public static uint IsAI = 0xC0;
             public static uint NickName = 0xB8;
-            public static uint AccountId = 0xC0;
-            public static uint PlayerBody = 0xD8;
-            public static uint Id = 0x7C;
+            public static uint AccountId = 0xE0;
+            public static uint PlayerBody = 0xF8;
+            public static uint Id = 0x90;
             public static uint VoipId = 0xB0;
             public static uint _playerLookRaycastTransform = 0x100;
         }
@@ -280,9 +280,9 @@ namespace SDK
             public static uint InventoryController = 0x10;
             public static uint Player = 0x18;
             public static uint InfoContainer = 0xD0;
-            public static readonly uint[] MovementController = [0xD8, 0x98];
-            public static uint HealthController = 0xE8;
-            public static uint HandsController = 0x120;
+            public static readonly uint[] MovementController = [0xF0, 0xB0];
+            public static uint HealthController = 0x100;
+            public static uint HandsController = 0x140;
         }
         public readonly partial struct ObservedMovementController
         {
@@ -315,11 +315,11 @@ namespace SDK
             public static uint PositionZeroSum = 0x348;
             public static uint Shootingg = 0x58;
             public static uint _aimingSpeed = 0x190;
-            public static uint _isAiming = 0x14D;
-            public static uint _optics = 0x1A8;
+            public static uint _isAiming = 0x16D;
+            public static uint _optics = 0x1C8;
             public static uint _shotDirection = 0x1F0;
             public static uint Mask = 0x30;
-            public static uint HandsContainer = 0x20;
+            public static uint HandsContainer = 0x38;
             public static uint _fovCompensatoryDistance = 0x1BC;
         }
         public readonly partial struct HandsContainer
@@ -380,7 +380,7 @@ namespace SDK
             public static uint Skills = 0x80;
             public static uint TaskConditionCounters = 0x90;
             public static uint QuestsData = 0x98;
-            public static uint WishlistManager = 0x108;
+            public static uint WishlistManager = 0x130;
             public static uint Stats = 0x148;
         }
         public readonly partial struct WishlistManager
@@ -454,16 +454,16 @@ namespace SDK
             public static uint _rotation = 0xC0;
             public static uint PlantState = 0x70;
             public static uint CurrentState = 0x1E8;
-            public static uint _states = 0x478;
-            public static uint _movementStates = 0x4A8;
+            public static uint _states = 0x498;
+            public static uint _movementStates = 0x4C8;
             public static uint _tilt = 0xAC;
             public static uint _physicalCondition = 0x190;
             public static uint _speedLimitIsDirty = 0x1B1;
             public static uint StateSpeedLimit = 0x1B4;
             public static uint StateSprintSpeedLimit = 0x1B8;
-            public static uint _lookDirection = 0x3B0;
-            public static uint WalkInertia = 0x4B4;
-            public static uint SprintBrakeInertia = 0x4B8;
+            public static uint _lookDirection = 0x3D0;
+            public static uint WalkInertia = 0x4D4;
+            public static uint SprintBrakeInertia = 0x4D8;
             public static uint _poseInertia = 0x4BC;
             public static uint _currentPoseInertia = 0x4C0;
             public static uint _inertiaAppliedTime = 0x264;
