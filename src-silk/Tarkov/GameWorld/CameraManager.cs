@@ -611,7 +611,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                     continue;
 
                 // Component -> GameObject -> Name
-                if (!Memory.TryReadPtr(cameraPtr + Comp_GameObject, out var gameObject, false))
+                if (!Memory.TryReadPtr(cameraPtr + GO_ObjectClass, out var gameObject, false))
                     continue;
 
                 if (!Memory.TryReadPtr(gameObject + GO_Name, out var namePtr, false))
