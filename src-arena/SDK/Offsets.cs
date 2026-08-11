@@ -202,7 +202,7 @@ namespace SDK
         public readonly partial struct EFTCameraManager
         {
             public static uint OpticCameraManager = 0x10;
-            public static uint Camera             = 0x70;
+            public static uint Camera             = 0x68;
             public static uint GetInstance_RVA    = 0x1C8A230;
         }
 
