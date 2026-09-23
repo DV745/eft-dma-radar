@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using eft_dma_radar.Silk.Config;
 
 namespace eft_dma_radar.Silk.Tarkov
 {
@@ -11,10 +12,29 @@ namespace eft_dma_radar.Silk.Tarkov
     {
         #region Constants
 
-        private const string TarkovDevUrl = "https://players.tarkov.dev/profile/";
+        private const string TarkovDevBaseUrl = "https://players.tarkov.dev/";
         private const int PollIntervalMs = 500;
         private const int RequestDelayMs = 1500;
         private const int RateLimitPauseMs = 60_000;
+
+        #endregion
+
+        #region Helpers
+
+        /// <summary>
+        /// Gets the profile API endpoint URL based on the configured game mode.
+        /// </summary>
+        private static string GetProfileUrl(string accountId)
+        {
+            var gameMode = SilkProgram.Config.TarkovPriceGameMode;
+            var modePath = gameMode switch
+            {
+                TarkovGameMode.PVE => "pve",
+                TarkovGameMode.Seasonal => "pvp-season",
+                _ => "profile" // Default to Regular/PVP
+            };
+            return $"{TarkovDevBaseUrl}{modePath}/{accountId}.json";
+        }
 
         #endregion
 
@@ -163,7 +183,7 @@ namespace eft_dma_radar.Silk.Tarkov
         {
             try
             {
-                var url = $"{TarkovDevUrl}{accountId}.json";
+                var url = GetProfileUrl(accountId);
                 using var response = _http.GetAsync(url).GetAwaiter().GetResult();
 
                 if (response.StatusCode == HttpStatusCode.TooManyRequests)

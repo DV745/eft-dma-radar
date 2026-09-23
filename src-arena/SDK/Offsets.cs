@@ -38,7 +38,24 @@ namespace SDK
             public static uint RegisteredPlayers = 0x1B8;
             public static uint MainPlayer        = 0x218;
             public static uint LocationId        = 0xD0;
+            public static uint SynchronizableObjectLogicProcessor = 0x250;
+            public static uint ClientShellingController = 0xA8;
+            public static uint Grenades = 0x298;
         }
+
+        public readonly partial struct Grenade
+        {
+            public static uint IsDestroyed = 0x4D;
+            public static uint WeaponSource = 0xB8;
+        }
+
+
+
+        public readonly partial struct SynchronizableObjectLogicProcessor
+        {
+            public static uint _activeSynchronizableObjects = 0x10;
+        }
+
 
         // ── ObservedPlayerView (EFT.NextObservedPlayer.ObservedPlayerView) ──
         // Field offsets verified against C:\Temp\il2cpp_full_dump.txt [14996]
@@ -102,7 +119,7 @@ namespace SDK
 
         public readonly partial struct ItemTemplate
         {
-            public static uint _id = 0x110; // <_id>k__BackingField (MongoID valuetype)
+            public static uint _id = 0x118; // <_id>k__BackingField (MongoID valuetype)
         }
 
         // ── ObservedMovementController rotation ──────────────────────────────
@@ -134,10 +151,10 @@ namespace SDK
         {
             public static uint GameWorld        = 0x650;  // EFT.Player [12002] → GameWorld ptr
             public static uint MovementContext  = 0x80;   // <MovementContext>k__BackingField
-            public static uint _playerLookRaycastTransform = 0xA98; // EFT.Player._playerLookRaycastTransform
+            public static uint _playerLookRaycastTransform = 0xAA8; // EFT.Player._playerLookRaycastTransform
             // Arena-verified via runtime offset auto-probe (see RegisteredPlayers.ProbeLocalInventoryControllerOffset).
             // EFT-mainline value here is 0x980; Arena's Player layout has it at 0x9E0.
-            public static uint _inventoryController = 0x9F0;
+            public static uint _inventoryController = 0xA00;
         }
 
         // ── MovementContext (EFT.MovementContext [12338]) ────────────────────

@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using eft_dma_radar.Silk.Config;
 
 namespace eft_dma_radar.Silk.Misc.Data
 {
@@ -18,8 +19,21 @@ namespace eft_dma_radar.Silk.Misc.Data
 
         // Static JSON dump of the tarkov.dev item database. Updated periodically server-side;
         // no query body needed, this is a plain GET.
-        private const string ItemsUrl = "https://json.tarkov.dev/regular/items";
         private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(20);
+
+        /// <summary>
+        /// Gets the items endpoint URL based on the configured game mode.
+        /// </summary>
+        private static string GetItemsUrl()
+        {
+            var gameMode = SilkProgram.Config.TarkovPriceGameMode;
+            return gameMode switch
+            {
+                TarkovGameMode.PVE => "https://json.tarkov.dev/pve/items",
+                TarkovGameMode.Seasonal => "https://json.tarkov.dev/pvp-season/items",
+                _ => "https://json.tarkov.dev/regular/items" // Default to Regular/PVP
+            };
+        }
 
         /// <summary>
         /// Starts a background loop that fetches live prices immediately, then repeats
@@ -45,10 +59,18 @@ namespace eft_dma_radar.Silk.Misc.Data
         {
             try
             {
-                Log.WriteLine("[TarkovDevService] Fetching live prices from json.tarkov.dev...");
+                var itemsUrl = GetItemsUrl();
+                var gameModeStr = SilkProgram.Config.TarkovPriceGameMode switch
+                {
+                    TarkovGameMode.PVE => "PVE",
+                    TarkovGameMode.Seasonal => "Seasonal",
+                    _ => "Regular/PVP"
+                };
+
+                Log.WriteLine($"[TarkovDevService] Fetching live prices ({gameModeStr}) from json.tarkov.dev...");
 
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
-                using var response = await _http.GetAsync(ItemsUrl, cts.Token);
+                using var response = await _http.GetAsync(itemsUrl, cts.Token);
                 response.EnsureSuccessStatusCode();
 
                 var result = await response.Content.ReadFromJsonAsync<RegularItemsResponse>(

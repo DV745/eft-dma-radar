@@ -220,7 +220,7 @@ namespace SDK
         {
             public static uint _status = 0x58;
             public static uint Settings = 0x98;
-            public static uint EligibleEntryPoints = 0xF8;
+            public static uint EligibleEntryPoints = 0xC0;
         }
         public readonly partial struct ScavExfil
         {
@@ -258,7 +258,7 @@ namespace SDK
             public static uint IsYourPlayer = 0xA91;
             public static uint VoipID = 0x8F8;
             public static uint Id = 0x900;
-            public static uint GameWorld = 0x600;
+            public static uint GameWorld = 0x5F0F268;
         }
         public readonly partial struct ObservedPlayerView
         {
@@ -305,7 +305,7 @@ namespace SDK
         public readonly partial struct ObservedHealthController
         {
             public static uint Player = 0x18;
-            public static uint PlayerCorpse = 0x20;
+            public static uint PlayerCorpse = 0x48;
             public static uint HealthStatus = 0x10;
         }
         public readonly partial struct ProceduralWeaponAnimation
@@ -510,7 +510,7 @@ namespace SDK
             public static uint ProfileId = 0x28;
             public static uint Nickname = 0x30;
             public static uint Side = 0x38;
-            public static uint Level = 0x3c;
+            public static uint Level = 0x3C;
             public static uint Time = 0x40;
             public static uint Status = 0x48;
             public static uint KillerAccountId = 0x50;
@@ -543,8 +543,8 @@ namespace SDK
         }
         public readonly partial struct LootableContainer
         {
-            public static uint InteractingPlayer = 0x150;
-            public static uint ItemOwner = 0x168;
+            public static uint InteractingPlayer = 0x160;
+            public static uint ItemOwner = 0x178;
             public static uint Template = 0x170;
         }
         public readonly partial struct LootableContainerItemOwner
@@ -734,7 +734,7 @@ namespace SDK
         public readonly partial struct EFTCameraManager
         {
             public static uint OpticCameraManager = 0x10;
-            public static uint Camera = 0x60;
+            public static uint Camera = 0x70;
             public static uint GetInstance_RVA = 0x3F151A0;
         }
         public readonly partial struct SightComponent

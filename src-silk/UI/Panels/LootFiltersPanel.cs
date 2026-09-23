@@ -1,4 +1,6 @@
 using ImGuiNET;
+using eft_dma_radar.Silk.Config;
+using eft_dma_radar.Silk.Misc.Data;
 
 namespace eft_dma_radar.Silk.UI.Panels
 {
@@ -141,6 +143,43 @@ namespace eft_dma_radar.Silk.UI.Panels
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Hide loot below the Important price threshold.\n" +
                                  "Wishlist, quest, and category items are still shown.");
+
+            // Game mode selection for tarkov.dev prices
+            ImGui.Spacing();
+            ImGui.TextDisabled("Tarkov.dev Price Source:");
+
+            var gameModes = new[] { "PVP (Regular)", "PVE", "Seasonal" };
+            int currentMode = (int)Config.TarkovPriceGameMode;
+
+            for (int i = 0; i < gameModes.Length; i++)
+            {
+                if (ImGui.RadioButton(gameModes[i], ref currentMode, i))
+                {
+                    Config.TarkovPriceGameMode = (TarkovGameMode)i;
+                    Config.MarkDirty();
+                }
+                if (i < gameModes.Length - 1) ImGui.SameLine();
+            }
+
+            // Refresh prices button
+            ImGui.Spacing();
+            if (ImGui.Button("Refresh Prices Now", new System.Numerics.Vector2(-1, 0)))
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await TarkovDevService.FetchAndApplyAsync();
+                        Log.WriteLine("[LootFiltersPanel] Manual price refresh completed.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine($"[LootFiltersPanel] Manual price refresh failed: {ex.Message}");
+                    }
+                });
+            }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Fetch the latest prices immediately for the selected gamemode.\nOtherwise, prices update automatically every 20 minutes.");
         }
 
         // ── Categories ───────────────────────────────────────────────────────

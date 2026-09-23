@@ -599,12 +599,14 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                             }
 
                             // Re-promote to Teammate if NG now matches local player (late resolution)
-                            // Also uses proximity fallback — same as WPF IsLocalSquadMember
+                            // Do NOT use proximity fallback in late-promotion to avoid false positives
+                            // (when solo players move near each other during the raid).
+                            // Proximity fallback is only reliable during initial discovery (Discovery.cs).
                             var lp = LocalPlayer;
                             if (entry.IsObserved && lp is Player.LocalPlayer localLp &&
                                 entry.Player.Type is PlayerType.USEC or PlayerType.BEAR &&
                                 !entry.Player.IsManualTeammate &&
-                                IsLocalSquadMember(entry.Player, localLp, localLp.IsPmc))
+                                IsLocalSquadMember(entry.Player, localLp, allowProximityFallback: false))
                             {
                                 entry.Player.Type = PlayerType.Teammate;
                                 Log.WriteLine($"[RegisteredPlayers] Late-promoted '{entry.Player.Name}' to Teammate (group={entry.Player.NetworkGroupID})");

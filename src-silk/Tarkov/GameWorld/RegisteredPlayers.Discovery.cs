@@ -108,18 +108,24 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                 if (!isLocal && isObserved && (type == PlayerType.USEC || type == PlayerType.BEAR))
                 {
                     var localPlayer = LocalPlayer;
-                    if (localPlayer is LocalPlayer lp && IsLocalSquadMember(player, lp, lp.IsPmc))
+                    if (localPlayer is LocalPlayer lp)
                     {
-                        player.Type = PlayerType.Teammate;
-                        type = PlayerType.Teammate;
+                        // Only use proximity fallback if the local player is in a group (not solo).
+                        // If solo (GroupID == -1), proximity-based matching is unreliable and causes false positives.
+                        bool allowProximity = lp.GroupID != -1;
+                        if (IsLocalSquadMember(player, lp, allowProximity))
+                        {
+                            player.Type = PlayerType.Teammate;
+                            type = PlayerType.Teammate;
+                        }
                     }
                 }
 
-                // Assign spawn group ID (proximity-based) for observed human players
+                // Assign spawn group ID (proximity-based, type-compatible) for observed human players
                 if (!isLocal && isObserved && (type == PlayerType.USEC || type == PlayerType.BEAR || type == PlayerType.Teammate || type == PlayerType.PScav))
                 {
                     if (!IsExcludedFromSpawnGroups(_mapId))
-                        player.SpawnGroupID = GetOrAssignSpawnGroup(player.Position);
+                        player.SpawnGroupID = GetOrAssignSpawnGroup(player.Position, type);
                 }
 
                 // Track in player history (non-local, human players only — filtered inside AddOrUpdate)
@@ -398,32 +404,75 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
         #region Spawn Group Assignment
 
         /// <summary>
-        /// Tracks a spawn position associated with a group ID.
+        /// Tracks a spawn position associated with a group ID and the player type of the group founder.
+        /// Used to segregate incompatible player types (e.g., PMCs and PScavs) into separate spawn groups.
         /// </summary>
         private sealed class SpawnGroupEntry
         {
             public int GroupId;
             public Vector3 SpawnPosition;
+            public PlayerType GroupPlayerType;
         }
 
         /// <summary>
-        /// Assigns a spawn-group ID based on position proximity.
-        /// Players spawning within <see cref="SpawnGroupDistanceSqr"/> of each other
-        /// are placed in the same group.
+        /// Determines if two player types can share the same spawn group.
+        /// Prevents incompatible types (e.g., PMCs and PScavs) from being grouped together visually.
         /// </summary>
-        private int GetOrAssignSpawnGroup(Vector3 spawnPos)
+        private static bool AreTypesCompatibleForSpawning(PlayerType groupType, PlayerType candidateType)
+        {
+            // If the candidate is the same type as the group founder, always compatible
+            if (groupType == candidateType)
+                return true;
+
+            // Teammates can join any PMC group (they're promoted to squad status)
+            if (candidateType == PlayerType.Teammate && (groupType == PlayerType.USEC || groupType == PlayerType.BEAR))
+                return true;
+            if (groupType == PlayerType.Teammate && (candidateType == PlayerType.USEC || candidateType == PlayerType.BEAR))
+                return true;
+
+            // PScavs should NOT join PMC groups or vice versa
+            if ((groupType == PlayerType.PScav && (candidateType == PlayerType.USEC || candidateType == PlayerType.BEAR)) ||
+                ((groupType == PlayerType.USEC || groupType == PlayerType.BEAR) && candidateType == PlayerType.PScav))
+                return false;
+
+            // PScavs should NOT join Teammate groups (unless the teammate is a Scav type)
+            if (groupType == PlayerType.PScav && candidateType == PlayerType.Teammate)
+                return false;
+            if (groupType == PlayerType.Teammate && candidateType == PlayerType.PScav)
+                return false;
+
+            // AI types (AIScav, AIRaider, AIBoss) are mostly isolated and shouldn't squad with humans
+            // except in very specific cases (raids with raiders, etc.)
+            if ((groupType == PlayerType.AIScav || groupType == PlayerType.AIRaider || groupType == PlayerType.AIBoss) &&
+                (candidateType == PlayerType.USEC || candidateType == PlayerType.BEAR || candidateType == PlayerType.PScav))
+                return false;
+            if ((candidateType == PlayerType.AIScav || candidateType == PlayerType.AIRaider || candidateType == PlayerType.AIBoss) &&
+                (groupType == PlayerType.USEC || groupType == PlayerType.BEAR || groupType == PlayerType.PScav))
+                return false;
+
+            // By default, allow (covers USEC/BEAR together, AI types together, etc.)
+            return true;
+        }
+
+        /// <summary>
+        /// Assigns a spawn-group ID based on position proximity and player type compatibility.
+        /// Players spawning within <see cref="SpawnGroupDistanceSqr"/> of each other are placed in the same group,
+        /// but only if their types are compatible (e.g., PMCs with PMCs, but not PMCs with PScavs).
+        /// </summary>
+        private int GetOrAssignSpawnGroup(Vector3 spawnPos, PlayerType playerType)
         {
             if (!IsValidSpawn(spawnPos))
                 return -1;
 
             foreach (var group in _spawnGroups)
             {
-                if (Vector3.DistanceSquared(group.SpawnPosition, spawnPos) <= SpawnGroupDistanceSqr)
+                if (Vector3.DistanceSquared(group.SpawnPosition, spawnPos) <= SpawnGroupDistanceSqr &&
+                    AreTypesCompatibleForSpawning(group.GroupPlayerType, playerType))
                     return group.GroupId;
             }
 
             int newId = _nextSpawnGroupId++;
-            _spawnGroups.Add(new SpawnGroupEntry { GroupId = newId, SpawnPosition = spawnPos });
+            _spawnGroups.Add(new SpawnGroupEntry { GroupId = newId, SpawnPosition = spawnPos, GroupPlayerType = playerType });
             return newId;
         }
 

@@ -765,7 +765,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                 if (entry.TransformReady && entry.Player.IsHuman
                     && entry.Player.SpawnGroupID == -1 && !entry.Player.IsLocalPlayer)
                 {
-                    entry.Player.SpawnGroupID = GetOrAssignSpawnGroup(entry.Player.Position);
+                    entry.Player.SpawnGroupID = GetOrAssignSpawnGroup(entry.Player.Position, entry.Player.Type);
                 }
             }
 

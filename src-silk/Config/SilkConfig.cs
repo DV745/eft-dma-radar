@@ -12,6 +12,16 @@ namespace eft_dma_radar.Silk.Config
     }
 
     /// <summary>
+    /// Tarkov game mode for fetching prices from tarkov.dev.
+    /// </summary>
+    public enum TarkovGameMode
+    {
+        Regular = 0,  // PVP / non-wipe
+        PVE = 1,      // PvE game mode
+        Seasonal = 2  // PVP seasonal
+    }
+
+    /// <summary>
     /// Individual hotkey entry for each action.
     /// </summary>
     public sealed class HotkeyEntry
@@ -533,6 +543,10 @@ namespace eft_dma_radar.Silk.Config
 
         /// <summary>Price source for loot values (0 = Best, 1 = Flea, 2 = Trader).</summary>
         public int LootPriceSource { get; set; } = 0;
+
+        /// <summary>Tarkov.dev game mode for fetching prices (0 = Regular/PVP, 1 = PVE, 2 = Seasonal).</summary>
+        [JsonPropertyName("tarkovPriceGameMode")]
+        public TarkovGameMode TarkovPriceGameMode { get; set; } = TarkovGameMode.Regular;
 
         /// <summary>Base radius (px) used for loot dot rendering on the radar.</summary>
         public float LootDotSize { get; set; } = 3f;
