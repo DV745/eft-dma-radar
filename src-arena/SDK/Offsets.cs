@@ -38,22 +38,6 @@ namespace SDK
             public static uint RegisteredPlayers = 0x1B8;
             public static uint MainPlayer        = 0x218;
             public static uint LocationId        = 0xD0;
-            public static uint SynchronizableObjectLogicProcessor = 0x250;
-            public static uint ClientShellingController = 0xA8;
-            public static uint Grenades = 0x298;
-        }
-
-        public readonly partial struct Grenade
-        {
-            public static uint IsDestroyed = 0x4D;
-            public static uint WeaponSource = 0xB8;
-        }
-
-
-
-        public readonly partial struct SynchronizableObjectLogicProcessor
-        {
-            public static uint _activeSynchronizableObjects = 0x10;
         }
 
 

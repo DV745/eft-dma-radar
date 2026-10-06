@@ -112,16 +112,23 @@ namespace eft_dma_radar.Silk.UI.Widgets
                     if (ImGui.IsItemHovered())
                         DrawNameTooltip(player, localPos);
 
-                    // Level (from corpse dogtag cache)
+                    // Level (from corpse dogtag cache, fallback to profile)
                     ImGui.TableNextColumn();
-                    if (player.Level > 0)
-                        ImGui.TextColored(color, player.Level.ToString());
+                    var profile = GetPlayerProfile(player);
+                    int displayLevel = player.Level;
+                    if (displayLevel <= 0)
+                    {
+                        if (profile is not null && profile.HasData)
+                            displayLevel = profile.Level;
+                    }
+
+                    if (displayLevel > 0)
+                        ImGui.TextColored(color, displayLevel.ToString());
                     else
                         ImGui.TextColored(ColorDim, "--");
 
                     // K/D (from tarkov.dev profile)
                     ImGui.TableNextColumn();
-                    var profile = GetPlayerProfile(player);
                     if (profile is not null && profile.HasData)
                         ImGui.TextColored(color, profile.KD.ToString("F1"));
                     else
