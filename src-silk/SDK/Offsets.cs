@@ -252,7 +252,7 @@ namespace SDK
             public static uint _healthController = 0xA20;
             public static uint _inventoryController = 0xA38;
             public static uint _handsController = 0xA40;
-            public static uint _playerLookRaycastTransform = 0xAD0;
+            public static uint _playerLookRaycastTransform = 0xAE0;
             public static uint InteractionRayOriginOnStartOperation = 0xA24;
             public static uint InteractionRayDirectionOnStartOperation = 0xA30;
             public static uint IsYourPlayer = 0xA91;
@@ -315,11 +315,11 @@ namespace SDK
             public static uint PositionZeroSum = 0x348;
             public static uint Shootingg = 0x58;
             public static uint _aimingSpeed = 0x190;
-            public static uint _isAiming = 0x16D;
-            public static uint _optics = 0x1C8;
+            public static uint _isAiming = 0x175;
+            public static uint _optics = 0x1D0;
             public static uint _shotDirection = 0x1F0;
             public static uint Mask = 0x30;
-            public static uint HandsContainer = 0x38;
+            public static uint HandsContainer = 0x40;
             public static uint _fovCompensatoryDistance = 0x1BC;
         }
         public readonly partial struct HandsContainer
@@ -391,8 +391,8 @@ namespace SDK
         public readonly partial struct PlayerInfo
         {
             public static uint Nickname = 0x10;
-            public static uint EntryPoint = 0x28;
-            public static uint Side = 0x48;
+            public static uint EntryPoint = 0x30;
+            public static uint Side = 0x50;
             public static uint RegistrationDate = 0x4C;
             public static uint GroupId = 0x50;
             public static uint Settings = 0x78;
@@ -724,8 +724,8 @@ namespace SDK
         }
         public readonly partial struct OpticCameraManager
         {
-            public static uint Camera = 0x70;
-            public static uint CurrentOpticSight = 0x78;
+            public static uint Camera = 0x68;
+            public static uint CurrentOpticSight = 0x70;
         }
         public readonly partial struct GPUInstancerRuntimeData
         {
