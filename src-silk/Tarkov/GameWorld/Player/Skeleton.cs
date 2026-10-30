@@ -88,6 +88,12 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         /// <summary>Max distance (meters) from the player's anchor before a bone is considered detached.</summary>
         private const float MaxBoneDistance = 15f;
 
+        /// <summary>
+        /// Number of transforms in the skeleton's _values list.
+        /// 138 for full humanoid, 81 for simplified (UseSimplifiedSkeleton).
+        /// </summary>
+        private int _skeletonBoneCount;
+
         /// <summary>Per-bone cached transform data.</summary>
         private sealed class BoneEntry
         {
@@ -107,9 +113,10 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
             public BoneEntry(Bones bone) => Bone = bone;
         }
 
-        private Skeleton(BoneEntry[] bones)
+        private Skeleton(BoneEntry[] bones, int skeletonBoneCount)
         {
             _bones = bones;
+            _skeletonBoneCount = skeletonBoneCount;
             _boneIndex = new Dictionary<Bones, int>(bones.Length);
             for (int i = 0; i < bones.Length; i++)
                 _boneIndex[bones[i].Bone] = i;
@@ -121,6 +128,11 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
         /// <para>
         /// Chain: _playerBody → PlayerBody.SkeletonRootJoint → DizSkinningSkeleton._values →
         /// List._items → element[boneIndex] → +0x10 → TransformInternal.
+        /// </para>
+        /// <para>
+        /// Reads skeleton bone count (_values.Count) to detect simplified skeletons (81 bones for
+        /// zombies) vs full humanoid (138 bones). Applies bounds checking to prevent out-of-range
+        /// accesses when reading bone elements.
         /// </para>
         /// </summary>
         internal static Skeleton? TryCreate(ulong playerBase, bool isObserved)
@@ -140,6 +152,25 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
                 if (!itemsArr.IsValidVirtualAddress())
                     return null;
 
+                // Read skeleton bone count from the List._size field (ManagedList.Count = 0x18)
+                // This detects simplified skeletons: 81 = UseSimplifiedSkeleton (zombies), 138 = full humanoid
+                int skeletonBoneCount = 138; // default
+                if (Memory.TryReadValue<int>(values + UnityOffsets.ManagedList.Count, out var countVal, false))
+                {
+                    skeletonBoneCount = countVal;
+                    if (skeletonBoneCount < 50 || skeletonBoneCount > 200)
+                        skeletonBoneCount = 138; // sanity check: use default if out of range
+                }
+
+                // Simplified rigs (zombies, 81 transforms) use a different bone order than the
+                // hardcoded humanoid indices; reading them yields wrong bones that trip drift
+                // detection and keep the player from showing. Skip the skeleton entirely —
+                // the root position/rotation chain is independent and still works.
+                if (skeletonBoneCount < 138)
+                {
+                    return null;
+                }
+
                 var entries = new BoneEntry[_allBones.Length];
 
                 for (int i = 0; i < _allBones.Length; i++)
@@ -149,6 +180,13 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
 
                     try
                     {
+                        // Bounds checking: skip bones with indices >= skeletonBoneCount (for simplified skeletons)
+                        if ((uint)bone >= (uint)skeletonBoneCount)
+                        {
+                            // This bone doesn't exist in this skeleton (e.g., Head=133 in 81-bone zombie rig)
+                            continue;
+                        }
+
                         // List element: itemsArr + 0x20 + boneIndex * 8 → Transform component → +0x10 → TransformInternal
                         ulong elemAddr = itemsArr + List.ArrStartOffset + (uint)bone * 0x8;
                         var transformComponent = Memory.ReadPtr(elemAddr, false);
@@ -200,18 +238,18 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld.Player
                 if (!hasAnchor || readyCount < 4)
                 {
                     Log.Write(AppLogLevel.Debug,
-                        $"[Skeleton] TryCreate failed — anchor={hasAnchor}, ready={readyCount}/{entries.Length}");
+                        $"[Skeleton] TryCreate failed — anchor={hasAnchor}, ready={readyCount}/{entries.Length} (skeletonBoneCount={skeletonBoneCount})");
                     return null;
                 }
 
-                var skeleton = new Skeleton(entries)
+                var skeleton = new Skeleton(entries, skeletonBoneCount)
                 {
                     TransformsReady = true,
                     IsInitialized = true
                 };
 
                 Log.Write(AppLogLevel.Debug,
-                    $"[Skeleton] Created — {readyCount}/{entries.Length} bones ready");
+                    $"[Skeleton] Created — {readyCount}/{entries.Length} bones ready (skeletonBoneCount={skeletonBoneCount})");
                 return skeleton;
             }
             catch (Exception ex)

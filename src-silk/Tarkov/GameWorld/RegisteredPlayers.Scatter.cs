@@ -412,32 +412,88 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
             // Use Try* variants throughout to avoid exception-as-control-flow.
             // A freshly-spawned ObservedPlayerView commonly has nulls in its pointer chain
             // for the first few hundred ms — that is expected, not an error.
-            uint lookOffset = entry.IsObserved
-                ? Offsets.ObservedPlayerView._playerLookRaycastTransform
-                : Offsets.Player._playerLookRaycastTransform;
 
-            if (!Memory.TryReadPtr(playerBase + lookOffset, out var lookTransformPtr, false)
-                || !lookTransformPtr.IsValidVirtualAddress())
+            bool isZombie = entry.Player.Name.Contains("Zombie", StringComparison.OrdinalIgnoreCase);
+
+            ulong transformPtr;
+
+            // Zombies don't have _playerLookRaycastTransform; use alternate path via PlayerBody.
+            // Infected variants are named "Infected"/"Raider" (labs override), so name matching is not
+            // reliable — also fall back to the PlayerBody path when the look transform is unavailable.
+            bool useBodyPath = isZombie && entry.IsObserved;
+            if (!useBodyPath && entry.IsObserved
+                && (!Memory.TryReadPtr(playerBase + Offsets.ObservedPlayerView._playerLookRaycastTransform, out var probeLook, false)
+                    || !probeLook.IsValidVirtualAddress()
+                    || !Memory.TryReadPtr(probeLook + 0x10, out var probeInternal, false)
+                    || !probeInternal.IsValidVirtualAddress()))
             {
-                entry.TransformReady = false;
-                return;
+                useBodyPath = true;
             }
 
-            if (!Memory.TryReadPtr(lookTransformPtr + 0x10, out var transformInternal, false)
-                || !transformInternal.IsValidVirtualAddress())
+            if (useBodyPath)
             {
-                entry.TransformReady = false;
-                return;
+                if (!Memory.TryReadPtr(playerBase + Offsets.ObservedPlayerView.PlayerBody, out var playerBodyPtr, false)
+                    || !playerBodyPtr.IsValidVirtualAddress())
+                {
+                    entry.TransformReady = false;
+                    return;
+                }
+
+                // PlayerBody → SkeletonRootJoint (DizSkinningSkeleton) → _values (List<Transform>) → _items → [0] → +0x10 → TransformInternal
+                if (!Memory.TryReadPtr(playerBodyPtr + SDK.Offsets.PlayerBody.SkeletonRootJoint, out var skeletonPtr, false)
+                    || !skeletonPtr.IsValidVirtualAddress()
+                    || !Memory.TryReadPtr(skeletonPtr + SDK.Offsets.DizSkinningSkeleton._values, out var valuesPtr, false)
+                    || !valuesPtr.IsValidVirtualAddress()
+                    || !Memory.TryReadPtr(valuesPtr + List.ArrOffset, out var itemsPtr, false)
+                    || !itemsPtr.IsValidVirtualAddress()
+                    || !Memory.TryReadPtr(itemsPtr + List.ArrStartOffset, out transformPtr, false)
+                    || !transformPtr.IsValidVirtualAddress())
+                {
+                    entry.TransformReady = false;
+                    return;
+                }
+
+                if (!Memory.TryReadPtr(transformPtr + 0x10, out var zombieTransformInternal, false)
+                    || !zombieTransformInternal.IsValidVirtualAddress())
+                {
+                    entry.TransformReady = false;
+                    return;
+                }
+
+                transformPtr = zombieTransformInternal;
+            }
+            else
+            {
+                // Standard path: _playerLookRaycastTransform
+                uint lookOffset = entry.IsObserved
+                    ? Offsets.ObservedPlayerView._playerLookRaycastTransform
+                    : Offsets.Player._playerLookRaycastTransform;
+
+                if (!Memory.TryReadPtr(playerBase + lookOffset, out var lookTransformPtr, false)
+                    || !lookTransformPtr.IsValidVirtualAddress())
+                {
+                    entry.TransformReady = false;
+                    return;
+                }
+
+                if (!Memory.TryReadPtr(lookTransformPtr + 0x10, out transformPtr, false)
+                    || !transformPtr.IsValidVirtualAddress())
+                {
+                    entry.TransformReady = false;
+                    return;
+                }
             }
 
-            if (!Memory.TryReadValue<int>(transformInternal + TransformAccess.IndexOffset, out var taIndex, false)
+            // From here on, transformPtr should be the TransformInternal
+            if (!Memory.TryReadValue<int>(transformPtr + TransformAccess.IndexOffset, out var taIndex, false)
                 || taIndex < 0 || taIndex > 128_000)
             {
                 entry.TransformReady = false;
                 return;
             }
 
-            if (!Memory.TryReadPtr(transformInternal + TransformAccess.HierarchyOffset, out var taHierarchy, false)
+
+            if (!Memory.TryReadPtr(transformPtr + TransformAccess.HierarchyOffset, out var taHierarchy, false)
                 || !taHierarchy.IsValidVirtualAddress())
             {
                 entry.TransformReady = false;
@@ -483,7 +539,7 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                 return;
             }
 
-            entry.TransformInternal = transformInternal;
+            entry.TransformInternal = transformPtr;
             entry.TransformIndex = taIndex;
             entry.VerticesAddr = verticesAddr;
             entry.CachedIndices = indices;
@@ -944,6 +1000,15 @@ namespace eft_dma_radar.Silk.Tarkov.GameWorld
                 var entry = entries[i];
                 if (!valid[i])
                 {
+                    // Zombies / simplified rigs have no _playerLookRaycastTransform — the batched
+                    // chain can't resolve them. Retry via the serial path, which has the PlayerBody fallback.
+                    if (entry.IsObserved)
+                    {
+                        TryInitTransform(entry.Base, entry);
+                        UpdateInitBackoff(entry, entry.TransformReady, isTransform: true, now);
+                        continue;
+                    }
+
                     UpdateInitBackoff(entry, success: false, isTransform: true, now);
                     continue;
                 }

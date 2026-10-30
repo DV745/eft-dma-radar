@@ -258,7 +258,7 @@ namespace SDK
             public static uint IsYourPlayer = 0xA91;
             public static uint VoipID = 0x8F8;
             public static uint Id = 0x900;
-            public static uint GameWorld = 0x5F0F268;
+            public static uint GameWorld = 0x690;
         }
         public readonly partial struct ObservedPlayerView
         {

@@ -1,0 +1,31 @@
+{
+  "mapID": [
+    "factory_event"
+  ],
+  "x": 64.9,
+  "y": 67,
+  "scale": 0.994,
+  "svgScale": 36.00,
+  "mapLayers": [
+    {
+		"minHeight": null,
+		"maxHeight": null,
+		"filename": "FactoryInfected.svg"
+    },
+    {
+		"minHeight": null,
+		"maxHeight": -0.8,
+		"filename": "Factory_-1fInfected.svg"
+    },
+	    {
+		"minHeight": 2.8,
+		"maxHeight": 6.5,
+		"filename": "Factory_2fInfected.svg"
+    },
+	    {
+		"minHeight": 6.5,
+		"maxHeight": null,
+		"filename": "Factory_3fInfected.svg"
+    }
+  ]
+}
