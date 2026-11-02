@@ -354,6 +354,141 @@ namespace eft_dma_radar.Arena.GameWorld
             }
         }
 
+        private static volatile bool _transformLayoutVerified;
+        private static readonly object _probeLock = new();
+
+        private static bool IsUnitQuat(ReadOnlySpan<float> f, int i)
+        {
+            if (i + 3 >= f.Length) return false;
+            float x = f[i], y = f[i + 1], z = f[i + 2], w = f[i + 3];
+            if (!float.IsFinite(x) || !float.IsFinite(y) || !float.IsFinite(z) || !float.IsFinite(w)) return false;
+            return MathF.Abs(x * x + y * y + z * z + w * w - 1f) < 0.02f;
+        }
+
+        private static bool FindWorldPos(byte[] hb, out uint posOff)
+        {
+            var f = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(hb);
+            for (int off = 0x20; off + 0x20 <= hb.Length; off += 0x10)
+            {
+                int i = off / 4;
+                float x = f[i], y = f[i + 1], z = f[i + 2];
+                if (!float.IsFinite(x) || !float.IsFinite(y) || !float.IsFinite(z)) continue;
+                if (y <= -500f || MathF.Abs(x) >= 4096f || MathF.Abs(y) >= 4096f || MathF.Abs(z) >= 4096f) continue;
+                if (x == 0f && y == 0f && z == 0f) continue;
+                if (!IsUnitQuat(f, i + 4)) continue;
+                posOff = (uint)off;
+                return true;
+            }
+            posOff = 0;
+            return false;
+        }
+
+        /// <summary>
+        /// Scans the native Transform / TransformHierarchy memory for the real field layout
+        /// (hierarchy pointer, index, world TRS, vertices and parent-index arrays) and updates
+        /// <see cref="TransformAccess"/> / <see cref="TransformHierarchy"/> offsets when a game update shifted them.
+        /// </summary>
+        private static void ProbeTransformLayout(ulong transformInternal)
+        {
+            if (_transformLayoutVerified) return;
+            lock (_probeLock)
+            {
+                if (_transformLayoutVerified) return;
+
+                var natives = new List<ulong> { transformInternal };
+                if (Memory.TryReadPtr(transformInternal + 0x10, out var inner, false) && inner.IsValidVirtualAddress())
+                    natives.Add(inner);
+
+                // Prefer the configured TransformAccess layout: if it already reaches a hierarchy with a
+                // plausible world TRS, only the world-position offset is refreshed.
+                foreach (var native in natives)
+                {
+                    if (!Memory.TryReadPtr(native + TransformAccess.HierarchyOffset, out var ch, false) || !ch.IsValidVirtualAddress())
+                        continue;
+                    var cb = new byte[0x240];
+                    if (!Memory.TryReadBuffer<byte>(ch, cb, false) || !FindWorldPos(cb, out uint cPos))
+                        continue;
+                    TransformHierarchy.WorldPositionOffset = cPos;
+                    TransformHierarchy.WorldRotationOffset = cPos + 0x10;
+                    _transformLayoutVerified = true;
+                    Log.WriteLine($"[RegisteredPlayers] Transform layout confirmed: TA.Hierarchy=0x{TransformAccess.HierarchyOffset:X} TA.Index=0x{TransformAccess.IndexOffset:X} TH.WorldPos=0x{cPos:X}");
+                    return;
+                }
+
+                foreach (var native in natives)
+                {
+                    var nb = new byte[0x80];
+                    if (!Memory.TryReadBuffer<byte>(native, nb, false)) continue;
+                    var nptr = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, ulong>(nb);
+                    var nint = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, int>(nb);
+
+                    for (int hi = 2; hi < nptr.Length; hi++)
+                    {
+                        ulong h = nptr[hi];
+                        if (!h.IsValidVirtualAddress()) continue;
+                        var hb = new byte[0x240];
+                        if (!Memory.TryReadBuffer<byte>(h, hb, false)) continue;
+                        if (!FindWorldPos(hb, out uint posOff)) continue;
+
+                        uint hierOff = (uint)(hi * 8);
+
+                        // Index: prefer the int right after the hierarchy pointer.
+                        int idxSlot = -1;
+                        int preferred = hi * 2 + 2;
+                        if (preferred < nint.Length && nint[preferred] >= 0 && nint[preferred] <= 128_000)
+                            idxSlot = preferred;
+                        else
+                        {
+                            for (int k = 2; k < nint.Length; k++)
+                                if (k / 2 != hi && nint[k] >= 0 && nint[k] <= 128_000) { idxSlot = k; break; }
+                        }
+                        if (idxSlot < 0) continue;
+                        int idx = nint[idxSlot];
+
+                        // Vertices (TrsX[], stride 0x30) and parent indices (int[], root = -1).
+                        var hptr = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, ulong>(hb);
+                        uint vertOff = 0, indOff = 0;
+                        for (int q = 1; q < hptr.Length; q++)
+                        {
+                            ulong p = hptr[q];
+                            if (!p.IsValidVirtualAddress() || q * 8 == posOff) continue;
+                            if (vertOff == 0)
+                            {
+                                var eb = new byte[0x30];
+                                if (Memory.TryReadBuffer<byte>(p + (ulong)idx * 0x30, eb, false))
+                                {
+                                    var ef = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(eb);
+                                    if (float.IsFinite(ef[0]) && float.IsFinite(ef[1]) && float.IsFinite(ef[2])
+                                        && MathF.Abs(ef[0]) < 4096f && MathF.Abs(ef[2]) < 4096f && IsUnitQuat(ef, 4))
+                                    {
+                                        vertOff = (uint)(q * 8);
+                                        continue;
+                                    }
+                                }
+                            }
+                            if (indOff == 0
+                                && Memory.TryReadValue<int>(p, out var first, false) && first == -1
+                                && Memory.TryReadValue<int>(p + (ulong)idx * 4, out var parent, false)
+                                && parent >= -1 && parent <= 128_000)
+                            {
+                                indOff = (uint)(q * 8);
+                            }
+                        }
+
+                        TransformAccess.HierarchyOffset = hierOff;
+                        TransformAccess.IndexOffset = (uint)(idxSlot * 4);
+                        TransformHierarchy.WorldPositionOffset = posOff;
+                        TransformHierarchy.WorldRotationOffset = posOff + 0x10;
+                        if (vertOff != 0) TransformHierarchy.VerticesOffset = vertOff;
+                        if (indOff != 0) TransformHierarchy.IndicesOffset = indOff;
+                        _transformLayoutVerified = true;
+                        Log.WriteLine($"[RegisteredPlayers] Transform layout auto-detected: TA.Hierarchy=0x{hierOff:X} TA.Index=0x{TransformAccess.IndexOffset:X} TH.WorldPos=0x{posOff:X} TH.Vertices=0x{TransformHierarchy.VerticesOffset:X} TH.Indices=0x{TransformHierarchy.IndicesOffset:X}");
+                        return;
+                    }
+                }
+            }
+        }
+
         private static bool TryInitTransform(Player player)
         {
             uint lookOffset = player.IsLocalPlayer
@@ -382,6 +517,9 @@ namespace eft_dma_radar.Arena.GameWorld
                     $"[RegisteredPlayers] TryInitTransform '{player.Name}': step2 transformInternal failed (lookTransform=0x{lookTransform:X})");
                 return false;
             }
+
+            // Step 2b: auto-detect the TransformAccess / TransformHierarchy layout (survives Unity updates)
+            ProbeTransformLayout(transformInternal);
 
             // Step 3: resolve native TransformAccess + hierarchy in one call (no double-read race)
             if (!ResolveNativeTransformInternal(transformInternal, out var nativeTi, out var hierarchy))
@@ -497,7 +635,7 @@ namespace eft_dma_radar.Arena.GameWorld
 
             if (player.IsLocalPlayer)
             {
-                // Local player: MovementContext Γ�Æ _rotation
+                // Local player: MovementContext Γ�Æ _rotation
                 if (!Memory.TryReadPtr(player.Base + Offsets.Player.MovementContext, out var movCtx, false)
                     || !movCtx.IsValidVirtualAddress())
                 {
@@ -509,7 +647,7 @@ namespace eft_dma_radar.Arena.GameWorld
             }
             else
             {
-                // Observed: ObservedPlayerController Γ�Æ MovementController Γ�Æ rotation
+                // Observed: ObservedPlayerController Γ�Æ MovementController Γ�Æ rotation
                 if (!Memory.TryReadPtr(player.Base + Offsets.ObservedPlayerView.ObservedPlayerController, out var opc, false)
                     || !opc.IsValidVirtualAddress())
                 {

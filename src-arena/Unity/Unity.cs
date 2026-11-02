@@ -24,16 +24,16 @@ namespace eft_dma_radar.Arena.Unity
             0x10,
         ];
         public const uint GomFallback = 0x21A4450;
-        public const uint AllCameras  = 0x19F3080;
+        public const uint AllCameras  = 0x1DA70C0;
         public static class ObjectClass { public const uint MonoBehaviourOffset = 0x10; }
         public static class Camera
         {
             // Arena Unity 6000.3.6.1f fallbacks (sig-scan still runs first):
             //   ViewMatrix: Camera::GetWorldToCameraMatrix body -> `lea rax, [rcx+88h]`
             //   FOV:        Camera_CUSTOM_GetGateFittedFieldOfView -> 2nd movss `[rcx+188h]`
-            public static uint ViewMatrix = 0x88;
-            public static uint FOV = 0x188;
-            public static uint AspectRatio = 0x4F8;
+            public static uint ViewMatrix = 0x90;
+            public static uint FOV = 0x190;
+            public static uint AspectRatio = 0x4F0;
             public const uint DerefIsAddedOffset = 0x35;
         }
         public static class List { public const uint ArrOffset = 0x10; public const uint ArrStartOffset = 0x20; }
@@ -49,12 +49,12 @@ namespace eft_dma_radar.Arena.Unity
             /// 0x40 slot pointed to a self+0x58 wrapper whose +0x48 aliased a managed pointer
             /// (producing the "taIndex out of range" / garbage-negative index reads).
             /// </summary>
-            public const uint HierarchyOffset = 0x40;
+            public static uint HierarchyOffset = 0x50;
             /// <summary>
             /// int32 transform index paired with HierarchyOffset. Values consistently fall in
             /// the small scene range (e.g. 0x23=35, 0x5F=95, 0x6F=111, 0x77=119) across players.
             /// </summary>
-            public const uint IndexOffset = 0x48;
+            public static uint IndexOffset = 0x58;
         }
         public static class TransformHierarchy
         {
@@ -67,11 +67,11 @@ namespace eft_dma_radar.Arena.Unity
             /// Since each player owns its own hierarchy, reading this single Vector3 is
             /// sufficient — no index walking or parent chain traversal required.
             /// </summary>
-            public const uint WorldPositionOffset = 0xB0;
+            public static uint WorldPositionOffset = 0xA0;
             /// <summary>
             /// Cached world-space rotation (Quaternion x,y,z,w) at h+0xC0.
             /// </summary>
-            public const uint WorldRotationOffset = 0xC0;
+            public static uint WorldRotationOffset = 0xB0;
 
             // ── Bone-chain offsets (used by per-player Skeleton) ──────────
             // The hierarchy's cached world position at +0xB0 only describes the
@@ -82,9 +82,9 @@ namespace eft_dma_radar.Arena.Unity
             // sentinel <0,-1000,0>), +0xA0 → int[] parent indices (first entry = -1
             // for root, branching pattern matches humanoid skeleton).
             /// <summary>TransformHierarchy + X → pointer to parent-indices array (int[]).</summary>
-            public const uint IndicesOffset  = 0x80;
+            public static uint IndicesOffset  = 0x68;
             /// <summary>TransformHierarchy + X → pointer to vertices array (TrsX[]).</summary>
-            public const uint VerticesOffset = 0xA0;
+            public static uint VerticesOffset = 0x40;
         }
         public static class UnityAnimator { public const uint Speed = 0x4B0; }
     }

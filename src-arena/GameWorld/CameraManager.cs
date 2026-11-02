@@ -45,7 +45,7 @@ namespace eft_dma_radar.Arena.GameWorld
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        private const int CameraCacheSchemaVersion = 2;
+        private const int CameraCacheSchemaVersion = 3;
 
         private sealed class CameraOffsetCache
         {
@@ -405,6 +405,21 @@ namespace eft_dma_radar.Arena.GameWorld
             {
                 _aspect = aspect;
                 arOk = true;
+            }
+
+            if (!arOk && TryProbeAspectOffset(FPSCamera, out var probedAr, out var probedAspect))
+            {
+                Log.WriteLine($"[CameraManager] Camera.AspectRatio probed: 0x{Camera.AspectRatio:X} -> 0x{probedAr:X} (AR={probedAspect:F3})");
+                Camera.AspectRatio = probedAr;
+                _aspect = probedAspect;
+                arOk = true;
+                SaveCameraCache();
+            }
+
+            if (!(vmOk && fovOk && arOk) && !IsReady)
+            {
+                Log.WriteRateLimited(AppLogLevel.Warning, "cam_notready", TimeSpan.FromSeconds(5),
+                    $"[CameraManager] Not ready - vm={vmOk} (0x{Camera.ViewMatrix:X}) fov={fovOk} (0x{Camera.FOV:X}) ar={arOk} (0x{Camera.AspectRatio:X}) FPSCamera=0x{FPSCamera:X}");
             }
 
             if (vmOk && fovOk && arOk)
@@ -935,6 +950,27 @@ namespace eft_dma_radar.Arena.GameWorld
         /// DumpCameraOffsets has been removed; the live offsets (VM=0x88, FOV=0x188, AR=0x4F8)
         /// were confirmed during development and are now hard-coded in UnityOffsets.Camera.
         /// </summary>
+
+        /// <summary>Scans the camera object for a float matching the viewport aspect ratio.</summary>
+        private static bool TryProbeAspectOffset(ulong cameraPtr, out uint offset, out float aspect)
+        {
+            offset = 0; aspect = 0;
+            float target = ViewportWidth > 0 && ViewportHeight > 0 ? (float)ViewportWidth / ViewportHeight : 16f / 9f;
+            var buf = new byte[0x800];
+            if (!Memory.TryReadBuffer<byte>(cameraPtr, buf, false))
+                return false;
+            var f = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(buf);
+            for (int i = 0x300 / 4; i < f.Length; i++)
+            {
+                if (MathF.Abs(f[i] - target) < 0.005f)
+                {
+                    offset = (uint)(i * 4);
+                    aspect = f[i];
+                    return true;
+                }
+            }
+            return false;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsFiniteMatrix(in Matrix4x4 m) =>

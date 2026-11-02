@@ -28,8 +28,8 @@ namespace SDK
         // Populated by TypeInfoTableResolver sig-scan at startup.
         public readonly partial struct Special
         {
-            public static ulong TypeInfoTableRva = 0x0;
-            public static uint GamePlayerOwner_TypeIndex = 0;
+            public static ulong TypeInfoTableRva = 0x8DB1F68;
+            public static uint GamePlayerOwner_TypeIndex = 0x377B;
         }
 
         // ── GameWorld / LocalGameWorld ──────────────────────────────────────
@@ -204,7 +204,7 @@ namespace SDK
         {
             public static uint OpticCameraManager = 0x10;
             public static uint Camera             = 0x68;
-            public static uint GetInstance_RVA    = 0x1C93300;
+            public static uint GetInstance_RVA    = 0x1DDCBD0;
         }
 
         // ── EFT.CameraControl.OpticCameraManager ────────────────────────────
