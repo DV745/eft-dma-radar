@@ -53,7 +53,7 @@ namespace eft_dma_radar.Arena.GameWorld
             MatchPositionLogger.Flush();
         }
 
-        private static void ProcessScatterResults(VmmScatter scatter, Player player)
+        private void ProcessScatterResults(VmmScatter scatter, Player player)
         {
             bool rotOk = true, posOk = true;
 
@@ -107,6 +107,10 @@ namespace eft_dma_radar.Arena.GameWorld
                             // the auto-reinit path kicks in.
                             posOk = false;
                         }
+                    }
+                    else if (!IsPlausiblePosition(player, worldPos, "realtime"))
+                    {
+                        sentinel = true; // garbage read: keep last good position, no error accounting
                     }
                     else
                     {
@@ -324,34 +328,30 @@ namespace eft_dma_radar.Arena.GameWorld
                 if (!float.IsFinite(wp.X) || !float.IsFinite(wp.Y) || !float.IsFinite(wp.Z)) continue;
                 if (wp.Y <= -500f) continue;       // sentinel: not spawned
                 if (wp.LengthSquared() < 1f) continue; // origin garbage
+                if (!IsPlausiblePosition(p, wp, "bones")) continue;
 
-                if (!p.RealtimeEstablished)
-                {
-                    // Realtime hasn't taken ownership yet ΓÇö bones are the only source of truth.
-                    p.Position = wp;
-                    p.HasValidPosition = true;
-                    MatchPositionLogger.RecordBone(p);
-                    continue;
-                }
-
-                // Realtime owns Position ΓÇö but verify it isn't stale. Compare against bones.
-                var delta = wp - p.Position;
-                if (delta.LengthSquared() >= StalePositionDivergenceSq)
-                {
-                    // Realtime read is succeeding but returning a frozen cached worldPos.
-                    // Trust the bones (they're animated every frame) and invalidate the
-                    // transform so the realtime worker rebuilds the hierarchy chain.
-                    p.Position = wp;
-                    p.HasValidPosition = true;
-                    p.TransformReady = false;
-                    p.RealtimeEstablished = false;
-                    p.ConsecutiveErrors = 0;
-                    p.LastPositionChangeMs = 0;
-                    MatchPositionLogger.RecordBone(p, wasStale: true);
-                    Log.WriteRateLimited(AppLogLevel.Debug, $"stale_pos_{p.Base:X}", TimeSpan.FromSeconds(5),
-                        $"[RegisteredPlayers] '{p.Name}': realtime position stale (╬ö={MathF.Sqrt(delta.LengthSquared()):F1}m) ΓÇö switched to bone-derived position, invalidating transform.");
-                }
+                // Realtime owns Position once established; bone reads were observed returning
+                // garbage positions, so they are only a fallback before realtime takes over.
+                if (p.RealtimeEstablished) continue;
+                p.Position = wp;
+                p.HasValidPosition = true;
+                MatchPositionLogger.RecordBone(p);
             }
+        }
+
+        // Arena maps are a few hundred metres across. A position far from the local player is a
+        // bad read (stale/recycled hierarchy), not a real location; accepting it makes the dot
+        // alternate between the true and bogus value.
+        private const float MaxPlausibleDistanceSq = 600f * 600f;
+
+        private bool IsPlausiblePosition(Player p, Vector3 pos, string source)
+        {
+            var local = LocalPlayer;
+            if (local is null || p.IsLocalPlayer || !local.HasValidPosition) return true;
+            if (Vector3.DistanceSquared(local.Position, pos) <= MaxPlausibleDistanceSq) return true;
+            Log.WriteRateLimited(AppLogLevel.Warning, $"implausible_{source}_{p.Base:X}", TimeSpan.FromSeconds(5),
+                $"[RegisteredPlayers] '{p.Name}': rejected implausible {source} position {pos} ({MathF.Sqrt(Vector3.DistanceSquared(local.Position, pos)):F0}m from local)");
+            return false;
         }
 
         private static volatile bool _transformLayoutVerified;

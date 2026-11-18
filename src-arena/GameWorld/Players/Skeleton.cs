@@ -188,7 +188,13 @@ namespace eft_dma_radar.Arena.GameWorld.Players
 
                         if (!Memory.TryReadValue<int>(transformInternal + TransformAccess.IndexOffset, out var taIndex, false) ||
                             taIndex < 0 || taIndex > 128_000)
+                        {
+                            Log.WriteRateLimited(AppLogLevel.Warning, $"skel_dx_idx_{playerBase:X}_{bone}", TimeSpan.FromSeconds(30),
+                                $"[Skeleton][DIAG] bone={bone} index check FAIL: ta=0x{transformInternal:X} +0x{TransformAccess.IndexOffset:X} -> {taIndex}");
                             continue;
+                        }
+
+                        DumpHierarchyDiag(playerBase, bone, transformInternal, taHierarchy, taIndex);
 
                         if (!Memory.TryReadPtr(taHierarchy + TransformHierarchy.VerticesOffset, out var verticesAddr, false) ||
                             !Memory.TryReadPtr(taHierarchy + TransformHierarchy.IndicesOffset, out var indicesAddr, false) ||
@@ -239,6 +245,30 @@ namespace eft_dma_radar.Arena.GameWorld.Players
                     $"[Skeleton] TryCreate exception: {ex.GetType().Name}: {ex.Message}");
                 return null;
             }
+        }
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<ulong, bool> _diagDone = new();
+
+        private static void DumpHierarchyDiag(ulong playerBase, Bones bone, ulong ta, ulong hier, int index)
+        {
+            if (bone != Bones.HumanSpine2) return;
+            if (_diagDone.Count >= 3 || !_diagDone.TryAdd(playerBase, true)) return;
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"[Skeleton][DIAG] base=0x{playerBase:X} bone={bone} ta=0x{ta:X} hier=0x{hier:X} index={index} cfg: V=0x{TransformHierarchy.VerticesOffset:X} I=0x{TransformHierarchy.IndicesOffset:X}");
+            for (uint off = 0x38; off <= 0xA8; off += 8)
+            {
+                if (!Memory.TryReadValue<ulong>(hier + off, out var raw, false)) { sb.Append($"\n  +0x{off:X}: <unreadable>"); continue; }
+                string desc = "";
+                if (raw.IsValidVirtualAddress())
+                {
+                    if (Memory.TryReadValue<int>(raw, out var i0, false) && Memory.TryReadValue<int>(raw + 4, out var i1, false))
+                        desc += $" int[0..1]=({i0},{i1})";
+                    if (Memory.TryReadValue<Vector3>(raw, out var v0, false))
+                        desc += $" vec3[0]=<{v0.X:F2},{v0.Y:F2},{v0.Z:F2}>";
+                }
+                sb.Append($"\n  +0x{off:X}: 0x{raw:X}{desc}");
+            }
+            Log.WriteLine(sb.ToString());
         }
 
         /// <summary>

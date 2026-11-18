@@ -37,7 +37,7 @@ namespace eft_dma_radar.Arena.GameWorld
         // first-chance BadPtr/Vmm exceptions are recoverable. Keeping the entry around for a
         // few extra ticks lets the next tick re-confirm the player instead of churning
         // remove â†’ re-discover (which makes them disappear from the overlay for ~1s+).
-        private const int MissingTicksBeforeRemoval = 5; // ~500ms
+        private const int MissingTicksBeforeRemoval = 30; // ~3s
 
         #endregion
 
@@ -273,6 +273,25 @@ namespace eft_dma_radar.Arena.GameWorld
                         // player appears at their last location immediately instead of <0,0,0>.
                         bool restoredCache = false;
                         ProfiledPosition cached = default;
+
+                        // Same player re-appearing at a new base address: take over the stale
+                        // (still-drawn) entry's last position and drop it, so there is no gap.
+                        foreach (var stale in _players)
+                        {
+                            var sp = stale.Value;
+                            if (sp.IsLocalPlayer || sp.MissingTicks <= 0 || stale.Key == ptr) continue;
+                            bool same = (player.ProfileId is string a && sp.ProfileId is string b && a == b)
+                                || (!string.IsNullOrEmpty(player.Name) && player.Name == sp.Name);
+                            if (!same) continue;
+                            if (sp.HasValidPosition && sp.Position.LengthSquared() > 1f)
+                            {
+                                var pos = new ProfiledPosition(sp.Position, sp.RotationYaw, sp.RotationPitch);
+                                if (sp.ProfileId is string spid) _lastPositionByProfile[spid] = pos;
+                                if (!string.IsNullOrEmpty(sp.Name)) _lastPositionByName[sp.Name] = pos;
+                            }
+                            _players.TryRemove(stale.Key, out _);
+                            break;
+                        }
                         bool foundCache = (player.ProfileId is string pid && _lastPositionByProfile.TryGetValue(pid, out cached))
                             || (!string.IsNullOrEmpty(player.Name) && _lastPositionByName.TryGetValue(player.Name, out cached));
                         if (foundCache && cached.Position.LengthSquared() > 1f)

@@ -195,7 +195,7 @@ namespace eft_dma_radar.Arena.UI
                     // Draw skeleton bones when available, otherwise a simple dot.
                     bool drewSkeleton = false;
                     float labelOffset;
-                    if (drawSkeletons && p.Skeleton is { IsInitialized: true } sk)
+                    if (drawSkeletons && useAdvanced && p.Skeleton is { IsInitialized: true } sk)
                     {
                         bool ok = useAdvanced
                             ? sk.UpdateScreenBuffer(contentMin, widgetW, widgetH)
